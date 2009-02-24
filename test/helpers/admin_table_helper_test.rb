@@ -33,13 +33,13 @@ class AdminTableHelperTest < ActiveSupport::TestCase
   end
 
   def test_typus_table_datetime_field
-    @resource = { }
-    @resource[:class] = Page
+
     post = posts(:published)
     Time::DATE_FORMATS[:post_short] = '%m/%y'
 
     output = typus_table_datetime_field(:created_at, post)
     assert_equal "<td>11/07</td>\n", output
+
   end
 
   def test_typus_table_boolean_field
