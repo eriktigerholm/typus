@@ -156,7 +156,7 @@ module AdminTableHelper
 
   def typus_table_datetime_field(attribute, item)
 
-    date_format = @resource[:class].typus_date_format(attribute)
+    date_format = item.class.typus_date_format(attribute)
 
     returning(String.new) do |html|
       html << <<-HTML
