@@ -157,12 +157,8 @@ module AdminTableHelper
   def typus_table_datetime_field(attribute, item)
 
     date_format = item.class.typus_date_format(attribute)
-
-    returning(String.new) do |html|
-      html << <<-HTML
-<td>#{!item.send(attribute).nil? ? item.send(attribute).to_s(date_format) : @resource[:class].typus_options_for(:nil)}</td>
-      HTML
-    end
+    value = !item.send(attribute).nil? ? item.send(attribute).to_s(date_format) : @resource[:class].typus_options_for(:nil)
+    return "<td>#{value}</td>\n"
 
   end
 
