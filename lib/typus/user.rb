@@ -106,9 +106,8 @@ module Typus
       end
 
       def set_token
-        record = "#{self.class.name}#{id}"
         chars = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
-        @attributes['token'] = chars.sort_by{rand}.to_s[0..12]
+        @attributes['token'] = Array.new(12) { chars.rand }.join
       end
 
     end

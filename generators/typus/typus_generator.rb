@@ -50,8 +50,10 @@ class TypusGenerator < Rails::Generator::Base
       m.file 'stylesheets/admin/reset.css', 'public/stylesheets/admin/reset.css'
       m.file 'javascripts/admin/application.js', 'public/javascripts/admin/application.js'
 
-      files = %w( spinner.gif trash.gif status_false.gif status_true.gif )
-      files.each { |file| m.file "images/admin/#{file}", "public/images/admin/#{file}" }
+      Dir["#{Rails.root}/vendor/plugins/typus/generators/typus/templates/images/admin/*"].each do |f|
+        base = File.basename(f)
+        m.file "images/admin/#{base}", "public/images/admin/#{base}"
+      end
 
       # Migration files
       m.migration_template 'db/create_typus_users.rb', 

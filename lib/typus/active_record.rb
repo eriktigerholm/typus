@@ -145,12 +145,9 @@ module Typus
       fields = typus_defaults_for(:order_by)
       return "`#{self.table_name}`.id ASC" if fields.empty?
 
-      order = []
-
-      fields.each do |field|
-        order_by = (field.include?('-')) ? "`#{self.table_name}`.#{field.delete('-')} DESC" : "`#{self.table_name}`.#{field} ASC"
-        order << order_by
-      end
+      order = fields.map do |field|
+                (field.include?('-')) ? "`#{self.table_name}`.#{field.delete('-')} DESC" : "`#{self.table_name}`.#{field} ASC"
+              end
 
       return order.join(', ')
 
@@ -161,7 +158,7 @@ module Typus
     #
     def typus_boolean(attribute = :default)
       boolean = Typus::Configuration.config[self.name]['fields']['options']['booleans'][attribute.to_s] rescue nil
-      boolean = "true, false" if boolean.nil?
+      boolean = 'true, false' if boolean.nil?
       return { :true => boolean.split(', ').first.humanize, 
                :false => boolean.split(', ').last.humanize }
     end
@@ -195,10 +192,9 @@ module Typus
 
       # If a search is performed.
       if query_params[:search]
-        search = []
-        self.typus_defaults_for(:search).each do |s|
-          search << ["LOWER(#{s}) LIKE '%#{query_params[:search]}%'"]
-        end
+        search = self.typus_defaults_for(:search).map do |s|
+                   ["LOWER(#{s}) LIKE '%#{query_params[:search]}%'"]
+                 end
         conditions = merge_conditions(conditions, search.join(' OR '))
       end
 

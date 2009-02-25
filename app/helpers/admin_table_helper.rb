@@ -81,17 +81,23 @@ module AdminTableHelper
     returning(String.new) do |html|
       headers = []
       fields.each do |key, value|
-        order_by = model.reflect_on_association(key.to_sym).primary_key_name rescue key
-        sort_order = (params[:sort_order] == 'asc') ? 'desc' : 'asc'
+
+        content = I18n.t(key.humanize, :default => key.humanize)
+
         if (model.model_fields.map(&:first).collect { |i| i.to_s }.include?(key) || model.reflect_on_all_associations(:belongs_to).map(&:name).include?(key.to_sym)) && params[:action] == 'index'
-          headers << <<-HTML
-<th>#{link_to "<div class=\"#{sort_order}\">#{t(key.humanize)}</div>", { :params => params.merge(:order_by => order_by, :sort_order => sort_order) }}</th>
-          HTML
-        else
-          headers << <<-HTML
-<th>#{t(key.humanize)}</th>
-          HTML
+          sort_order = case params[:sort_order]
+                       when 'asc':  'desc'
+                       when 'desc': 'asc'
+                       end
+          order_by = model.reflect_on_association(key.to_sym).primary_key_name rescue key
+          switch = (params[:order_by] == key) ? sort_order : ''
+          content = (link_to "<div class=\"#{switch}\">#{content}</div>", { :params => params.merge(:order_by => order_by, :sort_order => sort_order) })
         end
+
+        headers << <<-HTML
+<th>#{content}</th>
+        HTML
+
       end
       headers << "<th>&nbsp;</th>"
       html << <<-HTML

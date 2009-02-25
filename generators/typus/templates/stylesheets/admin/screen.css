@@ -1,5 +1,3 @@
-/* @override http://0.0.0.0:3000/stylesheets/admin/screen.css?1233398860 */
-
 /* @group Defaults */
 
 html {
@@ -383,6 +381,10 @@ a.on {
     #content table th a {
       color: #FFF!important;
     }
+
+    #content .asc { background: transparent url(/images/admin/arrow_up.gif) no-repeat right center; }
+
+    #content .desc { background: transparent url(/images/admin/arrow_down.gif) no-repeat right center; }
 
   #content table td.right {
     text-align: right;

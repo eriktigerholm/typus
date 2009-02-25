@@ -60,16 +60,9 @@ module Typus
       Typus::Configuration.roles.each do |key, value|
         all_resources += Typus::Configuration.roles[key].keys
       end
-      all_resources.uniq!
 
       resources = []
-      all_resources.each do |resource|
-        begin
-          resource.constantize
-        rescue
-          resources << resource
-        end
-      end
+      all_resources.uniq.each { |r| r.constantize rescue resources << r }
 
       return resources.uniq.sort
 
@@ -266,7 +259,6 @@ class Admin::#{model.pluralize}Controller < AdminController
 =end
 
 end
-
           RAW
 
           controller.puts(content)

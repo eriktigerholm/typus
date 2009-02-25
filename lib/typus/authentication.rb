@@ -39,9 +39,7 @@ protected
   #
   def generate_password(length = 8)
     chars = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
-    password = ""
-    1.upto(length) { |i| password << chars[rand(chars.size - 1)] }
-    return password
+    return Array.new(length) { chars.rand }.join
   end
 
   ##

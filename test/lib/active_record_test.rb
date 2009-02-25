@@ -245,9 +245,9 @@ class ActiveRecordTest < ActiveSupport::TestCase
       boolean_false = "(\"typus_users\".\"status\" = 'f')"
     end
 
-    params = { 'status' => 'true' }
+    params = { :status => 'true' }
     assert_equal boolean_true, TypusUser.build_conditions(params).first
-    params = { 'status' => 'false' }
+    params = { :status => 'false' }
     assert_equal boolean_false, TypusUser.build_conditions(params).first
 
   end
@@ -255,32 +255,33 @@ class ActiveRecordTest < ActiveSupport::TestCase
   def test_should_return_sql_conditions_on_filtering_typus_users_by_created_at
 
     expected = "(created_at BETWEEN '#{Time.today.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
-    params = { 'created_at' => 'today' }
+    params = { :created_at => 'today' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
     expected = "(created_at BETWEEN '#{6.days.ago.midnight.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
-    params = { 'created_at' => 'past_7_days' }
+    params = { :created_at => 'past_7_days' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
     expected = "(created_at BETWEEN '#{Time.today.last_month.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
-    params = { 'created_at' => 'this_month' }
+    params = { :created_at => 'this_month' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
     expected = "(created_at BETWEEN '#{Time.today.last_year.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
-    params = { 'created_at' => 'this_year' }
+    params = { :created_at => 'this_year' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
   end
 
   def test_should_return_sql_conditions_on_filtering_posts_by_published_at
     expected = "(published_at BETWEEN '#{Time.today.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
-    params = { 'published_at' => 'today' }
+    params = { :published_at => 'today' }
     assert_equal expected, Post.build_conditions(params).first
   end
 
   def test_should_return_sql_conditions_on_filtering_posts_by_string
-    # This case should verify when we have a filter like "Won't Fix"
-    # it's currently implemented, but not tested. :(
+    expected = "(\"typus_users\".\"roles\" = 'admin')"
+    params = { :roles => 'admin' }
+    assert_equal expected, TypusUser.build_conditions(params).first
   end
 
   def test_should_verify_previous_and_next_is_working
