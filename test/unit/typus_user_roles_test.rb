@@ -4,7 +4,7 @@ class TypusUserRolesTest < ActiveSupport::TestCase
 
   def test_should_get_list_of_roles
     roles = %w( admin designer editor )
-    assert_equal roles, Typus::Configuration.roles.map(&:first).reverse
+    assert_equal roles, Typus::Configuration.roles.map(&:first).sort
   end
 
   def test_admin_role_settings
