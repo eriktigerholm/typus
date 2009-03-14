@@ -68,7 +68,7 @@ module Typus
 
       all_resources = Typus::Configuration.roles.keys.map do |key|
                         Typus::Configuration.roles[key].keys
-                      end.flatten.sort.uniq!
+                      end.flatten.sort.uniq
 
       all_resources.delete_if { |x| models.include?(x) }
 
