@@ -88,4 +88,12 @@ class ConfigurationTest < ActiveSupport::TestCase
     assert_equal expected, Typus::Configuration.roles!
   end
 
+  def test_should_load_configuration_files_from_config_default
+    options = { :config_folder => 'vendor/plugins/typus/test/config/default' }
+    Typus::Configuration.stubs(:options).returns(options)
+    assert_not_equal Typus::Configuration.roles!, {}
+    assert_not_equal Typus::Configuration.config!, {}
+    assert_equal ['Typus'], Typus.resources
+  end
+
 end
