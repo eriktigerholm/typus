@@ -56,7 +56,7 @@ class AdminTableHelperTest < ActiveSupport::TestCase
     post = posts(:published)
     output = typus_table_string_field(:title, post, :title)
     expected = <<-HTML
-<td><a href=\"http://test.host/posts/edit/#{post.id}\">#{post.title}</a></td>
+<td><a href="http://test.host/posts/edit/#{post.id}">#{post.title}</a></td>
     HTML
 
     assert_equal expected, output
