@@ -51,6 +51,18 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 
   end
 
+  def test_typus_table_string_field_with_link
+
+    post = posts(:published)
+    output = typus_table_string_field(:title, post, :title)
+    expected = <<-HTML
+<td><a href=\"http://test.host/posts/edit/#{post.id}\">#{post.title}</a></td>
+    HTML
+
+    assert_equal expected, output
+
+  end
+
   def test_typus_table_tree_field
 
     return unless defined? ActiveRecord::Acts::Tree
