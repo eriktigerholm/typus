@@ -15,7 +15,7 @@ protected
     if session[:typus]
       set_current_user
     else
-      back_to = (request.env['REQUEST_URI'] == '/admin') ? nil : request.env['REQUEST_URI']
+      back_to = (request.env['REQUEST_URI'] == "/#{Typus::Configuration.options[:prefix]}") ? nil : request.env['REQUEST_URI']
       redirect_to admin_sign_in_path(:back_to => back_to)
     end
   end
@@ -26,12 +26,24 @@ protected
   # off from Typus.
   #
   def set_current_user
-    @current_user ||= Typus.user_class.find(session[:typus])
-    raise unless Typus::Configuration.roles.keys.include?(@current_user.roles)
+
+    @current_user = Typus.user_class.find(session[:typus])
+
+    unless Typus::Configuration.roles.keys.include?(@current_user.roles)
+      message = t("Typus user or role no longer exist.", :default => "Typus user or role no longer exist.")
+      raise
+    end
+
+    unless @current_user.status
+      back_to = (request.env['REQUEST_URI'] == "/#{Typus::Configuration.options[:prefix]}") ? nil : request.env['REQUEST_URI']
+      message = t("Your typus user has been disabled.", :default => "Your typus user has been disabled.")
+      raise
+    end
+
   rescue
-    flash[:error] = t("Error! Typus User or role doesn't exist.")
+    flash[:notice] = message
     session[:typus] = nil
-    redirect_to admin_sign_in_path
+    redirect_to admin_sign_in_path(:back_to => back_to)
   end
 
   ##
@@ -90,7 +102,7 @@ protected
 
     if message
       flash[:notice] = message
-      redirect_to :back rescue redirect_to admin_dashboard_url
+      redirect_to :back rescue redirect_to admin_dashboard_path
     end
 
   end
@@ -113,7 +125,7 @@ protected
 
     unless @current_user.can_perform?(@resource[:class], params[:action])
       flash[:notice] = message || t("{{current_user_role}} can't perform action. ({{action}})", :current_user_role => @current_user.roles.capitalize, :action => params[:action] )
-      redirect_to :back rescue redirect_to admin_dashboard_url
+      redirect_to :back rescue redirect_to admin_dashboard_path
     end
 
   end
@@ -128,7 +140,7 @@ protected
     action = params[:action]
     unless @current_user.can_perform?(controller.camelize, action, { :special => true })
       flash[:notice] = t("{{current_user_role}} can't go to {{action}} on {{controller}}", :current_user_role => @current_user.roles.capitalize, :action => action, :controller => controller.humanize.downcase)
-      redirect_to :back rescue redirect_to admin_dashboard_url
+      redirect_to :back rescue redirect_to admin_dashboard_path
     end
   end
 

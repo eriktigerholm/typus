@@ -17,13 +17,49 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.namespace :admin do |admin|
+
+    ##
+    # Generate routes for resources.
+    #
+    Typus.resources.each do |resource|
+      admin.connect "#{resource.underscore}/:action", :controller => resource.underscore, 
+                                                      :path_prefix => Typus::Configuration.options[:prefix]
+    end
+
     Typus.models.each do |m|
+
+      ##
+      # Collection routes depending on defined actions.
+      #
       collection = {}
       m.typus_actions_for(:index).each { |a| collection[a] = :any }
-      member = { :position => :any, :toggle => :any, :relate => :any, :unrelate => :any }
+
+      ##
+      # Member routes depending on fields & relationships.
+      #
+      member = {}
+
+      # Should be only available when acts_as_tree is available on the 
+      # model.
+      member[:position] = :any
+
+      # Should be only available if model has boolean attributes which 
+      # can be toggled.
+      member[:toggle] = :any
+
+      unless m.typus_defaults_for(:relationships).empty?
+        member[:relate] = :any
+        member[:unrelate] = :any
+      end
+
       m.typus_actions_for(:edit).each { |a| member[a] = :any }
-      admin.resources m.tableize, :collection => collection, :member => member, :path_prefix => Typus::Configuration.options[:prefix]
+
+      admin.resources m.tableize, :collection => collection, 
+                                  :member => member, 
+                                  :path_prefix => Typus::Configuration.options[:prefix]
+
     end
+
   end
 
 end

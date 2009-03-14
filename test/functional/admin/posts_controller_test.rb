@@ -19,10 +19,10 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     get :index
     assert_response :redirect
-    assert_redirected_to admin_sign_in_path(:back_to => '/admin/posts')
+    assert_redirected_to admin_sign_in_path(:back_to => '/typus/posts')
     get :edit, { :id => 1 }
     assert_response :redirect
-    assert_redirected_to admin_sign_in_path(:back_to => '/admin/posts')
+    assert_redirected_to admin_sign_in_path(:back_to => '/typus/posts')
 
   end
 
@@ -88,7 +88,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
   end
 
   def test_should_allow_admin_to_toggle_item
-    @request.env['HTTP_REFERER'] = '/admin/posts'
+    @request.env['HTTP_REFERER'] = '/typus/posts'
     post = posts(:unpublished)
     get :toggle, { :id => post.id, :field => 'status' }
     assert_response :redirect
@@ -108,7 +108,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
   def test_should_relate_category_to_post_which_is_a_habtm_relationship
     category = categories(:first)
     post_ = posts(:published)
-    @request.env['HTTP_REFERER'] = "/admin/posts/#{post_.id}/edit#categories"
+    @request.env['HTTP_REFERER'] = "/typus/posts/#{post_.id}/edit#categories"
     assert_difference('category.posts.count') do
       post :relate, { :id => post_.id, :related => { :model => 'Category', :id => category.id } }
     end
@@ -120,7 +120,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
   def test_should_unrelate_category_from_post_which_is_a_habtm_relationship
     category = categories(:first)
     post_ = posts(:published)
-    @request.env['HTTP_REFERER'] = "/admin/posts/#{post_.id}/edit#categories"
+    @request.env['HTTP_REFERER'] = "/typus/posts/#{post_.id}/edit#categories"
     assert_difference('category.posts.count', 0) do
       post :unrelate, { :id => post_.id, :resource => 'categories', :resource_id => category.id }
     end
@@ -137,7 +137,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     post_ = posts(:published)
 
-    @request.env['HTTP_REFERER'] = "/admin/posts/#{post_.id}/edit#assets"
+    @request.env['HTTP_REFERER'] = "/typus/posts/#{post_.id}/edit#assets"
 
     assert_difference('post_.assets.count', -1) do
       get :unrelate, { :id => post_.id, :resource => 'assets', :resource_id => post_.assets.first.id }
@@ -157,7 +157,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     get :new
     assert_response :redirect
-    assert_redirected_to admin_dashboard_url
+    assert_redirected_to admin_dashboard_path
 
     assert flash[:notice]
     assert_equal 'Designer can\'t perform action (new)', flash[:notice]
@@ -178,7 +178,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
   def test_should_disable_toggle_and_check_links_are_disabled
     Typus::Configuration.options[:toggle] = false
-    @request.env['HTTP_REFERER'] = '/admin/posts'
+    @request.env['HTTP_REFERER'] = '/typus/posts'
     post = posts(:unpublished)
     get :toggle, { :id => post.id, :field => 'status' }
     assert_response :redirect
@@ -190,7 +190,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_form_templates
-    get :create
+    get :new
     assert_response :success
     assert_match /datepicker_template_published_at/, @response.body
   end
@@ -201,10 +201,10 @@ class Admin::PostsControllerTest < ActionController::TestCase
     get :edit, { :id => post_.id }
     assert_response :success
     back_to = "/posts/#{post_.id}/edit"
-    re = /<a href="\/admin\/assets\/1\/edit(.*)">This is the caption\.<\/a>/
+    re = /<a href="\/typus\/assets\/1\/edit(.*)">This is the caption\.<\/a>/
     params = re.match(@response.body)
 
-    assert_equal params[1], "?back_to=%2Fadmin%2Fposts%2F1%2Fedit&amp;resource=posts&amp;resource_id=#{post_.id}"
+    assert_equal params[1], "?back_to=%2Ftypus%2Fposts%2F1%2Fedit&amp;resource=posts&amp;resource_id=#{post_.id}"
 
   end
 

@@ -14,19 +14,17 @@ module Typus
 
         attr_accessor :password
 
+        validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/
         validates_presence_of :email
-        validates_presence_of :password, :password_confirmation, :if => :new_record?
         validates_uniqueness_of :email
-        validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
-        validates_confirmation_of :password, :if => lambda { |i| i.new_record? or not i.password.blank? }
-        validates_length_of :password, :within => 8..40, :if => lambda { |i| i.new_record? or not i.password.blank? }
 
-        validates_inclusion_of :roles, 
-                               :in => self.roles, 
-                               :message => "has to be in #{Typus::Configuration.roles.keys.reverse.join(", ")}."
+        validates_confirmation_of :password, :if => :password_required?
+        validates_length_of :password, :within => 8..40, :if => :password_required?
+        validates_presence_of :password, :if => :password_required?
 
-        before_create :set_token
-        before_save :encrypt_password
+        validates_inclusion_of :roles, :in => roles, :message => "has to be #{Typus.roles_sentence}."
+
+        before_save :initialize_salt, :encrypt_password, :initialize_token
 
         include InstanceMethods
 
@@ -64,7 +62,7 @@ module Typus
       # Resources TypusUser has access to ...
       #
       def resources
-        Typus::Configuration.roles[self.roles].compact
+        Typus::Configuration.roles[roles].compact
       end
 
       def can_perform?(resource, action, options = {})
@@ -85,7 +83,8 @@ module Typus
                     end
         end
 
-        self.resources[resource.to_s].split(', ').include?(_action) rescue false
+        # OPTIMIZE
+        resources[resource.to_s].split(', ').include?(_action) rescue false
 
       end
 
@@ -95,19 +94,33 @@ module Typus
 
     protected
 
+      def generate_hash(string)
+        Digest::SHA1.hexdigest(string)
+      end
+
       def encrypt_password
         return if password.blank?
-        self.salt = Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{email}--") if new_record?
         self.crypted_password = encrypt(password)
       end
 
-      def encrypt(password)
-        Digest::SHA1.hexdigest("--#{salt}--#{password}")
+      def encrypt(string)
+        generate_hash("--#{salt}--#{string}")
       end
 
-      def set_token
-        chars = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
-        @attributes['token'] = Array.new(12) { chars.rand }.join
+      def initialize_salt
+        self.salt = generate_hash("--#{Time.now.utc.to_s}--#{email}--") if new_record?
+      end
+
+      def initialize_token
+        generate_token if new_record?
+      end
+
+      def generate_token
+        self.token = encrypt("--#{Time.now.utc.to_s}--#{password}--")
+      end
+
+      def password_required?
+        crypted_password.blank? || !password.blank?
       end
 
     end

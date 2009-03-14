@@ -3,13 +3,19 @@
   # This is a list of the available configuration options for Typus 
   # and their defaults. Update them to fit your application needs.
 
+  # Typus configuration options which you only can set from the 
+  # environments. Set them on `production.rb`, `development.rb` on 
+  # `config/environments` folder.
+
+  Typus::Configuration.options[:ignore_missing_translations] = true
+  Typus::Configuration.options[:prefix] = 'admin'
+
   # Typus system wide options
 
   Typus::Configuration.options[:app_name] = '<%= application %>'
   Typus::Configuration.options[:config_folder] = 'config/typus'
   Typus::Configuration.options[:email] = 'admin@example.com'
-  Typus::Configuration.options[:ignore_missing_translations] = true
-  Typus::Configuration.options[:prefix] = 'admin'
+  Typus::Configuration.options[:locales] = [ [ "English", :en ], [ "Español", :es ] ]
   Typus::Configuration.options[:recover_password] = true
   Typus::Configuration.options[:root] = 'admin'
   Typus::Configuration.options[:ssl] = false

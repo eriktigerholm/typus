@@ -3,6 +3,9 @@ require 'test/helper'
 class TypusHelperTest < ActiveSupport::TestCase
 
   include TypusHelper
+  include ActionView::Helpers::UrlHelper
+  include ActionView::Helpers::TextHelper
+  include ActionController::UrlWriter
 
   def test_applications
     assert true
@@ -19,22 +22,40 @@ class TypusHelperTest < ActiveSupport::TestCase
 
   def test_page_title
     params = {}
-    Typus::Configuration.options[:app_name] = 'whatistypus.com'
+    options = { :app_name => 'whatistypus.com' }
+    Typus::Configuration.stubs(:options).returns(options)
     output = page_title('custom_action')
     assert_equal 'whatistypus.com &rsaquo; Custom action', output
   end
 
   def test_header
-    output = header
-    assert_match /#{Typus::Configuration.options[:app_name]}/, output
-  end
 
-  def test_login_info
-    assert true
+    output = header
+    expected = <<-HTML
+<h1>#{Typus::Configuration.options[:app_name]} </h1>
+    HTML
+
+    assert_equal expected, output
+
   end
 
   def test_display_flash_message
-    assert true
+
+    message = { :test => 'This is the message.' }
+
+    output = display_flash_message(message)
+    expected = <<-HTML
+<div id="flash" class="test">
+  <p>This is the message.</p>
+</div>
+    HTML
+
+    assert_equal expected, output
+
+    message = {}
+    output = display_flash_message(message)
+    assert output.nil?
+
   end
 
   def test_typus_message
@@ -49,19 +70,19 @@ class TypusHelperTest < ActiveSupport::TestCase
 
   def test_locales
 
-    Typus::Configuration.options[:locales] = [ [ "English", :en ], [ "Español", :es ] ]
+    options = { :locales => [ [ "English", :en ], [ "Español", :es ] ] }
+    Typus::Configuration.stubs(:options).returns(options)
 
     output = locales('set_locale')
     expected = <<-HTML
 <ul>
-  <li>Set language:</li>
-  <li><a href="set_locale?en">English</a></li>
-  <li><a href="set_locale?es">Español</a></li>
+<li>Set language:</li>
+<li><a href="set_locale?en">English</a></li>
+<li><a href="set_locale?es">Español</a></li>
+
 </ul>
     HTML
     assert_equal expected, output
-
-    Typus::Configuration.options[:locales] = [ [ "English", :en ] ]
 
   end
 

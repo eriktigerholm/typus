@@ -5,12 +5,10 @@ class ActiveRecord::Base
     options = args.extract_options!
     display_id = new_record? ? 'new' : id
 
-    dom = [ options[:prefix], 
-            self.class.name.underscore, 
-            display_id, 
-            options[:suffix] ]
-
-    return dom.compact.join('_')
+    [ options[:prefix], 
+      self.class.name.underscore, 
+      display_id, 
+      options[:suffix] ].compact.join('_')
 
   end
 

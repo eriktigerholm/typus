@@ -8,7 +8,9 @@ class TypusController < ApplicationController
 
   if Typus::Configuration.options[:ssl]
     include SslRequirement
-    ssl_required :dashboard, :overview, :sign_in, :sign_out, :recover_password, :reset_password
+    ssl_required :sign_in, :sign_out, 
+                 :dashboard, :overview, 
+                 :recover_password, :reset_password
   end
 
   filter_parameter_logging :password
@@ -18,11 +20,14 @@ class TypusController < ApplicationController
   before_filter :reload_config_et_roles
   before_filter :require_login, 
                 :except => [ :sign_up, :sign_in, :sign_out, 
-                             :recover_password, :reset_password, :quick_edit ]
+                             :recover_password, :reset_password, 
+                             :quick_edit ]
 
   before_filter :check_if_user_can_perform_action_on_resource_without_model, 
                 :except => [ :sign_up, :sign_in, :sign_out, 
-                             :overview, :dashboard, :recover_password, :reset_password, :quick_edit, :set_locale ]
+                             :dashboard, :overview, 
+                             :recover_password, :reset_password, 
+                             :quick_edit, :set_locale ]
 
   before_filter :recover_password_disabled?, 
                 :only => [ :recover_password, :reset_password ]
@@ -80,7 +85,7 @@ class TypusController < ApplicationController
         flash[:success] = t("Password recovery link sent to your email.")
         redirect_to admin_sign_in_path
       else
-        redirect_to admin_recover_password_url
+        redirect_to admin_recover_password_path
       end
     end
   end
@@ -127,7 +132,7 @@ class TypusController < ApplicationController
 
     else
 
-      flash[:success] = t("Welcome! Write your email to create the first user.")
+      flash[:notice] = t("Write your email to create the first user.")
 
     end
 

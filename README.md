@@ -92,6 +92,14 @@ from the yaml files under `config/typus`.
         start_year: 1990
         toggle: true
 
+### Recover password
+
+Recover password is disabled by default. To enable it you should 
+provide an email address which will be shown as the sender.
+
+    Typus::Configuration.options[:email] = 'typus@application.com'
+    Typus::Configuration.options[:recover_password] = true
+
 ### Special Route
 
 To overwrite the default prefix path of your application place the 
@@ -99,6 +107,14 @@ following configuration option on `development.rb`, `production.rb`
 on the `config/environments` folder.
 
     Typus::Configuration.options[:prefix] = "backoffice"
+
+### View Missing Translations
+
+If you are a developer who wants to translate Typus, add the following 
+setting on `development.rb` on the `config/environments` folder so all 
+missing translations messages will be shown.
+
+    Typus::Configuration.options[:ignore_missing_translations] = false
 
 ### Disable password recover
 
@@ -527,6 +543,10 @@ example, the user Francesc Esplugas:
       Post: create, read, update, delete
 
 ## Testing the plugin
+
+You need to have `mocha` to test the plugin.
+
+    $ sudo gem install mocha
 
 Use the following steps to test the plugin.
 

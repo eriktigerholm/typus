@@ -3,9 +3,11 @@ published:
   title: Published Page
   body: Content of the published page.
   status: true
+  parent_id:
 
 unpublished:
   id: 2
   title: Unpublished Page
   body: Content of the unpublished page.
   status: false
+  parent_id: 1

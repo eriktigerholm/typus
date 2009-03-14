@@ -9,3 +9,15 @@ second:
   email: me@example.com
   body: Body of the comment
   post_id: 1
+
+without_post_id:
+  id: 3
+  email: john@example.com
+  body: Body of the comment
+  post_id: 
+
+with_post_id:
+  id: 4
+  email: me@example.com
+  body: Body of the comment
+  post_id: 1

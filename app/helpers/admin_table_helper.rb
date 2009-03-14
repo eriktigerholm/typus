@@ -3,7 +3,7 @@ module AdminTableHelper
   ##
   # All helpers related to table.
   #
-  def build_typus_table(model, fields, items, link_options = { } )
+  def build_typus_table(model, fields, items, link_options = {})
 
     returning(String.new) do |html|
 
@@ -109,11 +109,12 @@ module AdminTableHelper
   end
 
   def typus_table_belongs_to_field(attribute, item)
-    if item.send(attribute).kind_of?(NilClass)
-      "<td></td>"
-    else
-      "<td>#{link_to item.send(attribute).typus_name, :controller => attribute.pluralize, :action => 'edit', :id => item.send(attribute).id}</td>"
-    end
+    content = if !item.send(attribute).kind_of?(NilClass)
+                link_to item.send(attribute).typus_name, :controller => attribute.pluralize, :action => 'edit', :id => item.send(attribute).id
+              end
+    <<-HTML
+<td>#{content}</td>
+    HTML
   end
 
   def typus_table_has_and_belongs_to_many_field(attribute, item)
@@ -128,17 +129,14 @@ module AdminTableHelper
   # types.
   #
   def typus_table_string_field(attribute, item, first_field, link_options = {})
-    returning(String.new) do |html|
-      if first_field == attribute
-        html << <<-HTML
-<td>#{link_to item.send(attribute) || @resource[:class].typus_options_for(:nil), link_options.merge(:controller => item.class.name.tableize, :action => 'edit', :id => item.id)}</td>
-        HTML
-      else
-        html << <<-HTML
-<td>#{item.send(attribute)}</td>
-        HTML
-      end
-    end
+    content = if first_field == attribute
+                link_to item.send(attribute) || item.class.typus_options_for(:nil), link_options.merge(:controller => item.class.name.tableize, :action => 'edit', :id => item.id)
+              else
+                item.send(attribute)
+              end
+    <<-HTML
+<td>#{content}</td>
+    HTML
   end
 
   def typus_table_tree_field(attribute, item)
@@ -148,56 +146,61 @@ module AdminTableHelper
   end
 
   def typus_table_position_field(attribute, item)
-    returning(String.new) do |html|
-      html_position = [["Up", "move_higher"], ["Down", "move_lower"]].map do |position|
-                        <<-HTML
-#{link_to t(position.first), :params => params.merge(:controller => item.class.name.tableize, :action => 'position', :id => item.id, :go => position.last)}
-                        HTML
-                      end
-      html << <<-HTML
-<td>#{html_position.join('/ ')}</td>
+
+    html_position = []
+
+    [['Up', 'move_higher'], ['Down', 'move_lower']].each do |position|
+
+      options = { :controller => item.class.name.tableize, 
+                  :action => 'position', 
+                  :id => item.id, 
+                  :go => position.last }
+
+      html_position << <<-HTML
+#{link_to t(position.first), :params => params.merge(options)}
       HTML
+
     end
+
+    <<-HTML
+<td>#{html_position.join('/ ')}</td>
+    HTML
+
   end
 
   def typus_table_datetime_field(attribute, item)
 
     date_format = item.class.typus_date_format(attribute)
-    value = !item.send(attribute).nil? ? item.send(attribute).to_s(date_format) : @resource[:class].typus_options_for(:nil)
-    return "<td>#{value}</td>\n"
+    value = !item.send(attribute).nil? ? item.send(attribute).to_s(date_format) : item.class.typus_options_for(:nil)
+
+    <<-HTML
+<td>#{value}</td>
+    HTML
 
   end
 
   def typus_table_boolean_field(attribute, item)
 
-    boolean_icon = @resource[:class].typus_options_for(:icon_on_boolean)
-    boolean_hash = @resource[:class].typus_boolean(attribute)
+    boolean_icon = item.class.typus_options_for(:icon_on_boolean)
+    boolean_hash = item.class.typus_boolean(attribute)
 
-    unless item.send(attribute).nil?
-      status = item.send(attribute)
-      content = (boolean_icon) ? image_tag("admin/status_#{status}.gif") : boolean_hash["#{status}".to_sym]
-    else
-      # Content is nil, so we show nil.
-      content = @resource[:class].typus_options_for(:nil)
-    end
+    status = item.send(attribute)
 
-    returning(String.new) do |html|
+    link_text = unless item.send(attribute).nil?
+                  (boolean_icon) ? image_tag("admin/status_#{status}.gif") : boolean_hash["#{status}".to_sym]
+                else
+                  item.class.typus_options_for(:nil) # Content is nil, so we show nil.
+                end
 
-      if @resource[:class].typus_options_for(:toggle) && !item.send(attribute).nil?
-        html << <<-HTML
-<td align="center">
-  #{link_to content, {:params => params.merge(:controller => item.class.name.tableize, :action => 'toggle', :field => attribute, :id => item.id)} , :confirm => "Change #{attribute.humanize.downcase}?"}
-</td>
-        HTML
-      else
-        html << <<-HTML
-<td align="center">
-  #{content}
-</td>
-        HTML
-      end
+    content = if item.class.typus_options_for(:toggle) && !item.send(attribute).nil?
+                link_to link_text, { :params => params.merge(:controller => item.class.name.tableize, :action => 'toggle', :field => attribute, :id => item.id) } , :confirm => "Change #{attribute.humanize.downcase}?"
+              else
+                link_text
+              end
 
-    end
+    <<-HTML
+<td align="center">#{content}</td>
+    HTML
 
   end
 

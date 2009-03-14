@@ -5,14 +5,17 @@ admin:
   TypusUser: create, read, update, delete
   Page: create, read, update, delete
   Post: create, read, update, delete
-  Status: index
   Order:
+  Status: index
+  WatchDog: index, cleanup
+  Git: index, commit
 
 editor:
   Category: create, read, update
   Comment: read, update, delete
   Post: create, read, update
   TypusUser: read, update
+  Git: index
 
 designer:
   Category: read, update

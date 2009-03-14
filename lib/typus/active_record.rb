@@ -29,7 +29,7 @@ module Typus
       fields_with_type = ActiveSupport::OrderedHash.new
 
       begin
-        fields = Typus::Configuration.config[self.name]['fields'][filter.to_s]
+        fields = Typus::Configuration.config[name]['fields'][filter.to_s]
         fields = fields.split(', ').collect { |f| f.to_sym }
       rescue
         return [] if filter == 'list'
@@ -41,7 +41,7 @@ module Typus
 
         fields.each do |field|
 
-          attribute_type = self.model_fields[field]
+          attribute_type = model_fields[field]
 
           # Custom field_type depending on the attribute name.
           case field.to_s
@@ -51,11 +51,11 @@ module Typus
             when 'position':        attribute_type = :position
           end
 
-          if self.reflect_on_association(field)
-            attribute_type = self.reflect_on_association(field).macro
+          if reflect_on_association(field)
+            attribute_type = reflect_on_association(field).macro
           end
 
-          if self.typus_field_options_for(:selectors).include?(field)
+          if typus_field_options_for(:selectors).include?(field)
             attribute_type = :selector
           end
 
@@ -66,7 +66,7 @@ module Typus
         end
 
       rescue
-        fields = Typus::Configuration.config[self.name]['fields']['list'].split(', ')
+        fields = Typus::Configuration.config[name]['fields']['list'].split(', ')
         retry
       end
 
@@ -81,14 +81,14 @@ module Typus
 
       fields_with_type = ActiveSupport::OrderedHash.new
 
-      data = Typus::Configuration.config[self.name]['filters']
+      data = Typus::Configuration.config[name]['filters']
       return [] unless data
       fields = data.split(', ').collect { |i| i.to_sym }
 
       fields.each do |field|
-        attribute_type = self.model_fields[field.to_sym]
-        if self.reflect_on_association(field.to_sym)
-          attribute_type = self.reflect_on_association(field.to_sym).macro
+        attribute_type = model_fields[field.to_sym]
+        if reflect_on_association(field.to_sym)
+          attribute_type = reflect_on_association(field.to_sym).macro
         end
         fields_with_type[field.to_s] = attribute_type
       end
@@ -101,7 +101,7 @@ module Typus
     #  Extended actions for this model on Typus.
     #
     def typus_actions_for(filter)
-      Typus::Configuration.config[self.name]['actions'][filter.to_s].split(', ')
+      Typus::Configuration.config[name]['actions'][filter.to_s].split(', ')
     rescue
       []
     end
@@ -110,7 +110,7 @@ module Typus
     # Used for +search+, +relationships+
     #
     def typus_defaults_for(filter)
-      data = Typus::Configuration.config[self.name][filter.to_s]
+      data = Typus::Configuration.config[name][filter.to_s]
       return (!data.nil?) ? data.split(', ') : []
     end
 
@@ -118,7 +118,7 @@ module Typus
     #
     #
     def typus_field_options_for(filter)
-      Typus::Configuration.config[self.name]['fields']['options'][filter.to_s].split(', ').collect { |i| i.to_sym }
+      Typus::Configuration.config[name]['fields']['options'][filter.to_s].split(', ').collect { |i| i.to_sym }
     rescue
       []
     end
@@ -128,7 +128,7 @@ module Typus
     #
     def typus_options_for(filter)
 
-      data = Typus::Configuration.config[self.name]
+      data = Typus::Configuration.config[name]
       unless data['options'].nil?
         value = data['options'][filter.to_s] unless data['options'][filter.to_s].nil?
       end
@@ -143,10 +143,10 @@ module Typus
     def typus_order_by
 
       fields = typus_defaults_for(:order_by)
-      return "`#{self.table_name}`.id ASC" if fields.empty?
+      return "`#{table_name}`.id ASC" if fields.empty?
 
       order = fields.map do |field|
-                (field.include?('-')) ? "`#{self.table_name}`.#{field.delete('-')} DESC" : "`#{self.table_name}`.#{field} ASC"
+                (field.include?('-')) ? "`#{table_name}`.#{field.delete('-')} DESC" : "`#{table_name}`.#{field} ASC"
               end
 
       return order.join(', ')
@@ -157,7 +157,7 @@ module Typus
     # We are able to define our own booleans.
     #
     def typus_boolean(attribute = :default)
-      boolean = Typus::Configuration.config[self.name]['fields']['options']['booleans'][attribute.to_s] rescue nil
+      boolean = Typus::Configuration.config[name]['fields']['options']['booleans'][attribute.to_s] rescue nil
       boolean = 'true, false' if boolean.nil?
       return { :true => boolean.split(', ').first.humanize, 
                :false => boolean.split(', ').last.humanize }
@@ -167,7 +167,7 @@ module Typus
     # We are able to define how to display dates on Typus
     #
     def typus_date_format(attribute = :default)
-      date_format = Typus::Configuration.config[self.name]['fields']['options']['date_formats'][attribute.to_s] rescue nil
+      date_format = Typus::Configuration.config[name]['fields']['options']['date_formats'][attribute.to_s] rescue nil
       date_format = :db if date_format.nil?
       return date_format.to_sym
     end
@@ -176,7 +176,7 @@ module Typus
     # We are able to define which template to use to render the attribute within the form
     #
     def typus_template(attribute)
-      template = Typus::Configuration.config[self.name]['fields']['options']['templates'][attribute.to_s] rescue nil
+      template = Typus::Configuration.config[name]['fields']['options']['templates'][attribute.to_s] rescue nil
       return template
     end
 
@@ -192,7 +192,7 @@ module Typus
 
       # If a search is performed.
       if query_params[:search]
-        search = self.typus_defaults_for(:search).map do |s|
+        search = typus_defaults_for(:search).map do |s|
                    ["LOWER(#{s}) LIKE '%#{query_params[:search]}%'"]
                  end
         conditions = merge_conditions(conditions, search.join(' OR '))
@@ -200,7 +200,7 @@ module Typus
 
       query_params.each do |key, value|
 
-        filter_type = self.model_fields[key.to_sym] || self.model_relationships[key.to_sym]
+        filter_type = model_fields[key.to_sym] || model_relationships[key.to_sym]
 
         ##
         # Sidebar filters:
@@ -241,41 +241,29 @@ module Typus
 
   module InstanceMethods
 
-    def previous_and_next(condition = {})
+    def previous_and_next(condition = {}, klass = self.class)
 
-      conditions = if condition.empty?
-                     "id < #{self.id}"
-                   else
-                     self.class.build_conditions(condition) \
-                     << " AND id != #{self.id}"
-                   end
+      previous_conditions = "id < #{id}"
+      next_conditions = "id > #{id}"
 
-      previous_ = self.class.find :first, 
-                                  :select => [:id], 
-                                  :order => "id DESC", 
-                                  :conditions => conditions
+      if !condition.empty?
+        conditions, joins = klass.build_conditions(condition)
+        previous_conditions += " AND #{conditions}"
+        next_conditions += " AND #{conditions}"
+      end
 
-      conditions = if condition.empty?
-                     "id > #{self.id}"
-                   else
-                     self.class.build_conditions(condition) \
-                     << " AND id != #{self.id}"
-                   end
+      previous_ = klass.find :first, 
+                             :select => [:id], 
+                             :order => "id DESC", 
+                             :conditions => previous_conditions
 
-      next_ = self.class.find :first, 
-                              :select => [:id], 
-                              :order => "id ASC", 
-                              :conditions => conditions
+      next_ = klass.find :first, 
+                         :select => [:id], 
+                         :order => "id ASC", 
+                         :conditions => next_conditions
 
       return previous_, next_
 
-    end
-
-    ##
-    # Used by acts_as_tree to detect children.
-    #
-    def has_children?
-      children.size > 0
     end
 
     ##

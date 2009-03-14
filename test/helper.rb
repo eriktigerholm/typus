@@ -2,17 +2,24 @@
 ENV['RAILS_ENV'] = 'test'
 require File.expand_path(File.dirname(__FILE__) + "/../../../../config/environment")
 require 'test_help'
+require 'mocha'
+require 'redgreen'
 
 ##
 # Test with different DB settings
 #
 connection = case ENV['DB']
              when /mysql/
-               { :adapter => 'mysql', :username => 'root', :database => 'typus_test' }
+               { :adapter => 'mysql', 
+                 :username => 'root', 
+                 :database => 'typus_test' }
              when /postgresql/
-               { :adapter => 'postgresql', :encoding => 'unicode', :database => 'typus_test' }
+               { :adapter => 'postgresql', 
+                 :encoding => 'unicode', 
+                 :database => 'typus_test' }
              else
-               { :adapter => "sqlite3", :dbfile => ":memory:" }
+               { :adapter => 'sqlite3', 
+                 :dbfile => ':memory:' }
              end
 
 ActiveRecord::Base.establish_connection(connection)

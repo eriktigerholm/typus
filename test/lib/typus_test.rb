@@ -57,7 +57,8 @@ class TypusTest < ActiveSupport::TestCase
 
   def test_should_verify_resources_class_method
     assert Typus.respond_to?(:resources)
-    assert_equal %w( Status ), Typus.resources
+    models = Typus.models
+    assert_equal %w( Git Status WatchDog ), Typus.resources(models)
   end
 
   def test_should_return_description_of_module
@@ -78,9 +79,9 @@ class TypusTest < ActiveSupport::TestCase
   end
 
   def test_should_return_overwritted_user_class
-    Typus::Configuration.options[:user_class_name] = 'CustomUser'
+    options = { :user_class_name => 'CustomUser' }
+    Typus::Configuration.stubs(:options).returns(options)
     assert_equal CustomUser, Typus.user_class
-    Typus::Configuration.options[:user_class_name] = 'TypusUser'
   end
 
   def test_should_return_user_fk
@@ -88,9 +89,30 @@ class TypusTest < ActiveSupport::TestCase
   end
 
   def test_should_return_overwritted_user_fk
-    Typus::Configuration.options[:user_fk] = 'my_user_fk'
+    options = { :user_fk => 'my_user_fk' }
+    Typus::Configuration.stubs(:options).returns(options)
     assert_equal 'my_user_fk', Typus.user_fk
-    Typus::Configuration.options[:user_fk] = 'typus_user_id'
+  end
+
+  def test_should_verify_to_sentence_options
+
+    assert Typus.respond_to?(:to_sentence_options)
+    assert Typus.to_sentence_options.kind_of?(Hash)
+
+    expected = if Rails.version == '2.2.2'
+                 { :skip_last_comma => true, :connector => '&' }
+               else
+                 { :words_connector => ', ', :last_word_connector => ' & ' }
+               end
+    assert_equal expected, Typus.to_sentence_options
+
+    expected = if Rails.version == '2.2.2'
+                 { :skip_last_comma => true, :connector => 'or' }
+               else
+                 { :words_connector => ', ', :last_word_connector => ' or ' }
+               end
+    assert_equal expected, Typus.to_sentence_options('or')
+
   end
 
 end

@@ -6,29 +6,29 @@ module AdminHelper
   include AdminFormHelper
   include AdminTableHelper
 
-  def display_link_to_previous
+  def display_link_to_previous(klass_name = @resource[:class_name], _params = params)
 
-    options = { }
-    options[:resource_from] = @resource[:class_name].titleize
-    options[:resource_to] = params[:resource].classify.titleize if params[:resource]
+    options = {}
+    options[:resource_from] = klass_name.titleize
+    options[:resource_to] = _params[:resource].classify.titleize if _params[:resource]
 
-    editing = %w( edit update ).include?(params[:action])
+    editing = %w( edit update ).include?(_params[:action])
 
     message = case
-              when params[:resource] && editing
-                t("You're updating a {{resource_from}} for a {{resource_to}}", options)
+              when _params[:resource] && editing
+                I18n.t("You're updating a {{resource_from}} for {{resource_to}}", options)
               when editing
-                t("You're updating a {{resource_from}}", options)
-              when params[:resource]
-                t("You're adding a new {{resource_from}} to a {{resource_to}}", options)
+                I18n.t("You're updating a {{resource_from}}", options)
+              when _params[:resource]
+                I18n.t("You're adding a new {{resource_from}} to {{resource_to}}", options)
               else
-                t("You're adding a new {{resource_from}}", options)
+                I18n.t("You're adding a new {{resource_from}}", options)
               end
 
     returning(String.new) do |html|
       html << <<-HTML
 <div id="flash" class="notice">
-<p>#{ message + t("Do you want to cancel it?") + link_to(t("Click here"), params[:back_to]) }.</p>
+  <p>#{message} #{link_to(I18n.t("Do you want to cancel it?"), _params[:back_to])}</p>
 </div>
       HTML
     end
@@ -47,7 +47,7 @@ module AdminHelper
   # display, this will be used, otherwise we use a default table which 
   # it's build from the options defined on the yaml configuration file.
   #
-  def build_list(model, fields, items, resource = @resource[:self], link_options = { })
+  def build_list(model, fields, items, resource = @resource[:self], link_options = {})
 
     template = "app/views/admin/#{resource}/_#{resource.singularize}.html.erb"
 

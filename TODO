@@ -2,13 +2,17 @@ TODO (ordered by priority)
 ====
 
 [ ] Test helpers.
-[ ] Make tests pass on Rails `2.3.0`.
 [ ] Better show action view template.
 [ ] Extract form helpers to templates.
+[ ] Roles priority.
+[ ] Use previous and next with conditions if enabled.
 
 DONE
 ====
 
+[X] Recover password on Typus is disable by default. This will force 
+    developers to define a valid email address.
+[X] Make tests pass on Rails `2.3.0`.
 [X] Actions for a record can be added to the listings. (This can be done 
     from an instance method.)
 [X] Internationalize messages. (20090129)

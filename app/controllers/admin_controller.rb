@@ -12,6 +12,8 @@ class AdminController < ApplicationController
     ssl_required :index, :new, :create, :edit, :show, :update, :destroy, :toggle, :position, :relate, :unrelate
   end
 
+  filter_parameter_logging :password
+
   before_filter :reload_config_et_roles
 
   before_filter :require_login
@@ -117,7 +119,7 @@ class AdminController < ApplicationController
     %w( action controller model model_id back_to id resource resource_id ).each { |p| item_params.delete(p) }
     # We assign the params passed trough the url
     @item.attributes = item_params
-    @previous, @next = @item.previous_and_next
+    @previous, @next = @item.previous_and_next(item_params)
     select_template :edit
   end
 
@@ -284,9 +286,9 @@ private
   # Set fields and order when performing an index action.
   #
   def set_order_and_list_fields
-
+    # Set a default sort_order.
     params[:sort_order] ||= 'desc'
-
+    # Get @fields & @order.
     @fields = @resource[:class].typus_fields_for(:list)
     @order = params[:order_by] ? "`#{@resource[:table_name]}`.#{params[:order_by]} #{params[:sort_order]}" : @resource[:class].typus_order_by
   end
@@ -303,11 +305,8 @@ private
   # Select which template to render.
   #
   def select_template(template, resource = @resource[:self])
-    if File.exists?("app/views/admin/#{resource}/#{template}.html.erb")
-      render :template => "admin/#{resource}/#{template}"
-    else
-      render :template => "admin/#{template}"
-    end
+    folder = (File.exists?("app/views/admin/#{resource}/#{template}.html.erb")) ? resource : 'resources'
+    render :template => "admin/#{folder}/#{template}"
   end
 
   ##
@@ -354,10 +353,10 @@ private
   ##
   # Error handler
   #
-  def error_handler(error, redirection = admin_dashboard_url)
+  def error_handler(error, url = admin_dashboard_path)
     if Rails.env.production?
-      flash[:error] = error.message + "(#{@resource[:class]})"
-      redirect_to redirection
+      flash[:error] =  "#{error.message} (#{@resource[:class]})"
+      redirect_to url
     else
       raise error
     end

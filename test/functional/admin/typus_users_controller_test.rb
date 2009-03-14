@@ -30,7 +30,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_allow_admin_to_toggle_other_users_status
 
-    @request.env['HTTP_REFERER'] = '/admin/typus_users'
+    @request.env['HTTP_REFERER'] = '/typus/typus_users'
     editor = typus_users(:editor)
     get :toggle, { :id => editor.id, :field => 'status' }
 
@@ -87,7 +87,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_not_allow_editor_to_create_typus_users
 
-    @request.env['HTTP_REFERER'] = '/admin/typus_users'
+    @request.env['HTTP_REFERER'] = '/typus/typus_users'
     typus_user = typus_users(:editor)
     @request.session[:typus] = typus_user.id
     get :new
@@ -104,7 +104,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     Typus::Configuration.options[:edit_after_create] = true
     typus_user = typus_users(:editor)
     @request.session[:typus] = typus_user.id
-    @request.env['HTTP_REFERER'] = "/admin/typus_users/#{typus_user.id}/edit"
+    @request.env['HTTP_REFERER'] = "/typus/typus_users/#{typus_user.id}/edit"
     get :edit, { :id => typus_user.id }
 
     assert_response :success
@@ -126,7 +126,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
     typus_user = typus_users(:editor)
     @request.session[:typus] = typus_user.id
-    @request.env['HTTP_REFERER'] = "/admin/typus_users/#{typus_user.id}/edit"
+    @request.env['HTTP_REFERER'] = "/typus/typus_users/#{typus_user.id}/edit"
 
     assert_equal 'editor', typus_user.roles
 
@@ -142,7 +142,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_not_allow_editor_to_edit_other_users_profiles
 
-    @request.env['HTTP_REFERER'] = '/admin/typus_users'
+    @request.env['HTTP_REFERER'] = '/typus/typus_users'
     typus_user = typus_users(:editor)
     @request.session[:typus] = typus_user.id
     get :edit, { :id => typus_user.id }
@@ -161,7 +161,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_not_allow_editor_to_destroy_users
 
-    @request.env['HTTP_REFERER'] = '/admin/typus_users'
+    @request.env['HTTP_REFERER'] = '/typus/typus_users'
     typus_user = typus_users(:editor)
     @request.session[:typus] = typus_user.id
     delete :destroy, :id => typus_users(:admin).id
@@ -175,7 +175,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_not_allow_editor_to_destroy_herself
 
-    @request.env['HTTP_REFERER'] = '/admin/typus_users'
+    @request.env['HTTP_REFERER'] = '/typus/typus_users'
     typus_user = typus_users(:editor)
     @request.session[:typus] = typus_user.id
     delete :destroy, :id => typus_user.id
@@ -189,7 +189,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_redirect_to_admin_dashboard_if_user_does_not_have_privileges
 
-    @request.env['HTTP_REFERER'] = '/admin'
+    @request.env['HTTP_REFERER'] = '/typus'
     typus_user = typus_users(:designer)
     @request.session[:typus] = typus_user.id
     get :index

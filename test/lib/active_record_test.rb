@@ -4,14 +4,14 @@ class ActiveRecordTest < ActiveSupport::TestCase
 
   def test_should_return_model_fields_for_typus_user
     expected_fields = [[:id, :integer], 
-                       [:email, :string], 
                        [:first_name, :string], 
                        [:last_name, :string], 
+                       [:roles, :string], 
+                       [:email, :string], 
+                       [:status, :boolean], 
+                       [:token, :string], 
                        [:salt, :string], 
                        [:crypted_password, :string], 
-                       [:status, :boolean], 
-                       [:roles, :string], 
-                       [:token, :string], 
                        [:created_at, :datetime], 
                        [:updated_at, :datetime]]
     assert_equal expected_fields.map { |i| i.first }, TypusUser.model_fields.keys
@@ -284,10 +284,20 @@ class ActiveRecordTest < ActiveSupport::TestCase
     assert_equal expected, TypusUser.build_conditions(params).first
   end
 
-  def test_should_verify_previous_and_next_is_working
+  def test_should_verify_previous_and_next
     assert TypusUser.instance_methods.include?('previous_and_next')
     assert typus_users(:admin).previous_and_next.kind_of?(Array)
-    assert_equal [typus_users(:admin), typus_users(:disabled_user)], typus_users(:editor).previous_and_next
+  end
+
+  def test_should_verify_previous_and_next_works_without_conditions
+    expected = [ typus_users(:admin), typus_users(:disabled_user) ]
+    assert_equal expected, typus_users(:editor).previous_and_next
+  end
+
+  def test_should_verify_previous_and_next_works_with_conditions
+    expected = [ typus_users(:editor), typus_users(:removed_role) ]
+    conditions = { 'status' => 'true' }
+    assert_equal expected, typus_users(:designer).previous_and_next(conditions)
   end
 
   def test_should_verify_typus_name_is_working_properly
