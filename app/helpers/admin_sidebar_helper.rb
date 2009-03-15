@@ -94,23 +94,21 @@ module AdminSidebarHelper
     typus_search = @resource[:class].typus_defaults_for(:search)
     return if typus_search.empty?
 
-    search_by = typus_search.collect { |x| t(x) }.to_sentence(Typus.to_sentence_options).titleize.downcase
+    search_by = typus_search.collect { |x| I18n.t(x, :default => x) }.to_sentence(Typus.to_sentence_options).titleize.downcase
 
     search_params = params.dup
     %w( action controller search page ).each { |p| search_params.delete(p) }
 
     hidden_params = search_params.map { |key, value| hidden_field_tag(key, value) }
 
-    returning(String.new) do |html|
-      html << <<-HTML
-<h2>#{t("Search")}</h2>
+    <<-HTML
+<h2>#{I18n.t("Search", :default => "Search")}</h2>
 <form action="" method="get">
 <p><input id="search" name="search" type="text" value="#{params[:search]}"/></p>
-#{hidden_params.join("\n")}
+#{hidden_params.sort.join("\n")}
 </form>
-<p class="tip">#{t("Search by")} #{search_by}.</p>
-      HTML
-    end
+<p class="tip">#{I18n.t("Search by", :default => "Search by")} #{search_by}.</p>
+    HTML
 
   end
 
@@ -199,7 +197,8 @@ function surfto_#{model_pluralized}(form) {
     items = []
     %w( today past_7_days this_month this_year ).each do |timeline|
       switch = request.include?("#{filter}=#{timeline}") ? 'on' : 'off'
-      items << (link_to timeline.titleize, { :params => params.merge(filter => timeline, :page => nil) }, :class => switch)
+      options = { "#{filter}".to_sym => timeline, :page => nil }
+      items << (link_to timeline.titleize, params.merge(options), :class => switch)
     end
     build_typus_list(items, filter)
   end
@@ -208,28 +207,20 @@ function surfto_#{model_pluralized}(form) {
     items = []
     @resource[:class].typus_boolean(filter).each do |key, value|
       switch = request.include?("#{filter}=#{key}") ? 'on' : 'off'
-      items << (link_to t(value), { :params => params.merge(filter => key, :page => nil) }, :class => switch)
+      options = { "#{filter}".to_sym => key, :page => nil }
+      items << (link_to I18n.t(value, :default => value), params.merge(options), :class => switch)
     end
     build_typus_list(items, filter)
   end
 
   def string_filter(request, filter)
     values = @resource[:class].send(filter)
-    next if values.empty?
     items = []
     values.each do |item|
-      switch = request.include?("#{filter}=#{item}") ? 'on' : 'off'
-
-      if values.first.kind_of?(Array)
-        link_name = item.first
-        link_filter = item.last
-      else
-        link_name = item
-        link_filter = item
-      end
-
-      items << (link_to link_name.capitalize, { :params => params.merge(filter => link_filter, :page => nil) }, :class => switch)
-
+      link_name, link_filter = (values.first.kind_of?(Array)) ? [ item.first, item.last ] : [ item, item ]
+      switch = request.include?("#{filter}=#{link_filter}") ? 'on' : 'off'
+      options = { "#{filter}".to_sym => link_filter, :page => nil }
+      items << (link_to link_name.capitalize, params.merge(options), :class => switch)
     end
     build_typus_list(items, filter)
   end

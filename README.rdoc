@@ -1,21 +1,21 @@
-# Typus
+= Typus
 
-What's **Typus**?
+What's *Typus*?
 
-> Effortless admin interface for your Rails application.
+    Effortless admin interface for your Rails application.
 
-You can see some screenshots on the [wiki](http://github.com/fesplugas/typus/wikis).
+You can see some screenshots on the wiki[http://github.com/fesplugas/typus/wikis].
 
-As Django Admin, **Typus** is designed for a "single" activity:
+As Django Admin, *Typus* is designed for a "single" activity:
 
-> Trusted users editing structured content.
+    Trusted users editing structured content.
 
-Keep in mind that **Typus** doesn't try to be all the things to all 
+Keep in mind that *Typus* doesn't try to be all the things to all 
 the people but it's extensible enough to match lots of use cases. I 
 started to develop it late 2005 and have been updating it to match 
 all my clients sites/projects requirements.
 
-## Installing
+== Installing
 
 Install from GitHub.
 
@@ -35,7 +35,7 @@ required tables. (only `typus_users` table is created)
     $ rake db:migrate
 
 And finally create the first user, to do it, start the application 
-server, go to <http://0.0.0.0:3000/admin> and follow the instructions.
+server, go to http://0.0.0.0:3000/admin and follow the instructions.
 
 You can view the available tasks running:
 
@@ -47,7 +47,14 @@ You can view the available tasks running:
     rake typus:roles        # List current roles
     rake typus:ssl          # Intall ssl_requirement plugin.
 
-## Plugin Configuration Options
+=== Compatibilty
+
+Typus has been tested with:
+
+- Rails: 2.2.2, 2.3.1 and Egde.
+- Ruby: 1.8.6-p287 and 1.8.7-p72.
+
+== Plugin Configuration Options
 
 You can overwrite the following settings.
 
@@ -77,7 +84,7 @@ Model options.
     Typus::Configuration.options[:toggle]
 
 You can also overwrite the model options by model. This is done always 
-from the yaml files under `config/typus`.
+from the yaml files under <tt>config/typus</tt>.
 
     Post:
       options:
@@ -92,7 +99,7 @@ from the yaml files under `config/typus`.
         start_year: 1990
         toggle: true
 
-### Recover password
+=== Recover password
 
 Recover password is disabled by default. To enable it you should 
 provide an email address which will be shown as the sender.
@@ -100,37 +107,37 @@ provide an email address which will be shown as the sender.
     Typus::Configuration.options[:email] = 'typus@application.com'
     Typus::Configuration.options[:recover_password] = true
 
-### Special Route
+=== Special Route
 
 To overwrite the default prefix path of your application place the 
-following configuration option on `development.rb`, `production.rb` 
-on the `config/environments` folder.
+following configuration option on <tt>development.rb</tt>, <tt>production.rb</tt> 
+on the <tt>config/environments</tt> folder.
 
     Typus::Configuration.options[:prefix] = "backoffice"
 
-### View Missing Translations
+=== View Missing Translations
 
 If you are a developer who wants to translate Typus, add the following 
-setting on `development.rb` on the `config/environments` folder so all 
-missing translations messages will be shown.
+setting on <tt>development.rb</tt> on the <tt>config/environments</tt> 
+folder so all missing translations messages will be shown.
 
     Typus::Configuration.options[:ignore_missing_translations] = false
 
-### Disable password recover
+=== Disable password recover
 
 You can disable password recover on the login page. By default, password
 recovery is enabled.
 
     Typus::Configuration.options[:recover_password] = false
 
-### Disallow toggle
+=== Disallow toggle
 
 When you have a boolean on the lists you can toggle it's status from 
 true to false and false to true. You can disable this link with:
 
     Typus::Configuration.options[:toggle] = false
 
-### Redirect to index after create a record
+=== Redirect to index after create a record
 
 After creating a new record you'll be redirected to the record so 
 you can continue editing it. If you prefer to be redirected to the 
@@ -138,20 +145,20 @@ main index you can owerwrite the setting.
 
     Typus::Configuration.options[:edit_after_create] = false
 
-## Configuration file options
+== Configuration file options
 
-You can configure all **Typus** settings from the `application.yml` 
-file located under the `config/typus` folder. This file is created 
-once you run the `typus` generator.
+You can configure all *Typus* settings from the <tt>application.yml</tt> 
+file located under the <tt>config/typus</tt> folder. This file is created 
+once you run the <tt>typus</tt> generator.
 
-### Typus Fields
+=== Typus Fields
 
     fields:
       list: name, created_at, category, status
       form: name, body, created_at, status
       relationship: name, category
 
-NOTE: Upload files only works if you follow `Paperclip` naming 
+NOTE: Upload files only works if you follow <tt>Paperclip</tt> naming 
 conventions.
 
 In form fields you can have read only fields and read only fields for 
@@ -165,7 +172,7 @@ but won't be editable. Example with the "name" attribute being read-only:
       options:
         read_only: name
 
-To define `auto generated` fields.
+To define <tt>auto generated</tt> fields.
 
     Order:
       fields:
@@ -208,7 +215,7 @@ need special attributes like an slug, which is generated from the title.
 
     end
 
-You can add `slug` a as attribute and it'll be shown on the lists.
+You can add <tt>slug</tt> a as attribute and it'll be shown on the lists.
 
     ##
     # config/typus/application.yml
@@ -217,31 +224,31 @@ You can add `slug` a as attribute and it'll be shown on the lists.
         list: title, slug
         form: title
 
-### External Forms
+=== External Forms
 
 Typus will detect automatically which kind of relationships has the model.
 
     relationships: users, projects
 
-### Filters
+=== Filters
 
 You can define filters per model on the config file ...
 
     filters: status, author, created_at
 
-### Order
+=== Order
 
 Adding minus (-) sign before the attribute will make the order DESC.
 
     order_by: -attribute1, attribute2
 
-### Searches
+=== Searches
 
-You can define search filters on `config/typus/application.yml`
+You can define search filters on <tt>config/typus/application.yml</tt>.
 
     search: attribute1, attribute2
 
-### Questions?
+=== Questions?
 
 Sometimes on your forms you want to ask questions.
 
@@ -257,7 +264,7 @@ And you can enable them with the questions option.
         options:
           questions: is_highlighted
 
-### Selectors
+=== Selectors
 
 Need a selector, to select gender, size, status, the encoding status 
 of a video or whatever in the model? 
@@ -297,10 +304,10 @@ Example:
         options:
           selectors: status
 
-If the selector is not defined, you'll see a **text field** instead of a 
+If the selector is not defined, you'll see a *text field* instead of a 
 *select field*.
 
-### Booleans
+=== Booleans
 
 By default Typus will show all your booleans on the listings with an 
 icon, if you prefer to show it as a text to be more verbose you can 
@@ -323,7 +330,7 @@ attribute" to match your application requirements.
             default: publicado, no_publicado
             status: active, inactive
 
-### Date Formats
+=== Date Formats
 
 Date formats allows to define the format of the datetime field.
 
@@ -343,7 +350,7 @@ Date formats allows to define the format of the datetime field.
     # Date::DATE_FORMATS[:post_short] = "%m/%Y"
     Time::DATE_FORMATS[:post_short] = "%m/%y"
 
-### Want more actions?
+=== Want more actions?
 
     Post:
       fields:
@@ -370,11 +377,11 @@ You can add those actions to your admin controllers. Example:
 
 For feedback you can use the following flash methods.
 
-- `flash[:notice]` just some feedback.
-- `flash[:error]` when there's something wrong.
-- `flash[:success]` when the action successfully finished.
+- <tt>flash[:notice]</tt> just some feedback.
+- <tt>flash[:error]</tt> when there's something wrong.
+- <tt>flash[:success]</tt> when the action successfully finished.
 
-### Applications, modules and submodules
+=== Applications, modules and submodules
 
 To group modules into an application use *application*.
 
@@ -404,7 +411,7 @@ Example: (Blog)
     Tag:
       module: Post
 
-## Custom Views
+== Custom Views
 
 You can add your custom views to match your application requirements. Views 
 you can customize.
@@ -413,30 +420,30 @@ you can customize.
     edit.html.erb
     show.html.erb
 
-### Example
+=== Example
 
 Need a custom view on the Articles listing? 
 
-Under `app/view/admin/articles` add the file `index.html.erb` and 
-Typus default `index.html.erb` will be replaced.
+Under <tt>app/view/admin/articles</tt> add the file <tt>index.html.erb</tt> 
+and Typus default <tt>index.html.erb</tt> will be replaced.
 
-## Customize Interface
+== Customize Interface
 
-You can customize the interface by placing on `views/admin` the 
+You can customize the interface by placing on <tt>views/admin</tt> the 
 following files.
 
-### Login Page
+=== Login Page
 
     views/admin/login/_bottom.html.erb
     views/admin/login/_top.html.erb
 
-### Dashboard
+=== Dashboard
 
     views/admin/dashboard/_bottom.html.erb
     views/admin/dashboard/_sidebar.html.erb
     views/admin/dashboard/_top.html.erb
 
-### Models
+=== Models
 
     views/admin/MODEL/_edit.html.erb
     views/admin/MODEL/_edit_bottom.html.erb
@@ -460,14 +467,14 @@ Example:
     views/admin/posts/_index_top.html.erb
     views/admin/typus_users/_edit_top.html.erb
 
-### Attribute templates
+=== Attribute templates
 
 It is possible to change the presentation for a attribute 
-within the form. In the example below the "published_at" 
+within the form. In the example below the <tt>published_at</tt> 
 attribute will be rendered with the template 
-"app/views/admin/templates/_datepicker.html.erb". The 
+<tt>app/views/admin/templates/_datepicker.html.erb</tt>. The 
 resource and the attribute name will be sent as local 
-variables "resource" and "attribute". You can change the 
+variables <tt>resource</tt> and <tt>attribute</tt>. You can change the 
 folder with Typus::Configuration.options[:templates_folder].
 
     ##
@@ -487,7 +494,7 @@ folder with Typus::Configuration.options[:templates_folder].
       <%= calendar_date_select :item, attribute %>
     </li>
 
-## Roles
+== Roles
 
 Typus has roles support. You can can add as many roles as you want. 
 They are defined in `config/typus/application_roles.yml` and you 
@@ -502,9 +509,9 @@ can can define the allowed actions per role.
       Post: create, update
       Category: create, update
 
-## Resources which are not models
+== Resources which are not models
 
-Want to manage **memcached**, see the current **starling** queue or have 
+Want to manage *memcached*, see the current *starling* queue or have 
 an special resource which is not related to any model?
 
     ##
@@ -515,12 +522,12 @@ an special resource which is not related to any model?
       ApplicationLog: index
       Git: index, commit
 
-When you start **Typus** a controller and a view will be created.
+When you start *Typus* a controller and a view will be created.
 
     app/controllers/admin/backup_controller.rb
     app/views/admin/backup/index.html
 
-## Typus & SSL
+== Typus & SSL
 
 You can use SSL on Typus. To enable it update the initializer.
 
@@ -531,9 +538,9 @@ feature.
 
     $ rake typus:ssl
 
-## Tip & Tricks
+== Tip & Tricks
 
-### Roles for a user?
+=== Roles for a user?
 
 You can create a role for a user using directly the username nickname. For 
 example, the user Francesc Esplugas:
@@ -542,7 +549,7 @@ example, the user Francesc Esplugas:
       TypusUser: update
       Post: create, read, update, delete
 
-## Testing the plugin
+== Testing the plugin
 
 You need to have `mocha` to test the plugin.
 
@@ -563,7 +570,7 @@ created them you can run the tests.
     $ rake DB=mysql
     $ rake DB=postgresql
 
-## Splitting configuration files
+== Splitting configuration files
 
 You can split your configuration files in several files so it can be easier 
 to mantain. (Files will be loaded by alphabetical order so adding 00X can 
@@ -576,7 +583,7 @@ help to load files in an special order.)
     config/typus/002-newsletter_roles.yml
     config/typus/003-blog_roles.yml
 
-## Quick edit
+== Quick edit
 
 To enable quick edit include the AdminPublicHelper on your 
 `application_helper.rb`.
@@ -591,27 +598,25 @@ Example:
                    :id => @page.id, 
                    :message => 'Edit this page' %>
 
-## Acknowledgments
 
-- Laia Gargallo (Lover and tea provider) <http://azotacalles.net>
-- Isaac Feliu (Codereview) <http://www.vesne.com>
-- Lluis Folch (Icons, feedback & crazy ideas) <http://wet-floor.com>
+== Contributors
 
-## People who has contributed to the project with patches
+- Laia Gargallo (Lover and tea provider) http://azotacalles.net
+- Isaac Feliu (Codereview on first public release) http://www.vesne.com
+- Lluis Folch (Icons, feedback & crazy ideas) http://wet-floor.com
+- Sergio Espeja (Code) http://github.com/spejman
+- Eadz (Code) http://github.com/eadz
+- Anthony Underwood (Code) http://github.com/aunderwo
+- Felipe Talavera (Code) http://github.com/flype
+- Erik Tigerholm (Code) http://github.com/eriktigerholm
 
-- Sergio Espeja <http://github.com/spejman>
-- Eadz <http://github.com/eadz>
-- Anthony Underwood <http://github.com/aunderwo>
-- Felipe Talavera <http://github.com/flype>
-- Erik Tigerholm <http://github.com/eriktigerholm>
+== Author, contact, bugs, mailing list and more
 
-## Author, contact, bugs, mailing list and more
-
-- Recommend me at <http://workingwithrails.com/person/5061-francesc-esplugas>
-- Browse source on GitHub <http://github.com/fesplugas/typus/tree/master>
-- Visit the wiki <http://github.com/fesplugas/typus/wikis>
-- Group <http://groups.google.es/group/typus>
-- Report bugs <http://github.com/fesplugas/typus/wikis/bugs>
+- You can recommend me on http://workingwithrails.com/person/5061-francesc-esplugas
+- Browse source on GitHub http://github.com/fesplugas/typus/tree/master
+- Visit the wiki http://github.com/fesplugas/typus/wikis
+- Google Group http://groups.google.es/group/typus
+- Report bugs http://github.com/fesplugas/typus/wikis/bugs
 
 Copyright (c) 2007-2009 Francesc Esplugas Marti, released under the 
 MIT license

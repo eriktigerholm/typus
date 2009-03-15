@@ -101,7 +101,9 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_allow_editor_to_update_himself
 
-    Typus::Configuration.options[:edit_after_create] = true
+    options = Typus::Configuration.options.merge(:edit_after_create => true)
+    Typus::Configuration.stubs(:options).returns(options)
+
     typus_user = typus_users(:editor)
     @request.session[:typus] = typus_user.id
     @request.env['HTTP_REFERER'] = "/typus/typus_users/#{typus_user.id}/edit"
@@ -223,7 +225,8 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     # has access to all TypusUser records.
     #
 
-    Typus::Configuration.options[:root] = 'editor'
+    options = Typus::Configuration.options.merge(:root => 'editor')
+    Typus::Configuration.stubs(:options).returns(options)
 
     get :edit, :id => typus_user.id
     assert_response :success

@@ -19,9 +19,9 @@
   Typus::Configuration.options[:recover_password] = true
   Typus::Configuration.options[:root] = 'admin'
   Typus::Configuration.options[:ssl] = false
-  Typus::Configuration.options[:templates_folder]
-  Typus::Configuration.options[:user_class_name]
-  Typus::Configuration.options[:user_fk]
+  Typus::Configuration.options[:templates_folder] = 'admin/templates'
+  Typus::Configuration.options[:user_class_name] = 'TypusUser'
+  Typus::Configuration.options[:user_fk] = 'typus_user_id'
 
   # Model options.
 

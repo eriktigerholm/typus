@@ -7,6 +7,7 @@ class TypusGenerator < Rails::Generator::Base
       ##
       # Default name for our application.
       #
+
       application = File.basename(Dir.pwd)
 
       ##

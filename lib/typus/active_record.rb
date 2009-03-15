@@ -157,10 +157,16 @@ module Typus
     # We are able to define our own booleans.
     #
     def typus_boolean(attribute = :default)
+
       boolean = Typus::Configuration.config[name]['fields']['options']['booleans'][attribute.to_s] rescue nil
       boolean = 'true, false' if boolean.nil?
-      return { :true => boolean.split(', ').first.humanize, 
-               :false => boolean.split(', ').last.humanize }
+
+      hash = ActiveSupport::OrderedHash.new
+      hash[:true] = boolean.split(', ').first.humanize
+      hash[:false] = boolean.split(', ').last.humanize
+
+      return hash
+
     end
 
     ##
@@ -173,7 +179,8 @@ module Typus
     end
 
     ##
-    # We are able to define which template to use to render the attribute within the form
+    # We are able to define which template to use to render the attribute 
+    # within the form
     #
     def typus_template(attribute)
       template = Typus::Configuration.config[name]['fields']['options']['templates'][attribute.to_s] rescue nil
@@ -266,9 +273,6 @@ module Typus
 
     end
 
-    ##
-    #
-    #
     def typus_name
       respond_to?(:name) ? name : "#{self.class}##{id}"
     end

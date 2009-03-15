@@ -68,9 +68,9 @@ module Typus
 
       all_resources = Typus::Configuration.roles.keys.map do |key|
                         Typus::Configuration.roles[key].keys
-                      end.flatten.sort.uniq!
+                      end.flatten.sort.uniq
 
-      all_resources.delete_if { |x| models.include?(x) }
+      all_resources.delete_if { |x| models.include?(x) } rescue []
 
     end
 
@@ -101,7 +101,6 @@ module Typus
 
       # Ruby Extensions
       require 'typus/hash'
-      require 'typus/object'
       require 'typus/string'
 
       Typus::Configuration.config!

@@ -2,6 +2,10 @@ require 'test/helper'
 
 class ActiveRecordTest < ActiveSupport::TestCase
 
+  def test_should_verify_model_fields_is_an_instance_of_active_support_ordered_hash
+    assert TypusUser.model_fields.instance_of?(ActiveSupport::OrderedHash)
+  end
+
   def test_should_return_model_fields_for_typus_user
     expected_fields = [[:id, :integer], 
                        [:first_name, :string], 
@@ -28,6 +32,10 @@ class ActiveRecordTest < ActiveSupport::TestCase
                        [:published_at, :datetime]]
     assert_equal expected_fields.map { |i| i.first }, Post.model_fields.keys
     assert_equal expected_fields.map { |i| i.last }, Post.model_fields.values
+  end
+
+  def test_should_verify_model_relationships_is_an_instance_of_active_support_ordered_hash
+    assert TypusUser.model_relationships.instance_of?(ActiveSupport::OrderedHash)
   end
 
   def test_should_return_model_relationships_for_post
@@ -167,18 +175,27 @@ class ActiveRecordTest < ActiveSupport::TestCase
 
   end
 
+  def test_should_verify_typus_boolean_is_an_instance_of_active_support_ordered_hash
+    assert TypusUser.typus_boolean.instance_of?(ActiveSupport::OrderedHash)
+  end
+
   def test_should_return_booleans_for_typus_users
-    hash_status = { :true => 'Active', :false => 'Inactive' }
-    assert_equal hash_status, TypusUser.typus_boolean('status')
-    assert_equal hash_status, TypusUser.typus_boolean(:status)
-    hash_default = { :true => 'True', :false => 'False' }
-    assert_equal hash_default, TypusUser.typus_boolean
+    assert_equal [ :true, :false ], TypusUser.typus_boolean('status').keys
+    assert_equal [ "Active", "Inactive" ], TypusUser.typus_boolean('status').values
+    assert_equal [ :true, :false ], TypusUser.typus_boolean(:status).keys
+    assert_equal [ "Active", "Inactive" ], TypusUser.typus_boolean(:status).values
+  end
+
+  def test_should_return_default_booleans_for_typus_users
+    assert_equal [ :true, :false ], TypusUser.typus_boolean.keys
+    assert_equal [ "True", "False" ], TypusUser.typus_boolean.values
   end
 
   def test_should_return_booleans_for_post
-    hash = { :true => 'True', :false => 'False' }
-    assert_equal hash, Post.typus_boolean('status')
-    assert_equal hash, Post.typus_boolean(:status)
+    assert_equal [ :true, :false ], Post.typus_boolean('status').keys
+    assert_equal [ "True", "False" ], Post.typus_boolean('status').values
+    assert_equal [ :true, :false ], Post.typus_boolean(:status).keys
+    assert_equal [ "True", "False" ], Post.typus_boolean(:status).values
   end
 
   def test_should_return_date_formats_for_post

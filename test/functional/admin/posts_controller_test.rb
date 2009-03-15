@@ -40,21 +40,29 @@ class Admin::PostsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_item_and_redirect_to_index
-    Typus::Configuration.options[:edit_after_create] = false
+
+    options = Typus::Configuration.options.merge(:edit_after_create => false)
+    Typus::Configuration.stubs(:options).returns(options)
+
     assert_difference 'Post.count' do
       post :create, { :item => { :title => 'This is another title', :body => 'Body' } }
       assert_response :redirect
       assert_redirected_to :action => 'index'
     end
+
   end
 
   def test_should_create_item_and_redirect_to_edit
-    Typus::Configuration.options[:edit_after_create] = true
+
+    options = Typus::Configuration.options.merge(:edit_after_create => true)
+    Typus::Configuration.stubs(:options).returns(options)
+
     assert_difference 'Post.count' do
       post :create, { :item => { :title => 'This is another title', :body => 'Body' } }
       assert_response :redirect
       assert_redirected_to :action => 'edit'
     end
+
   end
 
   def test_should_render_show
@@ -72,19 +80,27 @@ class Admin::PostsControllerTest < ActionController::TestCase
   end
 
   def test_should_update_item_and_redirect_to_index
-    Typus::Configuration.options[:edit_after_create] = false
+
+    options = Typus::Configuration.options.merge(:edit_after_create => false)
+    Typus::Configuration.stubs(:options).returns(options)
+
     post_ = posts(:published)
     post :update, { :id => post_.id, :title => 'Updated' }
     assert_response :redirect
     assert_redirected_to :action => 'index'
+
   end
 
   def test_should_update_item_and_redirect_to_edit
-    Typus::Configuration.options[:edit_after_create] = true
+
+    options = Typus::Configuration.options.merge(:edit_after_create => true)
+    Typus::Configuration.stubs(:options).returns(options)
+
     post_ = posts(:published)
     post :update, { :id => post_.id, :title => 'Updated' }
     assert_response :redirect
     assert_redirected_to :action => 'edit', :id => post_.id
+
   end
 
   def test_should_allow_admin_to_toggle_item
@@ -177,7 +193,10 @@ class Admin::PostsControllerTest < ActionController::TestCase
   end
 
   def test_should_disable_toggle_and_check_links_are_disabled
-    Typus::Configuration.options[:toggle] = false
+
+    options = Typus::Configuration.options.merge(:toggle => false)
+    Typus::Configuration.stubs(:options).returns(options)
+
     @request.env['HTTP_REFERER'] = '/typus/posts'
     post = posts(:unpublished)
     get :toggle, { :id => post.id, :field => 'status' }
@@ -186,7 +205,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
     assert !flash[:success]
     assert flash[:warning]
     assert_match /Toggle is disabled/, flash[:warning]
-    Typus::Configuration.options[:toggle] = true
+
   end
 
   def test_should_show_form_templates

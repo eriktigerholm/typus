@@ -41,7 +41,8 @@ class Admin::AssetsControllerTest < ActionController::TestCase
 
   def test_should_return_to_back_to_url
 
-    Typus::Configuration.options[:edit_after_create] = false
+    options = Typus::Configuration.options.merge(:edit_after_create => false)
+    Typus::Configuration.stubs(:options).returns(options)
 
     post_ = posts(:published)
     asset_ = assets(:first)
@@ -51,8 +52,6 @@ class Admin::AssetsControllerTest < ActionController::TestCase
     assert_redirected_to '/admin/posts/1/edit#assets'
     assert flash[:success]
     assert_equal 'Asset successfully updated.', flash[:success]
-
-    Typus::Configuration.options[:edit_after_create] = true
 
   end
 

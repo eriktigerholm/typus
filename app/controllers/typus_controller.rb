@@ -9,7 +9,7 @@ class TypusController < ApplicationController
   if Typus::Configuration.options[:ssl]
     include SslRequirement
     ssl_required :sign_in, :sign_out, 
-                 :dashboard, :overview, 
+                 :dashboard, 
                  :recover_password, :reset_password
   end
 
@@ -25,7 +25,7 @@ class TypusController < ApplicationController
 
   before_filter :check_if_user_can_perform_action_on_resource_without_model, 
                 :except => [ :sign_up, :sign_in, :sign_out, 
-                             :dashboard, :overview, 
+                             :dashboard, 
                              :recover_password, :reset_password, 
                              :quick_edit, :set_locale ]
 
@@ -37,12 +37,6 @@ class TypusController < ApplicationController
   #
   def dashboard
     flash[:notice] = t("There are not defined applications in config/typus/*.yml.") if Typus.applications.empty?
-  end
-
-  ##
-  # Configuration Overview
-  #
-  def overview
   end
 
   ##

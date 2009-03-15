@@ -5,8 +5,7 @@ module Typus
     module Reloader
 
       ##
-      # Reload configuration files and roles when application is 
-      # running on development.
+      # Reload config and roles when app is running in development.
       #
       def reload_config_et_roles
         return unless Rails.env.development?
@@ -18,14 +17,8 @@ module Typus
     end
 
     ##
-    # Default application options that can be overwritten from
-    # an initializer.
+    # Default typus options that can be overwritten from an initializer.
     #
-    # Example:
-    #
-    #   Typus::Configuration.options[:app_name] = "Your App Name"
-    #
-
     typus_options = { :app_name => 'Typus', 
                       :config_folder => 'config/typus', 
                       :email => 'admin@example.com', 
@@ -39,6 +32,9 @@ module Typus
                       :user_class_name => 'TypusUser', 
                       :user_fk => 'typus_user_id' }
 
+    ##
+    # Default model options that can be overwritten from an initializer.
+    #
     model_options = { :edit_after_create => true, 
                       :end_year => nil,
                       :form_rows => 10, 
