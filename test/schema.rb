@@ -35,6 +35,7 @@ ActiveRecord::Schema.define do
     t.string :title
     t.text :body
     t.boolean :status
+    t.integer :favorite_comment_id
     t.timestamps
     t.datetime :published_at
   end

@@ -27,6 +27,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
                        [:title, :string],
                        [:body, :text],
                        [:status, :boolean],
+                       [:favorite_comment_id, :integer],
                        [:created_at, :datetime],
                        [:updated_at, :datetime],
                        [:published_at, :datetime]]

@@ -38,6 +38,7 @@ class Post < ActiveRecord::Base
   has_and_belongs_to_many :categories
   has_many :comments
   has_many :assets, :as => :resource, :dependent => :destroy
+  belongs_to :favorite_comment, :class_name => 'Comment'
 
   def self.status
     %w( true false pending published unpublished )

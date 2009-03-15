@@ -6,6 +6,8 @@ class AdminFormHelperTest < ActiveSupport::TestCase
   include ActionView::Helpers::FormHelper
   include ActionView::Helpers::FormOptionsHelper
   include ActionView::Helpers::DateHelper
+  include ActionView::Helpers::UrlHelper
+  include ActionView::Helpers::TagHelper
   include ActionController::UrlWriter
 
   def test_build_form
@@ -30,6 +32,30 @@ class AdminFormHelperTest < ActiveSupport::TestCase
     HTML
 
     assert_equal expected, typus_belongs_to_field('post', Comment)
+
+  end
+
+  def test_typus_belongs_to_field_diffrent_attribute_name
+
+   default_url_options[:host] = 'test.host'
+
+    params = { :controller => 'admin/post', :id => 1, :action => :create }
+    self.expects(:params).at_least_once.returns(params)
+
+    @current_user  = mock()
+    @current_user.expects(:can_perform?).with(Comment, 'create').returns(true)
+
+    expected = <<-HTML
+<li><label for="item_favorite_comment">Favorite comment
+    <small><a href="http://test.host/comments/new?back_to=%2Ftypus%2Fpost%2F1%2Fcreate&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost\\n\\nClick OK to continue, or click Cancel to stay on this page');">Add new</a></small>
+    </label>
+<select id="item_favorite_comment_id" name="item[favorite_comment_id]"><option value=""></option>
+<option value="1"></option>
+<option value="2"></option>
+<option value="3"></option>
+<option value="4"></option></select></li>
+    HTML
+    assert_equal expected, typus_belongs_to_field('favorite_comment', Post)
 
   end
 
