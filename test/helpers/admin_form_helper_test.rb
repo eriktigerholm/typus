@@ -4,14 +4,33 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 
   include AdminFormHelper
   include ActionView::Helpers::FormHelper
+  include ActionView::Helpers::FormOptionsHelper
   include ActionView::Helpers::DateHelper
+  include ActionController::UrlWriter
 
   def test_build_form
     assert true
   end
 
   def test_typus_belongs_to_field
-    assert true
+
+    params = { :controller => 'admin/post', :id => 1, :action => :create }
+    self.expects(:params).at_least_once.returns(params)
+
+    @current_user  = mock()
+    @current_user.expects(:can_perform?).with(Post, 'create').returns(false)
+
+    expected = <<-HTML
+<li><label for="item_post">Post
+    <small></small>
+    </label>
+<select id="item_post_id" name="item[post_id]"><option value=""></option>
+<option value="1">Post#1</option>
+<option value="2">Post#2</option></select></li>
+    HTML
+
+    assert_equal expected, typus_belongs_to_field('post', Comment)
+
   end
 
   def test_typus_boolean_field
