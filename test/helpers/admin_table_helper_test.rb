@@ -113,6 +113,20 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 
   end
 
+  def test_typus_table_datetime_field_with_ink
+
+    post = posts(:published)
+    Time::DATE_FORMATS[:post_short] = '%m/%y'
+
+    output = typus_table_datetime_field(:created_at, post, :created_at)
+    expected = <<-HTML
+<td><a href="http://test.host/posts/edit/#{post.id}">11/07</a></td>
+    HTML
+
+    assert_equal expected, output
+
+  end
+
   def test_typus_table_boolean_field
 
     options = { :icon_on_boolean => false, :toggle => false }
