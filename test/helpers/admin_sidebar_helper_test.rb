@@ -83,7 +83,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     request = ''
     output = datetime_filter(request, filter)
     expected = <<-HTML
-<h2>Created at</h2><ul>
+<h2>Created at</h2>
+<ul>
 <li><a href="http://test.host/typus/typus_users?created_at=today" class="off">Today</a></li>
 <li><a href="http://test.host/typus/typus_users?created_at=past_7_days" class="off">Past 7 Days</a></li>
 <li><a href="http://test.host/typus/typus_users?created_at=this_month" class="off">This Month</a></li>
@@ -95,7 +96,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     request = 'created_at=today&page=1'
     output = datetime_filter(request, filter)
     expected = <<-HTML
-<h2>Created at</h2><ul>
+<h2>Created at</h2>
+<ul>
 <li><a href="http://test.host/typus/typus_users?created_at=today" class="on">Today</a></li>
 <li><a href="http://test.host/typus/typus_users?created_at=past_7_days" class="off">Past 7 Days</a></li>
 <li><a href="http://test.host/typus/typus_users?created_at=this_month" class="off">This Month</a></li>
@@ -116,7 +118,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     request = 'status=true&page=1'
     output = boolean_filter(request, filter)
     expected = <<-HTML
-<h2>Status</h2><ul>
+<h2>Status</h2>
+<ul>
 <li><a href="http://test.host/typus/typus_users?status=true" class="on">Active</a></li>
 <li><a href="http://test.host/typus/typus_users?status=false" class="off">Inactive</a></li>
 </ul>
@@ -128,7 +131,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     request = 'status=false&page=1'
     output = boolean_filter(request, filter)
     expected = <<-HTML
-<h2>Status</h2><ul>
+<h2>Status</h2>
+<ul>
 <li><a href="http://test.host/typus/typus_users?status=true" class="off">Active</a></li>
 <li><a href="http://test.host/typus/typus_users?status=false" class="on">Inactive</a></li>
 </ul>
@@ -148,7 +152,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     @resource[:class].expects('roles').returns(['admin', 'designer', 'editor'])
     output = string_filter(request, filter)
     expected = <<-HTML
-<h2>Roles</h2><ul>
+<h2>Roles</h2>
+<ul>
 <li><a href="http://test.host/typus/typus_users?roles=admin" class="on">Admin</a></li>
 <li><a href="http://test.host/typus/typus_users?roles=designer" class="off">Designer</a></li>
 <li><a href="http://test.host/typus/typus_users?roles=editor" class="off">Editor</a></li>
@@ -162,7 +167,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     @resource[:class].expects('roles').returns(['admin', 'designer', 'editor'])
     output = string_filter(request, filter)
     expected = <<-HTML
-<h2>Roles</h2><ul>
+<h2>Roles</h2>
+<ul>
 <li><a href="http://test.host/typus/typus_users?roles=admin" class="off">Admin</a></li>
 <li><a href="http://test.host/typus/typus_users?roles=designer" class="off">Designer</a></li>
 <li><a href="http://test.host/typus/typus_users?roles=editor" class="on">Editor</a></li>
@@ -185,7 +191,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
 
     output = string_filter(request, filter)
     expected = <<-HTML
-<h2>Roles</h2><ul>
+<h2>Roles</h2>
+<ul>
 <li><a href="http://test.host/typus/typus_users?roles=admin" class="on">Administrador</a></li>
 <li><a href="http://test.host/typus/typus_users?roles=designer" class="off">Diseñador</a></li>
 <li><a href="http://test.host/typus/typus_users?roles=editor" class="off">Editor</a></li>

@@ -187,7 +187,7 @@ class Admin::#{model.pluralize}ControllerTest < ActionController::TestCase
 
 # Replace this with your real tests.
 test "the truth" do
-  assert true
+  flunk 'Not done testing yet.'
 end
 
 end

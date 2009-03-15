@@ -54,7 +54,7 @@ module AdminSidebarHelper
   def build_typus_list(items, header = nil, selector = nil)
     return "" if items.empty?
     returning(String.new) do |html|
-      html << "<h2>#{I18n.t(header.humanize, :default => header.humanize)}</h2>" unless header.nil?
+      html << "<h2>#{I18n.t(header.humanize, :default => header.humanize)}</h2>\n" unless header.nil?
       next unless selector.nil?
       html << "<ul>\n"
       items.each do |item|
