@@ -22,9 +22,9 @@ module AdminTableHelper
         fields.each do |key, value|
           case value
           when :boolean:           html << typus_table_boolean_field(key, item)
-          when :datetime:          html << typus_table_datetime_field(key, item)
-          when :date:              html << typus_table_datetime_field(key, item)
-          when :time:              html << typus_table_datetime_field(key, item)
+          when :datetime:          html << typus_table_datetime_field(key, item, fields.first.first, link_options)
+          when :date:              html << typus_table_datetime_field(key, item, fields.first.first, link_options)
+          when :time:              html << typus_table_datetime_field(key, item, fields.first.first, link_options)
           when :belongs_to:        html << typus_table_belongs_to_field(key, item)
           when :tree:              html << typus_table_tree_field(key, item)
           when :position:          html << typus_table_position_field(key, item)
@@ -168,13 +168,18 @@ module AdminTableHelper
 
   end
 
-  def typus_table_datetime_field(attribute, item)
+  def typus_table_datetime_field(attribute, item, first_field = nil, link_options = {} )
 
     date_format = item.class.typus_date_format(attribute)
     value = !item.send(attribute).nil? ? item.send(attribute).to_s(date_format) : item.class.typus_options_for(:nil)
+    content = if first_field == attribute
+                link_to value, link_options.merge(:controller => item.class.name.tableize, :action => 'edit', :id => item.id )
+              else
+                value
+              end
 
     <<-HTML
-<td>#{value}</td>
+<td>#{content}</td>
     HTML
 
   end
