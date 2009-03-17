@@ -10,8 +10,26 @@ class AdminTableHelperTest < ActiveSupport::TestCase
     assert true
   end
 
+  # TODO: Add tests with params.
   def test_typus_table_header
-    assert true
+
+    fields = TypusUser.typus_fields_for(:list)
+
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = typus_table_header(TypusUser, fields)
+    expected = <<-HTML
+<tr>
+<th><a href="http://test.host/typus/typus_users?order_by=email"><div class="">Email</div></a></th>
+<th><a href="http://test.host/typus/typus_users?order_by=roles"><div class="">Roles</div></a></th>
+<th><a href="http://test.host/typus/typus_users?order_by=status"><div class="">Status</div></a></th>
+<th>&nbsp;</th>
+</tr>
+    HTML
+
+    assert_equal expected, output
+
   end
 
   def test_typus_table_belongs_to_field
@@ -36,7 +54,16 @@ class AdminTableHelperTest < ActiveSupport::TestCase
   end
 
   def test_typus_table_has_and_belongs_to_many_field
-    assert true
+
+    post = Post.find(1)
+
+    output = typus_table_has_and_belongs_to_many_field('comments', post)
+    expected = <<-HTML
+<td>John<br />Me<br />Me</td>
+    HTML
+
+    assert_equal expected, output
+
   end
 
   def test_typus_table_string_field
@@ -65,7 +92,7 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 
   def test_typus_table_tree_field
 
-    return unless defined? ActiveRecord::Acts::Tree
+    return if !defined?(ActiveRecord::Acts::Tree)
 
     page = pages(:published)
     output = typus_table_tree_field('test', page)
@@ -113,7 +140,7 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 
   end
 
-  def test_typus_table_datetime_field_with_ink
+  def test_typus_table_datetime_field_with_link
 
     post = posts(:published)
     Time::DATE_FORMATS[:post_short] = '%m/%y'

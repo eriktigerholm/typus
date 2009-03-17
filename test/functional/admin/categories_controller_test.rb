@@ -12,7 +12,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
   end
 
   def test_should_position_item_one_step_down
-    return unless defined? ActiveRecord::Acts::List
+    return if !defined?(ActiveRecord::Acts::List)
     first_category = categories(:first)
     assert_equal 1, first_category.position
     second_category = categories(:second)
@@ -25,7 +25,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
   end
 
   def test_should_position_item_one_step_up
-    return unless defined? ActiveRecord::Acts::List
+    return if !defined?(ActiveRecord::Acts::List)
     first_category = categories(:first)
     assert_equal 1, first_category.position
     second_category = categories(:second)
@@ -38,7 +38,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
   end
 
   def test_should_position_top_item_to_bottom
-    return unless defined? ActiveRecord::Acts::List
+    return if !defined?(ActiveRecord::Acts::List)
     first_category = categories(:first)
     assert_equal 1, first_category.position
     get :position, { :id => first_category.id, :go => 'move_to_bottom' }
@@ -48,7 +48,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
   end
 
   def test_should_position_bottom_item_to_top
-    return unless defined? ActiveRecord::Acts::List
+    return if !defined?(ActiveRecord::Acts::List)
     third_category = categories(:third)
     assert_equal 3, third_category.position
     get :position, { :id => third_category.id, :go => 'move_to_top' }

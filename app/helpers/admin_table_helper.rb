@@ -22,16 +22,16 @@ module AdminTableHelper
         fields.each do |key, value|
           case value
           when :boolean:           html << typus_table_boolean_field(key, item)
-          when :datetime:          html << typus_table_datetime_field(key, item, fields.first.first, link_options)
-          when :date:              html << typus_table_datetime_field(key, item, fields.first.first, link_options)
-          when :time:              html << typus_table_datetime_field(key, item, fields.first.first, link_options)
+          when :datetime:          html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
+          when :date:              html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
+          when :time:              html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
           when :belongs_to:        html << typus_table_belongs_to_field(key, item)
           when :tree:              html << typus_table_tree_field(key, item)
           when :position:          html << typus_table_position_field(key, item)
           when :has_and_belongs_to_many:
             html << typus_table_has_and_belongs_to_many_field(key, item)
           else
-            html << typus_table_string_field(key, item, fields.first.first, link_options)
+            html << typus_table_string_field(key, item, fields.keys.first, link_options)
           end
         end
 
@@ -91,12 +91,11 @@ module AdminTableHelper
                        end
           order_by = model.reflect_on_association(key.to_sym).primary_key_name rescue key
           switch = (params[:order_by] == key) ? sort_order : ''
-          content = (link_to "<div class=\"#{switch}\">#{content}</div>", { :params => params.merge(:order_by => order_by, :sort_order => sort_order) })
+          options = { :order_by => order_by, :sort_order => sort_order }
+          content = (link_to "<div class=\"#{switch}\">#{content}</div>", params.merge(options))
         end
 
-        headers << <<-HTML
-<th>#{content}</th>
-        HTML
+        headers << "<th>#{content}</th>"
 
       end
       headers << "<th>&nbsp;</th>"
@@ -157,7 +156,7 @@ module AdminTableHelper
                   :go => position.last }
 
       html_position << <<-HTML
-#{link_to t(position.first), :params => params.merge(options)}
+#{link_to t(position.first), params.merge(options)}
       HTML
 
     end
@@ -197,8 +196,10 @@ module AdminTableHelper
                   item.class.typus_options_for(:nil) # Content is nil, so we show nil.
                 end
 
+    options = { :controller => item.class.name.tableize, :action => 'toggle', :field => attribute, :id => item.id }
+
     content = if item.class.typus_options_for(:toggle) && !item.send(attribute).nil?
-                link_to link_text, { :params => params.merge(:controller => item.class.name.tableize, :action => 'toggle', :field => attribute, :id => item.id) } , :confirm => "Change #{attribute.humanize.downcase}?"
+                link_to link_text, params.merge(options), :confirm => "Change #{attribute.humanize.downcase}?"
               else
                 link_text
               end

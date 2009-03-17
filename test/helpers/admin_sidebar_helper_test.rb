@@ -13,7 +13,40 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
   end
 
   def test_actions
-    assert true
+
+    self.expects(:default_actions).returns(['action1', 'action2'])
+    self.expects(:previous_and_next).returns(['previous', 'next'])
+    self.expects(:modules).with('parent_module').returns(['parent_module'])
+    self.expects(:modules).with('submodules').returns(['submodules'])
+
+    output = actions
+    expected = <<-HTML
+<h2>Actions</h2>
+<ul>
+<li>action1</li>
+<li>action2</li>
+</ul>
+
+<h2>Go to</h2>
+<ul>
+<li>previous</li>
+<li>next</li>
+</ul>
+
+<h2>Parent module</h2>
+<ul>
+<li>parent_module</li>
+</ul>
+
+<h2>Submodules</h2>
+<ul>
+<li>submodules</li>
+</ul>
+
+    HTML
+
+    assert_equal expected, output
+
   end
 
   def test_default_actions
@@ -21,7 +54,40 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
   end
 
   def test_non_crud_actions
-    assert true
+
+    @resource = { :class => Page }
+    @current_user = typus_users(:admin)
+
+    # Index without params
+
+    params = { :controller => 'admin/pages', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = non_crud_actions
+    expected = [ "<a href=\"http://test.host/typus/pages/rebuild_all\">Rebuild all</a>" ]
+    assert output.kind_of?(Array)
+    assert_equal expected, output
+
+    # Index with params
+
+    params = { :controller => 'admin/pages', :action => 'index', :status => true }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = non_crud_actions
+    expected = [ "<a href=\"http://test.host/typus/pages/rebuild_all?status=true\">Rebuild all</a>" ]
+    assert output.kind_of?(Array)
+    assert_equal expected, output
+
+    # Edit
+
+    params = { :controller => 'admin/pages', :action => 'edit', :id => 1 }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = non_crud_actions
+    expected = [ "<a href=\"http://test.host/typus/pages/1/rebuild\">Rebuild</a>" ]
+    assert output.kind_of?(Array)
+    assert_equal expected, output
+
   end
 
   def test_build_typus_list
@@ -45,12 +111,65 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
   end
 
   def test_previous_and_next
+
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = previous_and_next
+    assert output.empty?
+
+    # Test when there are no records.
+
+    typus_user = TypusUser.first
+    @next = nil
+    @previous = nil
+
+    params = { :controller => 'admin/typus_users', :action => 'edit', :id => typus_user.id }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = previous_and_next
+    assert output.empty?
+
+    # Test when we are on the first item.
+
+    typus_user = TypusUser.first
+    @previous, @next = typus_user.previous_and_next
+
+    output = previous_and_next
+    expected = [ "<a href=\"http://test.host/typus/typus_users/#{@next.id}/edit\">Next</a>" ]
+    assert_equal expected, output
+
+    # Test when we are on the last item.
+
+    typus_user = TypusUser.last
+    @previous, @next = typus_user.previous_and_next
+
+    output = previous_and_next
+    expected = [ "<a href=\"http://test.host/typus/typus_users/#{@previous.id}/edit\">Previous</a>" ]
+    assert_equal expected, output
+
+    # Test when we are on the middle.
+
+    typus_user = TypusUser.find(3)
+    @previous, @next = typus_user.previous_and_next
+
+    output = previous_and_next
+    expected = [ "<a href=\"http://test.host/typus/typus_users/#{@next.id}/edit\">Next</a>", 
+                 "<a href=\"http://test.host/typus/typus_users/#{@previous.id}/edit\">Previous</a>" ]
+    assert_equal expected, output
+
+  end
+
+  def test_previous_and_next_with_params
     assert true
   end
 
   def test_search
 
     @resource = { :class => TypusUser, :self => 'typus_users' }
+
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
 
     output = search
     expected = <<-HTML
@@ -68,7 +187,16 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
   end
 
   def test_filters
-    assert true
+
+    @resource = { :class => TypusUser, :self => 'typus_users' }
+
+    @resource[:class].expects(:typus_filters).returns(Array.new)
+
+    output = filters
+    assert output.nil?
+
+    # TODO: Test filters when @resource[:class].typus_filters returns filters.
+
   end
 
   def test_relationship_filter
@@ -79,6 +207,9 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
 
     @resource = { :class => TypusUser, :self => 'typus_users' }
     filter = 'created_at'
+
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
 
     request = ''
     output = datetime_filter(request, filter)
@@ -113,6 +244,9 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     @resource = { :class => TypusUser, :self => 'typus_users' }
     filter = 'status'
 
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
     # Status is true
 
     request = 'status=true&page=1'
@@ -145,6 +279,9 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
 
     @resource = { :class => TypusUser, :self => 'typus_users' }
     filter = 'roles'
+
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
 
     # Roles is admin
 
@@ -183,6 +320,9 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     @resource = { :class => TypusUser, :self => 'typus_users' }
     filter = 'roles'
 
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
     request = 'roles=admin&page=1'
     array = [['Administrador', 'admin'], 
              ['Diseñador', 'designer'], 
@@ -213,12 +353,6 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     output = string_filter(request, filter)
     assert output.empty?
 
-  end
-
-  private
-
-  def params
-    { :controller => 'admin/typus_users', :action => 'index' }
   end
 
 end

@@ -57,8 +57,8 @@ class Admin::#{resource}Controller < TypusController
 #       #{resource}: index
 #
 
-def index
-end
+  def index
+  end
 
 end
       RAW
@@ -118,24 +118,24 @@ class Admin::#{model.pluralize}Controller < AdminController
 
 =begin
 
-##
-# You can overwrite any of the AdminController methods.
-#
-def index
-end
+  ##
+  # You can overwrite any of the AdminController methods.
+  #
+  def index
+  end
 
-##
-# You can extend the AdminController with your actions.
-#
-# This actions have to be defined in `typus.yml`.
-#
-#   Post:
-#     actions:
-#       index: action_for_the_index
-#       edit: action_for_the_edit
-#
-def your_action
-end
+  ##
+  # You can extend the AdminController with your actions.
+  #
+  # This actions have to be defined in `typus.yml`.
+  #
+  #   Post:
+  #     actions:
+  #       index: action_for_the_index
+  #       edit: action_for_the_edit
+  #
+  def your_action
+  end
 
 =end
 
@@ -185,10 +185,10 @@ require 'test_helper'
 
 class Admin::#{model.pluralize}ControllerTest < ActionController::TestCase
 
-# Replace this with your real tests.
-test "the truth" do
-  flunk 'Not done testing yet.'
-end
+  # Replace this with your real tests.
+  test "the truth" do
+    flunk 'Not done testing yet.'
+  end
 
 end
         RAW

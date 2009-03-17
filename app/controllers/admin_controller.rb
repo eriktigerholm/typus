@@ -160,7 +160,7 @@ class AdminController < ApplicationController
     flash[:success] = t("{{model}} successfully removed.", :model => @resource[:class_name_humanized])
     redirect_to :back
   rescue Exception => error
-    error_handler(error, { :params => params.merge(:action => 'index', :id => nil) })
+    error_handler(error, params.merge(:action => 'index', :id => nil))
   end
 
   ##
@@ -355,7 +355,7 @@ private
   #
   def error_handler(error, url = admin_dashboard_path)
     if Rails.env.production?
-      flash[:error] =  "#{error.message} (#{@resource[:class]})"
+      flash[:error] = "#{error.message} (#{@resource[:class]})"
       redirect_to url
     else
       raise error

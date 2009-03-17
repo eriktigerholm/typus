@@ -8,7 +8,6 @@ class ConfigurationTest < ActiveSupport::TestCase
       assert_equal 'Typus', Typus::Configuration.options[:app_name]
       assert_equal 'vendor/plugins/typus/test/config/working', Typus::Configuration.options[:config_folder]
       assert_equal 'admin@example.com', Typus::Configuration.options[:email]
-      assert_equal true, Typus::Configuration.options[:ignore_missing_translations]
       assert_equal [ [ "English", :en] ], Typus::Configuration.options[:locales]
       assert_equal false, Typus::Configuration.options[:recover_password]
       assert_equal 'admin', Typus::Configuration.options[:root]
@@ -39,7 +38,8 @@ class ConfigurationTest < ActiveSupport::TestCase
     end
   end
 
-  def test_should_verify_options
+  def test_should_verify_options_which_are_only_overwrittable_from_environments
+    assert_equal true, Typus::Configuration.options[:ignore_missing_translations]
     assert_equal 'typus', Typus::Configuration.options[:prefix]
   end
 

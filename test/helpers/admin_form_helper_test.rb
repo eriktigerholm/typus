@@ -19,7 +19,7 @@ class AdminFormHelperTest < ActiveSupport::TestCase
     params = { :controller => 'admin/post', :id => 1, :action => :create }
     self.expects(:params).at_least_once.returns(params)
 
-    @current_user  = mock()
+    @current_user = mock()
     @current_user.expects(:can_perform?).with(Post, 'create').returns(false)
 
     expected = <<-HTML
@@ -35,14 +35,14 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 
   end
 
-  def test_typus_belongs_to_field_diffrent_attribute_name
+  def test_typus_belongs_to_field_with_different_attribute_name
 
-   default_url_options[:host] = 'test.host'
+    default_url_options[:host] = 'test.host'
 
     params = { :controller => 'admin/post', :id => 1, :action => :create }
     self.expects(:params).at_least_once.returns(params)
 
-    @current_user  = mock()
+    @current_user = mock()
     @current_user.expects(:can_perform?).with(Comment, 'create').returns(true)
 
     expected = <<-HTML
@@ -50,10 +50,10 @@ class AdminFormHelperTest < ActiveSupport::TestCase
     <small><a href="http://test.host/comments/new?back_to=%2Ftypus%2Fpost%2F1%2Fcreate&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost\\n\\nClick OK to continue, or click Cancel to stay on this page');">Add new</a></small>
     </label>
 <select id="item_favorite_comment_id" name="item[favorite_comment_id]"><option value=""></option>
-<option value="1"></option>
-<option value="2"></option>
-<option value="3"></option>
-<option value="4"></option></select></li>
+<option value="1">John</option>
+<option value="2">Me</option>
+<option value="3">John</option>
+<option value="4">Me</option></select></li>
     HTML
     assert_equal expected, typus_belongs_to_field('favorite_comment', Post)
 
@@ -176,7 +176,25 @@ class AdminFormHelperTest < ActiveSupport::TestCase
   end
 
   def test_typus_tree_field
-    assert true
+
+    return if !defined?(ActiveRecord::Acts::Tree)
+
+    self.stubs(:expand_tree_into_select_field).returns('expand_tree_into_select_field')
+
+    @resource = { :class => Page }
+    items = @resource[:class].roots
+
+    output = typus_tree_field('parent', items)
+    expected = <<-HTML
+<li><label for="item_parent">Parent</label>
+<select id="item_parent"  name="item[parent]">
+  <option value=""></option>
+  expand_tree_into_select_field
+</select></li>
+    HTML
+
+    assert_equal expected, output
+
   end
 
   def test_typus_string_field
@@ -195,8 +213,56 @@ class AdminFormHelperTest < ActiveSupport::TestCase
     assert true
   end
 
-  def test_typus_form_has_many
-    assert true
+  def test_typus_form_has_many_with_items
+
+    @current_user = typus_users(:admin)
+    @resource = { :class => Post }
+    @item = Post.find(1)
+
+    params = { :controller => 'admin/posts', :id => 1, :action => 'edit' }
+    self.expects(:params).at_least_once.returns(params)
+
+    self.stubs(:build_list).returns('<!-- a_nice_list -->')
+
+    output = typus_form_has_many('comments')
+    expected = <<-HTML
+<a name="comments"></a>
+<div class="box_relationships">
+  <h2>
+  <a href="http://test.host/comments">Comments</a>
+  <small><a href="http://test.host/comments/new?resource_id=1">Add new</a></small>
+  </h2>
+<!-- a_nice_list --></div>
+    HTML
+
+    assert_equal expected, output
+
+  end
+
+  def test_typus_form_has_many_without_items
+
+    @current_user = typus_users(:admin)
+    @resource = { :class => Post }
+    @item = Post.find(1)
+    @item.comments.destroy_all
+
+    params = { :controller => 'admin/posts', :id => 1, :action => 'edit' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = typus_form_has_many('comments')
+    expected = <<-HTML
+<a name="comments"></a>
+<div class="box_relationships">
+  <h2>
+  <a href="http://test.host/comments">Comments</a>
+  <small><a href="http://test.host/comments/new?resource_id=1">Add new</a></small>
+  </h2>
+  <div id="flash" class="notice"><p>There are no comments.</p></div>
+</div>
+    HTML
+
+    assert_equal expected, output
+
   end
 
   def test_typus_form_has_and_belongs_to_many
@@ -220,7 +286,39 @@ class AdminFormHelperTest < ActiveSupport::TestCase
   end
 
   def test_expand_tree_into_select_field
-    assert true
+
+    return if !defined?(ActiveRecord::Acts::Tree)
+
+    items = Page.roots
+
+    # Page#1 is a root.
+
+    @item = Page.find(1)
+    output = expand_tree_into_select_field(items, 'parent_id')
+    expected = <<-HTML
+<option  value="1"> &#92;_ Page#1</option>
+<option  value="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#2</option>
+<option  value="3"> &#92;_ Page#3</option>
+<option  value="4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#4</option>
+<option  value="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#5</option>
+<option  value="6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#6</option>
+    HTML
+    assert_equal expected, output
+
+    # Page#4 is a children.
+
+    @item = Page.find(4)
+    output = expand_tree_into_select_field(items, 'parent_id')
+    expected = <<-HTML
+<option  value="1"> &#92;_ Page#1</option>
+<option  value="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#2</option>
+<option selected value="3"> &#92;_ Page#3</option>
+<option  value="4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#4</option>
+<option  value="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#5</option>
+<option  value="6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#92;_ Page#6</option>
+    HTML
+    assert_equal expected, output
+
   end
 
 end

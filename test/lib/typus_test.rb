@@ -34,10 +34,14 @@ class TypusTest < ActiveSupport::TestCase
     assert Typus.respond_to?(:parent)
   end
 
+=begin
+
   def test_should_verify_parent_for_module
     assert Typus.parent(TypusUser.name, 'module').kind_of?(String)
     assert_equal 'Typus', Typus.parent(TypusUser.name, 'module')
   end
+
+=end
 
   def test_should_verify_parent_for_application
     assert Typus.parent(TypusUser.name, 'application').kind_of?(String)

@@ -1,76 +1,14 @@
-Page:
-  fields:
-    # Body field is overwrited from a Page class method.
-    list: title, body, status
-    form: title, body, status
-  relationships:
-    has_many: assets
-  application: Site
-  options:
-    form_rows: 25
-
-Asset:
-  fields:
-    list: caption
-    form: caption
-  application: Site
-  options:
-
-Category:
-  fields:
-    list: name, position
-    form: name, permalink, position
-  order_by: position
-  module: Post
-
-Post:
-  fields:
-    list: title, created_at, status
-    form: title, body, created_at, status, published_at
-    relationship: title, created_at
-    options:
-      selectors: status
-      read_only: permalink
-      auto_generated: created_at
-      questions: status
-      date_formats:
-        created_at: post_short
-      templates:
-        published_at: datepicker
-  relationships: assets, categories
-  actions:
-    index: cleanup
-    edit: send_as_newsletter, preview
-  filters: status, created_at, user, user_id
-  search: title
-  order_by: title, -created_at
-  application: Blog
-
-User:
-  fields:
-    list: first_name, last_name, email
-
-Comment:
-  fields:
-    list: email, post, post_id
-    form: email, post
-  filters: post
-  search: email, body
-  application: Blog
-
 TypusUser:
   fields:
-    list: first_name, last_name, email, roles, status
-    form: first_name, last_name, email, roles, password, password_confirmation
-    relationship: first_name, last_name, roles, email, status
+    list: email, roles, status
+    form: first_name, last_name, roles, email, password, password_confirmation
     options:
       selectors: roles
       booleans:
-        status: active, inactive
-  filters: status, roles, unexisting
+        status: Active, Inactive
+  filters: status, roles
   search: first_name, last_name, email, roles
-  module: Typus
-  description: System Users Administration
   application: Typus
+  description: System Users Administration
   options:
-    form_rows:
+    icon_on_boolean: false

@@ -50,9 +50,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
   end
 
   def test_should_return_typus_fields_for_list_for_typus_user
-    expected_fields = [['first_name', :string], 
-                       ['last_name', :string], 
-                       ['email', :string], 
+    expected_fields = [['email', :string], 
                        ['roles', :selector], 
                        ['status', :boolean]]
     assert_equal expected_fields.map { |i| i.first }, TypusUser.typus_fields_for('list').keys
@@ -74,8 +72,8 @@ class ActiveRecordTest < ActiveSupport::TestCase
   def test_should_return_typus_fields_for_form_for_typus_user
     expected_fields = [['first_name', :string], 
                        ['last_name', :string], 
-                       ['email', :string], 
                        ['roles', :selector], 
+                       ['email', :string], 
                        ['password', :password], 
                        ['password_confirmation', :password]]
     assert_equal expected_fields.map { |i| i.first }, TypusUser.typus_fields_for('form').keys
@@ -92,10 +90,8 @@ class ActiveRecordTest < ActiveSupport::TestCase
   end
 
   def test_should_return_typus_fields_for_relationship_for_typus_user
-    expected_fields = [['first_name', :string], 
-                       ['last_name', :string], 
+    expected_fields = [['email', :string], 
                        ['roles', :selector], 
-                       ['email', :string], 
                        ['status', :boolean]]
     assert_equal expected_fields.map { |i| i.first }, TypusUser.typus_fields_for('relationship').keys
     assert_equal expected_fields.map { |i| i.last }, TypusUser.typus_fields_for('relationship').values
@@ -104,9 +100,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
   end
 
   def test_should_return_all_fields_for_undefined_field_type_on_typus_user
-    expected_fields = [['first_name', :string], 
-                       ['last_name', :string], 
-                       ['email', :string], 
+    expected_fields = [['email', :string], 
                        ['roles', :selector], 
                        ['status', :boolean]]
     assert_equal expected_fields.map { |i| i.first }, TypusUser.typus_fields_for('undefined').keys
@@ -117,9 +111,8 @@ class ActiveRecordTest < ActiveSupport::TestCase
 
   def test_should_return_filters_for_typus_user
     expected = [['status', :boolean], 
-                ['roles', :string], 
-                ['unexisting', nil]]
-    assert_equal 'status, roles, unexisting', Typus::Configuration.config['TypusUser']['filters']
+                ['roles', :string]]
+    assert_equal 'status, roles', Typus::Configuration.config['TypusUser']['filters']
     assert_equal expected.map { |i| i.first }, TypusUser.typus_filters.keys
     assert_equal expected.map { |i| i.last }, TypusUser.typus_filters.values
   end
@@ -319,10 +312,16 @@ class ActiveRecordTest < ActiveSupport::TestCase
   end
 
   def test_should_verify_typus_name_is_working_properly
+
     assert Category.new.respond_to?(:name)
     assert_equal 'First Category', categories(:first).typus_name
+
     assert !Page.new.respond_to?(:name)
     assert_equal 'Page#1', pages(:published).typus_name
+
+    assert Comment.new.respond_to?(:name)
+    assert_equal "John", comments(:first).typus_name
+
   end
 
   def test_should_verify_typus_template_is_working_properly
