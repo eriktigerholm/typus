@@ -77,8 +77,8 @@ class TypusHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <ul>
 <li>Set language:</li>
-<li><a href="set_locale?en">English</a></li>
-<li><a href="set_locale?es">Español</a></li>
+<li><a href="set_locale?locale=en">English</a></li>
+<li><a href="set_locale?locale=es">Español</a></li>
 
 </ul>
     HTML

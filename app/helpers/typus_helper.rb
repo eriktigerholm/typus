@@ -156,7 +156,7 @@ module TypusHelper
 
     locales_link = Typus.locales.map do |locale|
                      <<-HTML
-<li><a href="#{uri}?#{locale.last}">#{locale.first}</a></li>
+<li><a href="#{uri}?locale=#{locale.last}">#{locale.first}</a></li>
                      HTML
                    end
 
