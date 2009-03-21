@@ -15,7 +15,7 @@ protected
     if session[:typus]
       set_current_user
     else
-      back_to = (request.env['REQUEST_URI'] == "/#{Typus::Configuration.options[:prefix]}") ? nil : request.env['REQUEST_URI']
+      back_to = (request.env['REQUEST_URI'] == "/#{Typus::Configuration.options[:path_prefix]}") ? nil : request.env['REQUEST_URI']
       redirect_to admin_sign_in_path(:back_to => back_to)
     end
   end
@@ -35,7 +35,7 @@ protected
     end
 
     unless @current_user.status
-      back_to = (request.env['REQUEST_URI'] == "/#{Typus::Configuration.options[:prefix]}") ? nil : request.env['REQUEST_URI']
+      back_to = (request.env['REQUEST_URI'] == "/#{Typus::Configuration.options[:path_prefix]}") ? nil : request.env['REQUEST_URI']
       message = t("Your typus user has been disabled.", :default => "Your typus user has been disabled.")
       raise
     end

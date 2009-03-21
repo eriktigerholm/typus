@@ -103,18 +103,10 @@ class TypusTest < ActiveSupport::TestCase
     assert Typus.respond_to?(:to_sentence_options)
     assert Typus.to_sentence_options.kind_of?(Hash)
 
-    expected = if Rails.version == '2.2.2'
-                 { :skip_last_comma => true, :connector => '&' }
-               else
-                 { :words_connector => ', ', :last_word_connector => ' & ' }
-               end
+    expected = { :words_connector => ', ', :last_word_connector => ' & ' }
     assert_equal expected, Typus.to_sentence_options
 
-    expected = if Rails.version == '2.2.2'
-                 { :skip_last_comma => true, :connector => 'or' }
-               else
-                 { :words_connector => ', ', :last_word_connector => ' or ' }
-               end
+    expected = { :words_connector => ', ', :last_word_connector => ' or ' }
     assert_equal expected, Typus.to_sentence_options('or')
 
   end

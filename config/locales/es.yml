@@ -4,7 +4,7 @@ es:
   "Sign in": "Entrar"
   "Recover password": "Recuperar contraseña"
   "Sign up": "Crear cuenta"
-  "Write your email to create the first user": "Escribe tu email para crear el primer usuario."
+  "Enter your email below to create the first user": "Introduce tu email para crear el primer usuario."
   "That doesn't seem like a valid email address": "Eso no parecia una dirección válida de correo electrónico."
   "I remember my password": "Recuerdo mi contraseña"
   "Password recovery link sent to your email": "Enlace de recuperación de contraseña enviado a tu correo electrónico.."

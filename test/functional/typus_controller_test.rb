@@ -165,7 +165,7 @@ class TypusControllerTest < ActionController::TestCase
 
     get :sign_up
     assert flash[:notice]
-    assert_equal 'Write your email to create the first user.', flash[:notice]
+    assert_equal 'Enter your email below to create the first user.', flash[:notice]
 
     post :sign_up, :user => { :email => 'example.com' }
     assert_response :redirect

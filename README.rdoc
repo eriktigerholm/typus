@@ -1,58 +1,54 @@
-= Typus
+= Typus: Effortless admin interface for your Rails application
 
-What's *Typus*?
-
-    Effortless admin interface for your Rails application.
-
-You can see some screenshots on the wiki[http://github.com/fesplugas/typus/wikis].
-
-As Django Admin, *Typus* is designed for a "single" activity:
+As Django Admin, *Typus* is designed for a single activity:
 
     Trusted users editing structured content.
 
-Keep in mind that *Typus* doesn't try to be all the things to all 
-the people but it's extensible enough to match lots of use cases. I 
-started to develop it late 2005 and have been updating it to match 
-all my clients sites/projects requirements.
+*Typus* doesn't try to be all the things to all the people but it's 
+extensible enough to match lots of use cases.
+
+You can see some screenshots on the wiki[http://github.com/fesplugas/typus/wikis].
 
 == Installing
 
-Install from GitHub.
+Install from GitHub the latest version which it's compatible with 
+Rails 2.3.2.
 
     $ script/plugin install git://github.com/fesplugas/typus.git
 
-The `typus` generator copies required assets to the public folder 
-of your Rails application, creates configuration files on `config` 
-folder and generates the required database migration files. Make sure to 
-run `rake db:migrate` before running the generator as Typus has to connect 
-to your database to detect the model attributes.
+Once plugin is installed generate *Typus* files and migrate your 
+database (<tt>typus_users</tt> table is created)
 
     $ script/generate typus
-
-Once `typus` generator is run, migrate your database to create the 
-required tables. (only `typus_users` table is created)
-
     $ rake db:migrate
 
-And finally create the first user, to do it, start the application 
-server, go to http://0.0.0.0:3000/admin and follow the instructions.
+To create the first user, start the application server, go to 
+http://0.0.0.0:3000/admin and follow the instructions.
+
+=== Compatibility and old versions
+
+Master branch is tested with:
+
+- Rails: 2.3.2 and Egde.
+- Ruby: 1.8.6-p287 and 1.8.7-p72.
+
+If you want to use *Typus* with Rails 2.2.2 install the 2.2.2 branch 
+of the plugin. This branch will be mantained during 3 months from the 
+release of Rails 2.3.2.
+
+    $ script/plugin install -r '2.2.2' git://github.com/fesplugas/typus.git
+
+== Available rake tasks
 
 You can view the available tasks running:
 
     $ rake -T typus
-    (in /Users/fesplugas/Development/typus_platform)
+    (in /Users/fesplugas/Development/typus_core)
     rake doc:plugins:typus  # Generate documentation for the typus plugin
     rake typus:i18n         # Install simplified_translation plugin.
     rake typus:misc         # Install Paperclip, acts_as_list, acts_as_tree.
     rake typus:roles        # List current roles
     rake typus:ssl          # Intall ssl_requirement plugin.
-
-=== Compatibility
-
-Typus has been tested with:
-
-- Rails: 2.2.2, 2.3.2 and Egde.
-- Ruby: 1.8.6-p287 and 1.8.7-p72.
 
 == Plugin Configuration Options
 
@@ -62,7 +58,8 @@ You can overwrite the following settings.
     Typus::Configuration.options[:config_folder]
     Typus::Configuration.options[:email]
     Typus::Configuration.options[:ignore_missing_translations]
-    Typus::Configuration.options[:prefix]
+    Typus::Configuration.options[:locales]
+    Typus::Configuration.options[:path_prefix]
     Typus::Configuration.options[:recover_password]
     Typus::Configuration.options[:root]
     Typus::Configuration.options[:ssl]
@@ -83,8 +80,8 @@ Model options.
     Typus::Configuration.options[:start_year]
     Typus::Configuration.options[:toggle]
 
-You can also overwrite the model options by model. This is done always 
-from the yaml files under <tt>config/typus</tt>.
+Model options can also be defined by model on the yaml files located 
+on <tt>config/typus</tt>.
 
     Post:
       options:
@@ -99,6 +96,27 @@ from the yaml files under <tt>config/typus</tt>.
         start_year: 1990
         toggle: true
 
+=== Translating the interface
+
+By default Typus I18n is set to English. You can change this with the 
+following configuration option. (i.e. interface in Español)
+
+    Typus::Configuration.options[:locales] = [ [ "Español", :es ] ]
+
+If you need more than one language you can use the following settings. 
+
+    Typus::Configuration.options[:locales] = [ [ "English", :en ], 
+                                               [ "Español", :es ] ]
+
+Previous settings makes appear a language list on the right bottom of 
+the interface.
+
+Available languages are:
+
+- English
+- Español
+- Brazilian Portuguese
+
 === Recover password
 
 Recover password is disabled by default. To enable it you should 
@@ -107,13 +125,24 @@ provide an email address which will be shown as the sender.
     Typus::Configuration.options[:email] = 'typus@application.com'
     Typus::Configuration.options[:recover_password] = true
 
+=== Enable SSL
+
+You can use SSL on Typus. To enable it update the initializer.
+
+    Typus::Configuration.options[:ssl] = true
+
+Remember to install the <tt>ssl_requirement</tt> plugin to be able to 
+use this feature.
+
+    $ rake typus:ssl
+
 === Special Route
 
-To overwrite the default prefix path of your application place the 
+To overwrite default <tt>prefix_path</tt> of your application place the 
 following configuration option on <tt>development.rb</tt>, <tt>production.rb</tt> 
 on the <tt>config/environments</tt> folder.
 
-    Typus::Configuration.options[:prefix] = "backoffice"
+    Typus::Configuration.options[:path_prefix] = 'backoffice'
 
 === View Missing Translations
 
@@ -126,7 +155,7 @@ folder so all missing translations messages will be shown.
 === Disable password recover
 
 You can disable password recover on the login page. By default, password
-recovery is enabled.
+recovery is disabled.
 
     Typus::Configuration.options[:recover_password] = false
 
@@ -141,29 +170,44 @@ true to false and false to true. You can disable this link with:
 
 After creating a new record you'll be redirected to the record so 
 you can continue editing it. If you prefer to be redirected to the 
-main index you can owerwrite the setting.
+main index you can owerwrite the setting. This setting can be defined 
+globally or by model.
 
     Typus::Configuration.options[:edit_after_create] = false
 
 == Configuration file options
 
-You can configure all *Typus* settings from the <tt>application.yml</tt> 
-file located under the <tt>config/typus</tt> folder. This file is created 
-once you run the <tt>typus</tt> generator.
+You can configure all *Typus* settings from the yaml files which are placed 
+on <tt>config/typus</tt> folder. This file is created once you run the 
+<tt>typus</tt> generator.
+
+There are two kind of files, the <tt>*.yml</tt> and the <tt>*_roles.yml</tt>. 
+Look the generated files to see the available options.
 
 === Typus Fields
+
+Define the collection of fields which you want to display on different 
+parts of the site. List is for lists, form is for forms.
 
     fields:
       list: name, created_at, category, status
       form: name, body, created_at, status
-      relationship: name, category
 
-NOTE: Upload files only works if you follow <tt>Paperclip</tt> naming 
-conventions.
+==== File fields
+
+Upload files works if you follow <tt>Paperclip</tt> naming conventions.
+
+    Asset:
+      fields:
+        list: asset_file_name
+        form: asset_file_name
+
+==== Read only fields
 
 In form fields you can have read only fields and read only fields for 
 autogenerated content. These kind of fields will be shown in the form 
-but won't be editable. Example with the "name" attribute being read-only:
+but won't be editable. Example with the <tt>name</tt> attribute being 
+read-only:
 
     fields:
       list: name, created_at, category, status
@@ -172,7 +216,9 @@ but won't be editable. Example with the "name" attribute being read-only:
       options:
         read_only: name
 
-To define <tt>auto generated</tt> fields.
+==== Auto generated fields
+
+Define <tt>auto generated</tt> fields.
 
     Order:
       fields:
@@ -183,9 +229,7 @@ To define <tt>auto generated</tt> fields.
 
 You can then initialize it from the model.
 
-    ##
     # app/models/order.rb
-    #
     class Order < ActiveRecord::Base
 
       def initialize_with_defaults(attributes = nil, &block)
@@ -199,12 +243,12 @@ You can then initialize it from the model.
 
     end
 
-You can even add "virtual fields". For example you have a model and you 
-need special attributes like an slug, which is generated from the title.
+==== Virtual attribute fields
 
-    ##
+Define a <tt>virtual attributes</tt>. (i.e. model which has an slug 
+attribute which is generated from the title)
+
     # app/models/post.rb
-    #
     class Post < ActiveRecord::Base
 
       validates_presence_of :title
@@ -215,9 +259,8 @@ need special attributes like an slug, which is generated from the title.
 
     end
 
-You can add <tt>slug</tt> a as attribute and it'll be shown on the lists.
+Add <tt>slug</tt> as field and it'll be shown on the listings.
 
-    ##
     # config/typus/application.yml
     Post:
       fields:
@@ -226,25 +269,29 @@ You can add <tt>slug</tt> a as attribute and it'll be shown on the lists.
 
 === External Forms
 
-Typus will detect automatically which kind of relationships has the model.
+Typus will detect automatically which kind of relationships has the 
+model and will appear on the listings.
 
     relationships: users, projects
 
 === Filters
 
-You can define filters per model on the config file ...
+Define which filters you want to have on an specific model. 
+(i.e. show status, author and created_at filters for posts)
 
     filters: status, author, created_at
 
 === Order
 
-Adding minus (-) sign before the attribute will make the order DESC.
+Det the default display order of the items on a model.
 
-    order_by: -attribute1, attribute2
+    order_by: attribute1, -attribute2
+
+Adding minus (-) sign before the attribute will make the order DESC.
 
 === Searches
 
-You can define search filters on <tt>config/typus/application.yml</tt>.
+Define which fields will be used when performing a search on the model.
 
     search: attribute1, attribute2
 
@@ -279,11 +326,7 @@ of a video or whatever in the model?
 From now on the form, if you have enabled them on the list/form you'll see 
 a selector with the options that you define in your model.
 
-Example:
-
-    ##
     # app/models/video.rb
-    #
     class Video < ActiveRecord::Base
 
       validates_inclusion_of :status, :in => self.status
@@ -294,9 +337,9 @@ Example:
 
     end
 
-    ##
+Configuration file will look like this:
+
     # config/typus/application.yml
-    #
     Video:
       fields:
         list: title, status
@@ -304,39 +347,36 @@ Example:
         options:
           selectors: status
 
-If the selector is not defined, you'll see a *text field* instead of a 
-*select field*.
+If the selector is not defined, you'll see a <tt>text field</tt> instead of a 
+<tt>select field</tt>.
 
 === Booleans
 
-By default Typus will show all your booleans on the listings with an 
-icon, if you prefer to show it as a text to be more verbose you can 
-disable it with:
+By default all your booleans will be represented with an icon, if you 
+prefer to show it as a text to be more verbose you can disable it with:
 
     Typus::Configuration.options[:icon_on_boolean]
 
-Boolean text shows *True* & *False*, but you can personalize it "per 
-attribute" to match your application requirements.
+Boolean text shows <tt>true</tt> & <tt>false</tt>, but you can 
+personalize it "per attribute" to match your application requirements.
 
-    ##
     # config/typus/application.yml
-    #
     TypusUser:
       fields:
         list: email, status
         options:
           booleans:
-            # attribute: TRUE, FALSE
+            # attribute: true, false
             default: publicado, no_publicado
             status: active, inactive
+
+This setting can be defined by model or system wide.
 
 === Date Formats
 
 Date formats allows to define the format of the datetime field.
 
-    ##
     # config/typus/application.yml
-    #
     Post:
       fields:
         list: title, published_at
@@ -344,29 +384,23 @@ Date formats allows to define the format of the datetime field.
           date_formats:
             published_at: post_short
 
-    ##
     # config/initializers/dates.rb
-    #
-    # Date::DATE_FORMATS[:post_short] = "%m/%Y"
-    Time::DATE_FORMATS[:post_short] = "%m/%y"
+    Date::DATE_FORMATS[:post_short] = '%m/%Y'
+    Time::DATE_FORMATS[:post_short] = '%m/%y'
 
 === Want more actions?
 
+Define more actions which will be shown on the requested action.
+
     Post:
-      fields:
-        list: ...
-        form: ...
       actions:
         index: notify_all
         edit: notify
 
-These actions will only be available on the requested action.
-
-You can add those actions to your admin controllers. Example:
+Add those actions to your admin controllers.
 
     class Admin::NewslettersController < AdminController
 
-      ##
       # Action to deliver emails ...
       def deliver
         ...
@@ -411,7 +445,12 @@ Example: (Blog)
     Tag:
       module: Post
 
-== Custom Views
+== Custom Interface
+
+You can customize the interface by placing on <tt>views/admin</tt> the 
+following files.
+
+=== Change default views
 
 You can add your custom views to match your application requirements. Views 
 you can customize.
@@ -420,52 +459,42 @@ you can customize.
     edit.html.erb
     show.html.erb
 
-=== Example
-
-Need a custom view on the Articles listing? 
+Need a custom view on the Articles listing?
 
 Under <tt>app/view/admin/articles</tt> add the file <tt>index.html.erb</tt> 
 and Typus default <tt>index.html.erb</tt> will be replaced.
 
-== Customize Interface
+=== Blocks
 
-You can customize the interface by placing on <tt>views/admin</tt> the 
-following files.
-
-=== Login Page
+Login Page
 
     views/admin/login/_bottom.html.erb
     views/admin/login/_top.html.erb
 
-=== Dashboard
+Dashboard
 
     views/admin/dashboard/_bottom.html.erb
     views/admin/dashboard/_sidebar.html.erb
     views/admin/dashboard/_top.html.erb
 
-=== Models
+Models
 
-    views/admin/MODEL/_edit.html.erb
-    views/admin/MODEL/_edit_bottom.html.erb
-    views/admin/MODEL/_edit_sidebar.html.erb
-    views/admin/MODEL/_edit_top.html.erb
-    views/admin/MODEL/_index.html.erb
-    views/admin/MODEL/_index_bottom.html.erb
-    views/admin/MODEL/_index_sidebar.html.erb
-    views/admin/MODEL/_index_top.html.erb
-    views/admin/MODEL/_new.html.erb
-    views/admin/MODEL/_new_bottom.html.erb
-    views/admin/MODEL/_new_sidebar.html.erb
-    views/admin/MODEL/_new_top.html.erb
-    views/admin/MODEL/_show.html.erb
-    views/admin/MODEL/_show_bottom.html.erb
-    views/admin/MODEL/_show_sidebar.html.erb
-    views/admin/MODEL/_show_top.html.erb
-
-Example:
-
-    views/admin/posts/_index_top.html.erb
-    views/admin/typus_users/_edit_top.html.erb
+    views/admin/<YOUR_RESOURCE>/_edit.html.erb
+    views/admin/<YOUR_RESOURCE>/_edit_bottom.html.erb
+    views/admin/<YOUR_RESOURCE>/_edit_sidebar.html.erb
+    views/admin/<YOUR_RESOURCE>/_edit_top.html.erb
+    views/admin/<YOUR_RESOURCE>/_index.html.erb
+    views/admin/<YOUR_RESOURCE>/_index_bottom.html.erb
+    views/admin/<YOUR_RESOURCE>/_index_sidebar.html.erb
+    views/admin/<YOUR_RESOURCE>/_index_top.html.erb
+    views/admin/<YOUR_RESOURCE>/_new.html.erb
+    views/admin/<YOUR_RESOURCE>/_new_bottom.html.erb
+    views/admin/<YOUR_RESOURCE>/_new_sidebar.html.erb
+    views/admin/<YOUR_RESOURCE>/_new_top.html.erb
+    views/admin/<YOUR_RESOURCE>/_show.html.erb
+    views/admin/<YOUR_RESOURCE>/_show_bottom.html.erb
+    views/admin/<YOUR_RESOURCE>/_show_sidebar.html.erb
+    views/admin/<YOUR_RESOURCE>/_show_top.html.erb
 
 === Attribute templates
 
@@ -477,9 +506,7 @@ resource and the attribute name will be sent as local
 variables <tt>resource</tt> and <tt>attribute</tt>. You can change the 
 folder with Typus::Configuration.options[:templates_folder].
 
-    ##
     # config/typus/application.yml
-    #
     Post:
       fields:
         list: title, published_at
@@ -487,9 +514,7 @@ folder with Typus::Configuration.options[:templates_folder].
           templates:
             published_at: datepicker
 
-    ##
     # app/views/admin/templates/_datepicker.html.erb
-    #
     <li><label><%= t(attribute.humanize) %></label>
       <%= calendar_date_select :item, attribute %>
     </li>
@@ -497,61 +522,39 @@ folder with Typus::Configuration.options[:templates_folder].
 == Roles
 
 Typus has roles support. You can can add as many roles as you want. 
-They are defined in `config/typus/application_roles.yml` and you 
+They are defined in <tt>config/typus/application_roles.yml</tt> and you 
 can can define the allowed actions per role.
 
     admin:
-      TypusUser: create, read, update, delete
-      Post: create, read, update, delete, rebuild
       Category: create, read, update, delete
+      Post: create, read, update, delete, rebuild
+      TypusUser: create, read, update, delete
 
     editor:
-      Post: create, update
       Category: create, update
+      Post: create, update
 
 == Resources which are not models
 
 Want to manage *memcached*, see the current *starling* queue or have 
 an special resource which is not related to any model?
 
-    ##
     # config/typus/application_roles.yml
     admin:
-      Backup: index, download_db, download_media
-      MemCached: index
       ApplicationLog: index
+      Backup: index, download_db, download_media
       Git: index, commit
+      MemCached: index
 
-When you start *Typus* a controller and a view will be created.
+When you start *Typus* needed controllers and a default view will be 
+created.
 
     app/controllers/admin/backup_controller.rb
     app/views/admin/backup/index.html
 
-== Typus & SSL
-
-You can use SSL on Typus. To enable it update the initializer.
-
-    Typus::Configuration.options[:ssl] = true
-
-Remember to install the `ssl_requirement` plugin to be able to use this 
-feature.
-
-    $ rake typus:ssl
-
-== Tip & Tricks
-
-=== Roles for a user?
-
-You can create a role for a user using directly the username nickname. For 
-example, the user Francesc Esplugas:
-
-    fesplugas:
-      TypusUser: update
-      Post: create, read, update, delete
-
 == Testing the plugin
 
-You need to have `mocha` to test the plugin.
+You need to have <tt>mocha</tt> installed to test the plugin.
 
     $ sudo gem install mocha
 
@@ -563,9 +566,8 @@ Use the following steps to test the plugin.
     $ rake
 
 By default tests are be performed against a SQLite3 database in memory.
-You can also run tests against PostgreSQL and MySQL databases. You 
-have to create databases, both are called `typus_test`. Once you've 
-created them you can run the tests.
+You can also run tests against PostgreSQL and MySQL databases. (database 
+name is <tt>typus_test</tt>)
 
     $ rake DB=mysql
     $ rake DB=postgresql
@@ -573,8 +575,7 @@ created them you can run the tests.
 == Splitting configuration files
 
 You can split your configuration files in several files so it can be easier 
-to mantain. (Files will be loaded by alphabetical order so adding 00X can 
-help to load files in an special order.)
+to mantain. Files are loaded by alphabetical order.
 
     config/typus/001-application.yml
     config/typus/002-newsletter.yml
@@ -586,18 +587,17 @@ help to load files in an special order.)
 == Quick edit
 
 To enable quick edit include the AdminPublicHelper on your 
-`application_helper.rb`.
+<tt>application_helper.rb</tt>.
 
     module ApplicationHelper
       include AdminPublicHelper
     end
 
-Example:
+Include the helper on your views.
 
     <%= quick_edit :resource => 'pages', 
                    :id => @page.id, 
                    :message => 'Edit this page' %>
-
 
 == Contributors
 
@@ -609,6 +609,7 @@ Example:
 - Anthony Underwood (Code) http://github.com/aunderwo
 - Felipe Talavera (Code) http://github.com/flype
 - Erik Tigerholm (Code) http://github.com/eriktigerholm
+- George Guimarães (Translation to Brazilian Portuguese) http://github.com/georgeguimaraes
 
 == Author, contact, bugs, mailing list and more
 

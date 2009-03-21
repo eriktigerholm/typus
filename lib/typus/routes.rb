@@ -4,7 +4,7 @@ end
 
 ActionController::Routing::Routes.draw do |map|
 
-  map.with_options :controller => 'typus', :path_prefix => Typus::Configuration.options[:prefix] do |i|
+  map.with_options :controller => 'typus', :path_prefix => Typus::Configuration.options[:path_prefix] do |i|
     i.admin_quick_edit 'quick_edit', :action => 'quick_edit'
     i.admin_dashboard '', :action => 'dashboard'
     i.admin_sign_in 'sign_in', :action => 'sign_in'
@@ -22,7 +22,7 @@ ActionController::Routing::Routes.draw do |map|
     #
     Typus.resources.each do |resource|
       admin.connect "#{resource.underscore}/:action", :controller => resource.underscore, 
-                                                      :path_prefix => Typus::Configuration.options[:prefix]
+                                                      :path_prefix => Typus::Configuration.options[:path_prefix]
     end
 
     Typus.models.each do |m|
@@ -55,7 +55,7 @@ ActionController::Routing::Routes.draw do |map|
 
       admin.resources m.tableize, :collection => collection, 
                                   :member => member, 
-                                  :path_prefix => Typus::Configuration.options[:prefix]
+                                  :path_prefix => Typus::Configuration.options[:path_prefix]
 
     end
 

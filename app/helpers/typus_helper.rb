@@ -66,7 +66,7 @@ module TypusHelper
 
         html << <<-HTML
 <tr class="#{cycle('even', 'odd')}">
-<td>#{link_to I18n.t(resource.titleize, :default => resource.titleize), "#{Typus::Configuration.options[:prefix]}/#{resource.underscore}"}</td>
+<td>#{link_to I18n.t(resource.titleize, :default => resource.titleize), "#{Typus::Configuration.options[:path_prefix]}/#{resource.underscore}"}</td>
 <td align="right" style="vertical-align: bottom;"></td>
 </tr>
         HTML
@@ -86,11 +86,7 @@ module TypusHelper
     options = args.extract_options!
     template = [ 'admin', options[:model], options[:location], "_#{options[:partial]}.html.erb" ].compact.join('/')
 
-    exists = if Rails.version == '2.2.2'
-               ActionController::Base.view_paths.map { |vp| File.exists?("#{vp}/#{template}") }
-             else
-               ActionController::Base.view_paths.map { |vp| File.exists?("#{Rails.root}/#{vp}/#{template}") }
-             end
+    exists = ActionController::Base.view_paths.map { |vp| File.exists?("#{Rails.root}/#{vp}/#{template}") }
 
     return unless exists.include?(true)
     render :partial => template.gsub('/_', '/')

@@ -126,7 +126,7 @@ class TypusController < ApplicationController
 
     else
 
-      flash[:notice] = t("Write your email to create the first user.")
+      flash[:notice] = t("Enter your email below to create the first user.")
 
     end
 

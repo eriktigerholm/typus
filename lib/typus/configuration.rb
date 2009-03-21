@@ -24,7 +24,7 @@ module Typus
                       :email => 'admin@example.com', 
                       :ignore_missing_translations => true, 
                       :locales => [ [ "English", :en ] ], 
-                      :prefix => 'admin', 
+                      :path_prefix => 'admin', 
                       :recover_password => false, 
                       :root => 'admin', 
                       :ssl => false, 

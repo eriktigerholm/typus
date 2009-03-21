@@ -5,7 +5,7 @@
 # `config/environments` folder.
 
 # Typus::Configuration.options[:ignore_missing_translations] = true
-# Typus::Configuration.options[:prefix] = 'admin'
+# Typus::Configuration.options[:path_prefix] = 'admin'
 
 # System wide options
 

@@ -45,7 +45,7 @@ module AdminFormHelper
     #
     params[:action] = (params[:action] == 'create') ? 'new' : params[:action]
 
-    back_to = [ Typus::Configuration.options[:prefix], 
+    back_to = [ Typus::Configuration.options[:path_prefix], 
                 params[:controller].split('/').last, 
                 params[:id], 
                 params[:action] ]
@@ -189,7 +189,7 @@ module AdminFormHelper
 
   def typus_relationships
 
-    back_to = [ Typus::Configuration.options[:prefix], 
+    back_to = [ Typus::Configuration.options[:path_prefix], 
                 params[:controller].split('/').last, 
                 params[:id], 
                 params[:action] ]
