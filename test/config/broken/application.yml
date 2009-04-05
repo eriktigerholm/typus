@@ -29,7 +29,6 @@ Post:
       selectors: status
       read_only: permalink
       auto_generated: created_at
-      questions: status
       date_formats:
         created_at: post_short
   relationships: assets, categories
@@ -55,15 +54,15 @@ Comment:
 
 TypusUser:
   fields:
-    list: first_name, last_name, email, roles, status
-    form: first_name, last_name, email, roles, password, password_confirmation
-    relationship: first_name, last_name, roles, email, status
+    list: first_name, last_name, email, role, status
+    form: first_name, last_name, email, role, password, password_confirmation
+    relationship: first_name, last_name, role, email, status
     options:
-      selectors: roles
+      selectors: role
       booleans:
         status: active, inactive
-  filters: status, roles, unexisting
-  search: first_name, last_name, email, roles
+  filters: status, role, unexisting
+  search: first_name, last_name, email, role
   module: Typus
   description: System Users Administration
   application: Typus

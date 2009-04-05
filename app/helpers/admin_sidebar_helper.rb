@@ -26,7 +26,7 @@ module AdminSidebarHelper
     case params[:action]
     when 'index', 'edit', 'update'
       if @current_user.can_perform?(@resource[:class], 'create')
-        items << (link_to t("Add entry"), :action => 'new')
+        items << (link_to t("Add entry", :default => "Add entry"), :action => 'new')
       end
     end
 
@@ -34,7 +34,7 @@ module AdminSidebarHelper
 
     case params[:action]
     when 'new', 'create', 'edit', 'update'
-      items << (link_to t("Back to list"), :action => 'index')
+      items << (link_to t("Back to list", :default => "Back to list"), :action => 'index')
     end
 
     return items
@@ -94,7 +94,7 @@ module AdminSidebarHelper
     typus_search = @resource[:class].typus_defaults_for(:search)
     return if typus_search.empty?
 
-    search_by = typus_search.collect { |x| I18n.t(x, :default => x) }.to_sentence(Typus.to_sentence_options).titleize.downcase
+    search_by = typus_search.collect { |x| I18n.t(x, :default => x) }.to_sentence
 
     search_params = params.dup
     %w( action controller search page ).each { |p| search_params.delete(p) }
@@ -107,7 +107,7 @@ module AdminSidebarHelper
 <p><input id="search" name="search" type="text" value="#{params[:search]}"/></p>
 #{hidden_params.sort.join("\n")}
 </form>
-<p class="tip">#{I18n.t("Search by", :default => "Search by")} #{search_by}.</p>
+<p class="tip">#{I18n.t("Search by", :default => "Search by")} #{search_by.humanize.downcase}.</p>
     HTML
 
   end
@@ -121,6 +121,7 @@ module AdminSidebarHelper
 
     returning(String.new) do |html|
       typus_filters.each do |key, value|
+        value = :boolean if key.include?('?')
         case value
         when :boolean:      html << boolean_filter(current_request, key)
         when :string:       html << string_filter(current_request, key)
@@ -170,7 +171,7 @@ function surfto_#{model_pluralized}(form) {
 <!-- /Embedded JS -->
 <p><form class="form" action="#">
   <select name="#{model_pluralized}" onChange="surfto_#{model_pluralized}(this.form)">
-    <option value="#{url_for params_without_filter}">#{t("filter by")} #{t(model.name.titleize)}</option>
+    <option value="#{url_for params_without_filter}">#{t("filter by", :default => "filter by")} #{t(model.name.humanize, :default => model.name.humanize)}</option>
     #{items.join("\n")}
   </select>
 </form></p>
@@ -198,16 +199,16 @@ function surfto_#{model_pluralized}(form) {
     %w( today past_7_days this_month this_year ).each do |timeline|
       switch = request.include?("#{filter}=#{timeline}") ? 'on' : 'off'
       options = { "#{filter}".to_sym => timeline, :page => nil }
-      items << (link_to timeline.titleize, params.merge(options), :class => switch)
+      items << (link_to I18n.t(timeline.humanize, :default => timeline.humanize), params.merge(options), :class => switch)
     end
     build_typus_list(items, filter)
   end
 
   def boolean_filter(request, filter)
     items = []
-    @resource[:class].typus_boolean(filter).each do |key, value|
-      switch = request.include?("#{filter}=#{key}") ? 'on' : 'off'
-      options = { "#{filter}".to_sym => key, :page => nil }
+    @resource[:class].typus_boolean(filter.typus_cleaner).each do |key, value|
+      switch = request.include?("#{filter.typus_cleaner}=#{key}") ? 'on' : 'off'
+      options = { "#{filter.typus_cleaner}".to_sym => key, :page => nil }
       items << (link_to I18n.t(value, :default => value), params.merge(options), :class => switch)
     end
     build_typus_list(items, filter)

@@ -22,6 +22,15 @@ class TypusControllerTest < ActionController::TestCase
     assert_redirected_to admin_dashboard_path
   end
 
+  def test_should_return_message_when_sign_in_fails
+    post :sign_in, { :user => { :email => 'john@example.com', 
+                                :password => 'XXXXXXXX' } }
+    assert_response :redirect
+    assert_redirected_to admin_sign_in_path
+    assert flash[:error]
+    assert_equal "The email and/or password you entered is invalid.", flash[:error]
+  end
+
   def test_should_not_sign_in_a_disabled_user
     typus_user = typus_users(:disabled_user)
     post :sign_in, { :user => { :email => typus_user.email, 
@@ -42,7 +51,7 @@ class TypusControllerTest < ActionController::TestCase
     assert_redirected_to admin_sign_in_path
     assert_nil @request.session[:typus]
     assert flash[:notice]
-    assert_equal 'Typus user or role no longer exist.', flash[:notice]
+    assert_equal 'Role does no longer exists.', flash[:notice]
   end
 
   def test_should_not_send_recovery_password_link_to_unexisting_user
@@ -87,7 +96,7 @@ class TypusControllerTest < ActionController::TestCase
     assert_redirected_to admin_sign_in_path
 
     assert flash[:notice]
-    assert_equal "Your typus user has been disabled.", flash[:notice]
+    assert_equal "Typus user has been disabled.", flash[:notice]
     assert_nil @request.session[:typus]
 
   end
@@ -168,8 +177,7 @@ class TypusControllerTest < ActionController::TestCase
     assert_equal 'Enter your email below to create the first user.', flash[:notice]
 
     post :sign_up, :user => { :email => 'example.com' }
-    assert_response :redirect
-    assert_redirected_to admin_sign_up_path
+    assert_response :success
     assert flash[:error]
     assert_equal 'That doesn\'t seem like a valid email address.', flash[:error]
 
@@ -177,7 +185,7 @@ class TypusControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to admin_dashboard_path
     assert flash[:notice]
-    assert_match /Your new password is/, flash[:notice]
+    assert_equal "Password set to \"hocus-pocus\".", flash[:notice]
     assert @request.session[:typus]
     assert !TypusUser.find(:all).empty?
 

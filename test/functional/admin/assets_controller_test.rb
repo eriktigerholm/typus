@@ -14,7 +14,7 @@ class Admin::AssetsControllerTest < ActionController::TestCase
   def test_should_test_polymorphic_relationship_message
     post_ = posts(:published)
     get :new, { :back_to => "/admin/posts/#{post_.id}/edit", :resource => post_.class.name, :resource_id => post_.id }
-    assert_match 'You\'re adding a new Asset to Post.', @response.body
+    assert_match "You're adding a new Asset to Post.", @response.body
   end
 
   def test_should_create_a_polymorphic_relationship
@@ -36,7 +36,7 @@ class Admin::AssetsControllerTest < ActionController::TestCase
     post_ = posts(:published)
     asset_ = assets(:first)
     get :edit, { :id => asset_.id, :back_to => "/admin/posts/#{post_.id}/edit", :resource => post_.class.name, :resource_id => post_.id }
-    assert_match 'You\'re updating a Asset for Post.', @response.body
+    assert_match "You're updating a Asset for Post.", @response.body
   end
 
   def test_should_return_to_back_to_url

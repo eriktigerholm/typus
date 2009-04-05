@@ -28,8 +28,28 @@ class TypusHelperTest < ActiveSupport::TestCase
     assert_equal 'whatistypus.com &rsaquo; Custom action', output
   end
 
-  def test_header
+  def test_header_with_root_path
+    # Add root named route
+    ActionController::Routing::Routes.add_named_route :root, "/", {:controller => "posts"}
+    
+    # ActionView::Helpers::UrlHelper does not support strings, which are returned by named routes
+    # link root_path
+    self.stubs(:link_to).returns(%(<a href="/">View site</a>))
+    
+    output = header
+    expected = <<-HTML
+<h1>#{Typus::Configuration.options[:app_name]} <small><a href="/">View site</a></small>
+</h1>
+    HTML
 
+    assert_equal expected, output
+
+  end
+  
+  def test_header_without_root_path
+    # Remove root route from list
+    ActionController::Routing::Routes.named_routes.routes.reject! {|key, route| key == :root }
+    
     output = header
     expected = <<-HTML
 <h1>#{Typus::Configuration.options[:app_name]} </h1>
@@ -75,12 +95,7 @@ class TypusHelperTest < ActiveSupport::TestCase
 
     output = locales('set_locale')
     expected = <<-HTML
-<ul>
-<li>Set language:</li>
-<li><a href="set_locale?locale=en">English</a></li>
-<li><a href="set_locale?locale=es">Español</a></li>
-
-</ul>
+<p>Set language to <a href=\"set_locale?locale=en\">english</a>, <a href=\"set_locale?locale=es\">español</a>.</p>
     HTML
     assert_equal expected, output
 

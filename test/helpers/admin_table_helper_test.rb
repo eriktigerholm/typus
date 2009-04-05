@@ -22,7 +22,7 @@ class AdminTableHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <tr>
 <th><a href="http://test.host/typus/typus_users?order_by=email"><div class="">Email</div></a></th>
-<th><a href="http://test.host/typus/typus_users?order_by=roles"><div class="">Roles</div></a></th>
+<th><a href="http://test.host/typus/typus_users?order_by=role"><div class="">Role</div></a></th>
 <th><a href="http://test.host/typus/typus_users?order_by=status"><div class="">Status</div></a></th>
 <th>&nbsp;</th>
 </tr>

@@ -2,40 +2,38 @@ require 'test/helper'
 
 class ConfigurationTest < ActiveSupport::TestCase
 
+  def test_should_verify_configuration_responds_to_options
+    assert Typus::Configuration.respond_to?(:options)
+  end
+
   def test_should_verify_application_wide_configuration_options
     initializer = "#{Rails.root}/config/initializers/typus.rb"
-    unless File.exists?(initializer)
-      assert_equal 'Typus', Typus::Configuration.options[:app_name]
-      assert_equal 'vendor/plugins/typus/test/config/working', Typus::Configuration.options[:config_folder]
-      assert_equal 'admin@example.com', Typus::Configuration.options[:email]
-      assert_equal [ [ "English", :en] ], Typus::Configuration.options[:locales]
-      assert_equal false, Typus::Configuration.options[:recover_password]
-      assert_equal 'admin', Typus::Configuration.options[:root]
-      assert_equal false, Typus::Configuration.options[:ssl]
-      assert_equal 'admin/templates', Typus::Configuration.options[:templates_folder]
-      assert_equal 'TypusUser', Typus::Configuration.options[:user_class_name]
-      assert_equal 'typus_user_id', Typus::Configuration.options[:user_fk]
-    else
-      assert Typus::Configuration.respond_to?(:options)
-    end
+    return if File.exists?(initializer)
+    assert_equal 'Typus', Typus::Configuration.options[:app_name]
+    assert_equal 'vendor/plugins/typus/test/config/working', Typus::Configuration.options[:config_folder]
+    assert_equal 'admin@example.com', Typus::Configuration.options[:email]
+    assert_equal [ [ "English", :en] ], Typus::Configuration.options[:locales]
+    assert_equal false, Typus::Configuration.options[:recover_password]
+    assert_equal 'admin', Typus::Configuration.options[:root]
+    assert_equal false, Typus::Configuration.options[:ssl]
+    assert_equal 'admin/templates', Typus::Configuration.options[:templates_folder]
+    assert_equal 'TypusUser', Typus::Configuration.options[:user_class_name]
+    assert_equal 'typus_user_id', Typus::Configuration.options[:user_fk]
   end
 
   def test_should_verify_model_configuration_options
     initializer = "#{Rails.root}/config/initializers/typus.rb"
-    unless File.exists?(initializer)
-      assert_equal true, Typus::Configuration.options[:edit_after_create]
-      assert_equal nil, Typus::Configuration.options[:end_year]
-      assert_equal 10, Typus::Configuration.options[:form_rows]
-      assert_equal true, Typus::Configuration.options[:icon_on_boolean]
-      assert_equal 5, Typus::Configuration.options[:minute_step]
-      assert_equal 'nil', Typus::Configuration.options[:nil]
-      assert_equal 15, Typus::Configuration.options[:per_page]
-      assert_equal 10, Typus::Configuration.options[:sidebar_selector]
-      assert_equal nil, Typus::Configuration.options[:start_year]
-      assert_equal true, Typus::Configuration.options[:toggle]
-    else
-      assert Typus::Configuration.respond_to?(:options)
-    end
+    return if File.exists?(initializer)
+    assert_equal true, Typus::Configuration.options[:edit_after_create]
+    assert_equal nil, Typus::Configuration.options[:end_year]
+    assert_equal 10, Typus::Configuration.options[:form_rows]
+    assert_equal true, Typus::Configuration.options[:icon_on_boolean]
+    assert_equal 5, Typus::Configuration.options[:minute_step]
+    assert_equal 'nil', Typus::Configuration.options[:nil]
+    assert_equal 15, Typus::Configuration.options[:per_page]
+    assert_equal 10, Typus::Configuration.options[:sidebar_selector]
+    assert_equal nil, Typus::Configuration.options[:start_year]
+    assert_equal true, Typus::Configuration.options[:toggle]
   end
 
   def test_should_verify_options_which_are_only_overwrittable_from_environments
@@ -66,7 +64,6 @@ class ConfigurationTest < ActiveSupport::TestCase
     assert_equal Hash.new, Typus::Configuration.roles!
     assert_equal Hash.new, Typus::Configuration.config!
   end
-
 
   def test_should_load_configuration_files_from_config_ordered
     options = { :config_folder => 'vendor/plugins/typus/test/config/ordered' }

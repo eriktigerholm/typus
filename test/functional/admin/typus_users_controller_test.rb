@@ -24,7 +24,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /You can't toggle your status./, flash[:notice]
+    assert_equal "You can't toggle your status.", flash[:notice]
 
   end
 
@@ -37,7 +37,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:success]
-    assert_match /Typus User status changed./, flash[:success]
+    assert_equal "Typus user status changed.", flash[:success]
 
   end
 
@@ -51,7 +51,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /You're not allowed to toggle status./, flash[:notice]
+    assert_equal "You're not allowed to toggle status.", flash[:notice]
 
   end
 
@@ -66,7 +66,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /You can't remove yourself./, flash[:notice]
+    assert_equal "You can't remove yourself.", flash[:notice]
 
   end
 
@@ -81,7 +81,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:success]
-    assert_match /Typus User successfully removed./, flash[:success]
+    assert_equal "Typus user successfully removed.", flash[:success]
 
   end
 
@@ -95,7 +95,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_equal 'Editor can\'t perform action (new)', flash[:notice].to_s
+    assert_equal "Editor can't perform action (new).", flash[:notice].to_s
 
   end
 
@@ -110,17 +110,17 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     get :edit, { :id => typus_user.id }
 
     assert_response :success
-    assert_equal 'editor', typus_user.roles
+    assert_equal 'editor', typus_user.role
 
     post :update, { :id => typus_user.id, 
                     :item => { :first_name => 'Richard', 
                                :last_name => 'Ashcroft', 
-                               :roles => 'editor' } }
+                               :role => 'editor' } }
 
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:success]
-    assert_match /Typus User successfully updated./, flash[:success]
+    assert_equal "Typus user successfully updated.", flash[:success]
 
   end
 
@@ -130,15 +130,15 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     @request.session[:typus] = typus_user.id
     @request.env['HTTP_REFERER'] = "/typus/typus_users/#{typus_user.id}/edit"
 
-    assert_equal 'editor', typus_user.roles
+    assert_equal 'editor', typus_user.role
 
     post :update, { :id => typus_user.id, 
-                    :item => { :roles => 'admin' } }
+                    :item => { :role => 'admin' } }
 
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /You can't change your role./, flash[:notice]
+    assert_equal "You can't change your role.", flash[:notice]
 
   end
 
@@ -157,7 +157,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /As you're not the admin or the owner of this record you cannot edit it./, flash[:notice]
+    assert_equal "As you're not the admin or the owner of this record you cannot edit it.", flash[:notice]
 
   end
 
@@ -171,7 +171,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /You're not allowed to remove Typus Users./, flash[:notice]
+    assert_equal "You're not allowed to remove Typus Users.", flash[:notice]
 
   end
 
@@ -185,7 +185,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /You're not allowed to remove Typus Users./, flash[:notice]
+    assert_equal "You're not allowed to remove Typus Users.", flash[:notice]
 
   end
 
@@ -199,7 +199,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /Designer can't display items./, flash[:notice]
+    assert_equal "Designer can't display items.", flash[:notice]
 
   end
 
@@ -209,7 +209,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     @request.session[:typus] = typus_user.id
     @request.env['HTTP_REFERER'] = '/admin/typus_users'
 
-    assert_equal 'editor', typus_user.roles
+    assert_equal 'editor', typus_user.role
 
     get :edit, :id => typus_user.id
     assert_response :success
@@ -218,7 +218,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert flash[:notice]
-    assert_match /As you're not the admin or the owner of this record you cannot edit it./, flash[:notice]
+    assert_equal "As you're not the admin or the owner of this record you cannot edit it.", flash[:notice]
 
     ##
     # Here we change the behavior, editor has become root, so he 

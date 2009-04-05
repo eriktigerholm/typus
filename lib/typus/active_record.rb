@@ -49,6 +49,7 @@ module Typus
             when /file_name/:       attribute_type = :file
             when /password/:        attribute_type = :password
             when 'position':        attribute_type = :position
+            when /\?/:              attribute_type = :boolean
           end
 
           if reflect_on_association(field)
@@ -162,8 +163,14 @@ module Typus
       boolean = 'true, false' if boolean.nil?
 
       hash = ActiveSupport::OrderedHash.new
-      hash[:true] = boolean.split(', ').first.humanize
-      hash[:false] = boolean.split(', ').last.humanize
+
+      if boolean.kind_of?(Array)
+        hash[:true] = boolean.first.humanize
+        hash[:false] = boolean.last.humanize
+      else
+        hash[:true] = boolean.split(', ').first.humanize
+        hash[:false] = boolean.split(', ').last.humanize
+      end
 
       return hash
 
@@ -183,8 +190,9 @@ module Typus
     # within the form
     #
     def typus_template(attribute)
-      template = Typus::Configuration.config[name]['fields']['options']['templates'][attribute.to_s] rescue nil
-      return template
+      Typus::Configuration.config[name]['fields']['options']['templates'][attribute.to_s]
+    rescue
+      nil
     end
 
     ##

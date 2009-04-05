@@ -27,7 +27,7 @@ ActiveRecord::Schema.define do
   create_table :pages, :force => true do |t|
     t.string :title
     t.text :body
-    t.boolean :status
+    t.boolean :is_published
     t.integer :parent_id
   end
 
@@ -43,7 +43,7 @@ ActiveRecord::Schema.define do
   create_table :typus_users, :force => true do |t|
     t.string :first_name, :default => "", :null => false
     t.string :last_name, :default => "", :null => false
-    t.string :roles, :null => false
+    t.string :role, :null => false
     t.string :email, :null => false
     t.boolean :status, :default => false
     t.string :token, :null => false

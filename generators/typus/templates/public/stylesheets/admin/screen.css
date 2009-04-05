@@ -277,15 +277,9 @@ a.on {
 
   #footer .right {
     float: right;
-    margin-top: 1em;
   }
 
-    #footer .right li {
-      display: inline;
-      padding-left: 0.5em;
-    }
-
-  #footer li, #footer p {
+  #footer p {
     color: #FFF;
     font-size: 0.9em;
     line-height: 18px;

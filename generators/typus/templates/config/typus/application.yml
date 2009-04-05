@@ -4,23 +4,24 @@
 #
 # Post:
 #   fields:
-#     list: id, title, category_id, created_at, status
-#     form: title, body, status, created_at
+#     list: id, title, category_id, created_at, is_published?
+#     form: title, body, is_published?, created_at
 #     relationship: title, status
 #     options:
 #       selectors:
 #       read_only:
 #       auto_generated:
-#       questions:
 #       date_formats:
 #         created_at: post_long
+#       booleans:
+#         is_published: ["Yes, it is", "No, it isn't"]
 #   actions:
 #     index: cleanup
 #     edit: send_as_newsletter
 #     show: rebuild
 #   order_by: created_at
 #   relationships:
-#   filters: status, created_at, category_id
+#   filters: is_published?, created_at, category_id
 #   search: title, body
 #   application: Application
 #   description: Some text to describe the model
@@ -54,7 +55,6 @@
       selectors:
       read_only:
       auto_generated:
-      questions:
   actions:
     index:
     edit:

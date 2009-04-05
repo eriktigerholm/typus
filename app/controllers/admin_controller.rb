@@ -99,7 +99,9 @@ class AdminController < ApplicationController
     if @item.valid?
       create_with_back_to and return if params[:back_to]
       @item.save
-      flash[:success] = t("{{model}} successfully created.", :model => @resource[:class_name_humanized])
+      flash[:success] = t("{{model}} successfully created", 
+                          :default => "{{model}} successfully created.", 
+                          :model => @resource[:class_name_humanized])
       if @resource[:class].typus_options_for(:edit_after_create)
         redirect_to :action => 'edit', :id => @item.id
       else
@@ -136,7 +138,9 @@ class AdminController < ApplicationController
   #
   def update
     if @item.update_attributes(params[:item])
-      flash[:success] = t("{{model}} successfully updated.", :model => @resource[:class_name_humanized])
+      flash[:success] = t("{{model}} successfully updated", 
+                          :default => "{{model}} successfully updated.", 
+                          :model => @resource[:class_name_humanized])
       if @resource[:class].typus_options_for(:edit_after_create)
         redirect_to :action => 'edit', :id => @item.id
       else
@@ -157,7 +161,9 @@ class AdminController < ApplicationController
   #
   def destroy
     @item.destroy
-    flash[:success] = t("{{model}} successfully removed.", :model => @resource[:class_name_humanized])
+    flash[:success] = t("{{model}} successfully removed", 
+                        :default => "{{model}} successfully removed.", 
+                        :model => @resource[:class_name_humanized])
     redirect_to :back
   rescue Exception => error
     error_handler(error, params.merge(:action => 'index', :id => nil))
@@ -169,9 +175,13 @@ class AdminController < ApplicationController
   def toggle
     if @resource[:class].typus_options_for(:toggle)
       @item.toggle!(params[:field])
-      flash[:success] = t("{{model}} {{attribute}} changed.", :model => @resource[:class_name_humanized], :attribute => params[:field].humanize.downcase)
+      flash[:success] = t("{{model}} {{attribute}} changed.", 
+                          :default => "{{model}} {{attribute}} changed.", 
+                          :model => @resource[:class_name_humanized], 
+                          :attribute => params[:field].humanize.downcase)
     else
-      flash[:warning] = t("Toggle is disabled.")
+      flash[:warning] = t("Toggle is disabled", 
+                          :default => "Toggle is disabled.")
     end
     redirect_to :back
   end
@@ -187,7 +197,9 @@ class AdminController < ApplicationController
   #
   def position
     @item.send(params[:go])
-    flash[:success] = t("Record moved {{to}}.", :to => params[:go].gsub(/move_/, '').humanize.downcase)
+    flash[:success] = t("Record moved {{to}}", 
+                        :default => "Record moved {{to}}.", 
+                        :to => params[:go].gsub(/move_/, '').humanize.downcase)
     redirect_to :back
   end
 
@@ -203,7 +215,10 @@ class AdminController < ApplicationController
 
     @item.send(params[:related][:model].tableize) << resource
 
-    flash[:success] = t("{{model_a}} related to {{model_b}}.", :model_a => resource_class.name.titleize , :model_b => @resource[:class_name_humanized])
+    flash[:success] = t("{{model_a}} related to {{model_b}}", 
+                        :default => "{{model_a}} related to {{model_b}}.", 
+                        :model_a => resource_class.name.humanize, 
+                        :model_b => @resource[:class_name_humanized])
     redirect_to :action => 'edit', :id => @item.id, :anchor => resource_tableized
 
   end
@@ -221,10 +236,16 @@ class AdminController < ApplicationController
     case @resource[:class].reflect_on_association(params[:resource].to_sym).macro
     when :has_and_belongs_to_many
       @item.send(params[:resource]).delete(resource)
-      flash[:success] = t("{{model_a}} unrelated from {{model_b}}.", :model_a => resource_class.name.humanize, :model_b => @resource[:class_name_humanized])
+      flash[:success] = t("{{model_a}} unrelated from {{model_b}}", 
+                          :default => "{{model_a}} unrelated from {{model_b}}.", 
+                          :model_a => resource_class.name.humanize, 
+                          :model_b => @resource[:class_name_humanized])
     when :has_many
       resource.destroy
-      flash[:success] = t("{{model_a}} removed from {{model_b}}.", :model_a => resource_class.name.humanize, :model_b => @resource[:class_name_humanized])
+      flash[:success] = t("{{model_a}} removed from {{model_b}}", 
+                          :default => "{{model_a}} removed from {{model_b}}.", 
+                          :model_a => resource_class.name.humanize, 
+                          :model_b => @resource[:class_name_humanized])
     end
 
     redirect_to :controller => @resource[:self], :action => 'edit', :id => @item.id, :anchor => resource_tableized
@@ -245,7 +266,7 @@ private
     @resource[:class] = resource.classify.constantize
     @resource[:table_name] = resource.classify.constantize.table_name
     @resource[:class_name] = resource.classify
-    @resource[:class_name_humanized] = resource.classify.titleize
+    @resource[:class_name_humanized] = resource.humanize.singularize
 
   rescue Exception => error
     error_handler(error)
@@ -272,11 +293,12 @@ private
 
     # If the current model doesn't include a key which relates it with the
     # current_user, by-pass.
-    return unless @item.attributes.include?(Typus.user_fk)
+    return unless @item.respond_to?(Typus.user_fk)
 
     # If the record is owned by the user ...
     unless @item.send(Typus.user_fk) == session[:typus]
-      flash[:notice] = t("Record owned by another user.")
+      flash[:notice] = t("Record owned by another user", 
+                         :default => "Record owned by another user.")
       redirect_to :action => 'show', :id => @item.id
     end
 
@@ -337,13 +359,18 @@ private
 
       end
 
-      flash[:success] = t("{{model_a}} successfully assigned to {{model_b}}.", :model_a => @item.class, :model_b => resource_class.name)
+      flash[:success] = t("{{model_a}} successfully assigned to {{model_b}}", 
+                          :default => "{{model_a}} successfully assigned to {{model_b}}.", 
+                          :model_a => @item.class, 
+                          :model_b => resource_class.name)
       redirect_to "#{params[:back_to]}##{@resource[:self]}"
 
     else
 
       @item.save
-      flash[:success] = t("{{model}} successfully created.", :model => @resource[:class_name_humanized])
+      flash[:success] = t("{{model}} successfully created", 
+                          :default => "{{model}} successfully created.", 
+                          :model => @resource[:class_name_humanized])
       redirect_to "#{params[:back_to]}?#{params[:selected]}=#{@item.id}"
 
     end

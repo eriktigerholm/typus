@@ -47,7 +47,7 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 
     expected = <<-HTML
 <li><label for="item_favorite_comment">Favorite comment
-    <small><a href="http://test.host/comments/new?back_to=%2Ftypus%2Fpost%2F1%2Fcreate&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost\\n\\nClick OK to continue, or click Cancel to stay on this page');">Add new</a></small>
+    <small><a href="http://test.host/comments/new?back_to=%2Ftypus%2Fpost%2F1%2Fcreate&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost.\\n\\nClick OK to continue, or click Cancel to stay on this page.');">Add new</a></small>
     </label>
 <select id="item_favorite_comment_id" name="item[favorite_comment_id]"><option value=""></option>
 <option value="1">John</option>
@@ -70,9 +70,18 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 
     assert_equal expected, output
 
-    Post.expects(:typus_field_options_for).with(:questions).returns('test')
-    output = typus_boolean_field('test', Post)
-    assert_match /Test?/, output
+  end
+
+  def test_typus_boolean_field_with_question_mark
+
+    output = typus_boolean_field('is_published?', Post)
+
+    expected = <<-HTML
+<li><label for="item_is_published?">Is published?</label>
+<input name="item[is_published]" type="hidden" value="0" /><input id="item_is_published" name="item[is_published]" type="checkbox" value="1" /> Checked if active</li>
+               HTML
+
+    assert_equal expected, output
 
   end
 

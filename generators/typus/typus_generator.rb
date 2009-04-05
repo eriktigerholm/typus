@@ -23,8 +23,8 @@ class TypusGenerator < Rails::Generator::Base
         begin
           klass = class_name.constantize
           ar_models << klass if klass.superclass.equal?(ActiveRecord::Base)
-        rescue Exception => e
-          puts "=> [typus] #{e.message} on `#{class_name}`."
+        rescue Exception => error
+          puts "=> [typus] #{error.message} on `#{class_name}`."
         end
       end
 

@@ -77,7 +77,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
     get :new
     assert_response :redirect
     assert flash[:notice]
-    assert_equal 'Designer can\'t perform action (new)', flash[:notice]
+    assert_equal "Designer can't perform action (new).", flash[:notice]
     assert_redirected_to :action => :index
   end
 
@@ -99,7 +99,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
     get :destroy, { :id => category.id, :method => :delete }
     assert_response :redirect
     assert flash[:notice]
-    assert_match /Designer can't delete this item./, flash[:notice]
+    assert_match /Designer can't delete this item/, flash[:notice]
     assert_redirected_to :action => :index
   end
 

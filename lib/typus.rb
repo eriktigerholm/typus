@@ -113,17 +113,12 @@ module Typus
       require 'typus/active_record'
       require 'typus/routes'
 
-      # Rails Overwrites
-      require 'typus/translation_helper' if Typus::Configuration.options[:ignore_missing_translations]
-
       # Mixins
       require 'typus/authentication'
       require 'typus/export'
-      require 'typus/greetings'
       require 'typus/locale'
       require 'typus/user'
       require 'typus/generator'
-      require 'typus/more'
 
       # Vendor
       require 'vendor/active_record'

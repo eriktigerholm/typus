@@ -25,8 +25,10 @@ module Typus
     admin_helpers = admin_helpers.map { |i| File.basename(i) }
 
     # Create test/functional/admin if doesn't exist.
-    admin_controller_tests_folder = "#{Rails.root}/test/functional/admin"
-    Dir.mkdir(admin_controller_tests_folder) unless File.directory?(admin_controller_tests_folder)
+    if File.directory?("#{Rails.root}/test")
+      admin_controller_tests_folder = "#{Rails.root}/test/functional/admin"
+      Dir.mkdir(admin_controller_tests_folder) unless File.directory?(admin_controller_tests_folder)
+    end
 
     # Get a list of all the available app/helpers/admin
     admin_controller_tests = Dir['vendor/plugins/*/test/functional/admin/*.rb', 'test/functional/admin/*.rb']
@@ -86,7 +88,7 @@ end
 
 <!-- Content -->
 
-<h2><%= link_to t("Dashboard"), admin_dashboard_path %> &rsaquo; #{resource.titleize}</h2>
+<h2><%= link_to t("Dashboard"), admin_dashboard_path %> &rsaquo; #{resource.humanize}</h2>
 
 <p>And here we do whatever we want to ...</p>
 
@@ -173,7 +175,7 @@ end
       test_filename = "#{model.tableize}_controller_test.rb"
       test_location = "#{admin_controller_tests_folder}/#{test_filename}"
 
-      if !admin_controller_tests.include?(test_filename)
+      if !admin_controller_tests.include?(test_filename) && File.directory?("#{Rails.root}/test")
         test = File.open(test_location, "w+")
 
         content = <<-RAW

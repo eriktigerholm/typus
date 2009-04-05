@@ -4,7 +4,9 @@ end
 
 ActionController::Routing::Routes.draw do |map|
 
-  map.with_options :controller => 'typus', :path_prefix => Typus::Configuration.options[:path_prefix] do |i|
+  path_prefix = Typus::Configuration.options[:path_prefix]
+
+  map.with_options :controller => 'typus', :path_prefix => path_prefix do |i|
     i.admin_quick_edit 'quick_edit', :action => 'quick_edit'
     i.admin_dashboard '', :action => 'dashboard'
     i.admin_sign_in 'sign_in', :action => 'sign_in'
@@ -17,45 +19,27 @@ ActionController::Routing::Routes.draw do |map|
 
   map.namespace :admin do |admin|
 
-    ##
-    # Generate routes for resources.
-    #
-    Typus.resources.each do |resource|
-      admin.connect "#{resource.underscore}/:action", :controller => resource.underscore, 
-                                                      :path_prefix => Typus::Configuration.options[:path_prefix]
-    end
+    admin.with_options :path_prefix => path_prefix do |opt|
 
-    Typus.models.each do |m|
-
-      ##
-      # Collection routes depending on defined actions.
-      #
-      collection = {}
-      m.typus_actions_for(:index).each { |a| collection[a] = :any }
-
-      ##
-      # Member routes depending on fields & relationships.
-      #
-      member = {}
-
-      # Should be only available when acts_as_tree is available on the 
-      # model.
-      member[:position] = :any
-
-      # Should be only available if model has boolean attributes which 
-      # can be toggled.
-      member[:toggle] = :any
-
-      unless m.typus_defaults_for(:relationships).empty?
-        member[:relate] = :any
-        member[:unrelate] = :any
+      # Routes for tableless resources.
+      Typus.resources.each do |resource|
+        opt.connect "#{resource.underscore}/:action", :controller => resource.underscore
       end
 
-      m.typus_actions_for(:edit).each { |a| member[a] = :any }
+      # Routes for models.
+      Typus.models.each do |model|
 
-      admin.resources m.tableize, :collection => collection, 
-                                  :member => member, 
-                                  :path_prefix => Typus::Configuration.options[:path_prefix]
+        # Collection routes depending on defined actions.
+        collection = {}
+        model.typus_actions_for(:index).each { |a| collection[a] = :any }
+
+        # Member routes for edit actions
+        member = {}
+        model.typus_actions_for(:edit).each { |a| member[a] = :any }
+
+        opt.resources model.tableize, :collection => collection, :member => member
+
+      end
 
     end
 

@@ -9,6 +9,20 @@ extensible enough to match lots of use cases.
 
 You can see some screenshots on the wiki[http://github.com/fesplugas/typus/wikis].
 
+== Quick demo in 3 steps
+
+Step 1. Create a Rails application using a template.
+
+    $ rails application_with_typus -m http://gist.github.com/86613.txt
+
+Step 2. Start the server:
+
+    $ cd application_with_typus && script/server
+
+Step 3. Go to the admin area and enjoy it!
+
+    http://0.0.0.0:3000/admin
+
 == Installing
 
 Install from GitHub the latest version which it's compatible with 
@@ -295,22 +309,6 @@ Define which fields will be used when performing a search on the model.
 
     search: attribute1, attribute2
 
-=== Questions?
-
-Sometimes on your forms you want to ask questions.
-
-- Is highlighted?
-- On newsletter?
-
-And you can enable them with the questions option.
-
-    Story:
-      fields:
-        list: title, is_highlighted
-        form: title, body, is_highlighted
-        options:
-          questions: is_highlighted
-
 === Selectors
 
 Need a selector, to select gender, size, status, the encoding status 
@@ -368,7 +366,7 @@ personalize it "per attribute" to match your application requirements.
           booleans:
             # attribute: true, false
             default: publicado, no_publicado
-            status: active, inactive
+            status: ["It's active", "It's inactive"]
 
 This setting can be defined by model or system wide.
 
@@ -599,6 +597,17 @@ Include the helper on your views.
                    :id => @page.id, 
                    :message => 'Edit this page' %>
 
+== What is coming to Typus?
+
+There's no a date for this new features, but are things which I'd like 
+to see in Typus in the near future.
+
+- Sphinx search integration when available.
+- Search in multiple models.
+- Nested models.
+- Content Management System generator.
+- Server administration tools.
+
 == Contributors
 
 - Laia Gargallo (Lover and tea provider) http://azotacalles.net
@@ -609,7 +618,7 @@ Include the helper on your views.
 - Anthony Underwood (Code) http://github.com/aunderwo
 - Felipe Talavera (Code) http://github.com/flype
 - Erik Tigerholm (Code) http://github.com/eriktigerholm
-- George Guimarães (Translation to Brazilian Portuguese) http://github.com/georgeguimaraes
+- George Guimarães (Translation to Brazilian Portuguese and code) http://github.com/georgeguimaraes
 
 == Author, contact, bugs, mailing list and more
 

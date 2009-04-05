@@ -55,9 +55,12 @@ module AdminFormHelper
     related = klass.reflect_on_association(attribute.to_sym).class_name.constantize
     related_fk = klass.reflect_on_association(attribute.to_sym).primary_key_name
 
-    message = [ I18n.t("Are you sure you want to leave this page?"),
-                I18n.t("If you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost."),
-                I18n.t("Click OK to continue, or click Cancel to stay on this page.") ]
+    message = [ I18n.t("Are you sure you want to leave this page?", 
+                       :default => "Are you sure you want to leave this page?"),
+                I18n.t("If you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost", 
+                       :default => "If you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost."),
+                I18n.t("Click OK to continue, or click Cancel to stay on this page", 
+                       :default => "Click OK to continue, or click Cancel to stay on this page.") ]
 
     returning(String.new) do |html|
 
@@ -66,7 +69,7 @@ module AdminFormHelper
       else
         html << <<-HTML
 <li><label for="item_#{attribute}">#{I18n.t(related_fk.humanize, :default => related_fk.humanize)}
-    <small>#{link_to I18n.t("Add new"), { :controller => related.class_name.tableize, :action => 'new', :back_to => back_to, :selected => related_fk }, :confirm => message.join("\n\n") if @current_user.can_perform?(related, 'create')}</small>
+    <small>#{link_to I18n.t("Add new", :default => "Add new"), { :controller => related.class_name.tableize, :action => 'new', :back_to => back_to, :selected => related_fk }, :confirm => message.join("\n\n") if @current_user.can_perform?(related, 'create')}</small>
     </label>
 #{select :item, related_fk, related.find(:all, :order => related.typus_order_by).collect { |p| [p.typus_name, p.id] }, { :include_blank => true }, { :disabled => attribute_disabled?(attribute, klass) } }</li>
         HTML
@@ -77,14 +80,10 @@ module AdminFormHelper
   end
 
   def typus_boolean_field(attribute, klass = @resource[:class])
-
-    question = true if klass.typus_field_options_for(:questions).include?(attribute)
-
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}#{'?' if question}</label>
+<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
 #{check_box :item, attribute} #{I18n.t("Checked if active", :default => "Checked if active")}</li>
     HTML
-
   end
 
   def typus_date_field(attribute, options, klass = @resource[:class])
@@ -178,7 +177,7 @@ module AdminFormHelper
       value = 'auto_generated' if %w( new edit ).include?(params[:action])
     end
 
-    comment = %w( read_only auto_generated ).include?(value) ? (value + ' field').titleize : ''
+    comment = %w( read_only auto_generated ).include?(value) ? (value + ' field').humanize : ''
 
     <<-HTML
 <li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)} <small>#{comment}</small></label>
@@ -217,7 +216,7 @@ module AdminFormHelper
 <a name="#{field}"></a>
 <div class="box_relationships">
   <h2>
-  #{link_to I18n.t(field.titleize, :default => field.titleize), :controller => field}
+  #{link_to I18n.t(field.humanize, :default => field.humanize), :controller => field}
   <small>#{link_to I18n.t("Add new", :default => "Add new"), :controller => field, :action => 'new', :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
@@ -231,7 +230,7 @@ module AdminFormHelper
                            options)
       else
         html << <<-HTML
-  <div id="flash" class="notice"><p>#{I18n.t("There are no {{records}}.", :records => I18n.t(field.titleize.downcase, :default => field.titleize.downcase), :default => "There are no {{records}}.")}</p></div>
+  <div id="flash" class="notice"><p>#{I18n.t("There are no {{records}}.", :records => I18n.t(field.humanize.downcase, :default => field.humanize.downcase), :default => "There are no {{records}}.")}</p></div>
         HTML
       end
       html << <<-HTML
@@ -248,7 +247,7 @@ module AdminFormHelper
 <a name="#{field}"></a>
 <div class="box_relationships">
   <h2>
-  #{link_to I18n.t(field.titleize, :default => field.titleize), :controller => field}
+  #{link_to I18n.t(field.humanize, :default => field.humanize), :controller => field}
   <small>#{link_to I18n.t("Add new", :default => "Add new"), :controller => field, :action => 'new', :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
@@ -266,7 +265,7 @@ module AdminFormHelper
         html << build_list(model_to_relate, model_to_relate.typus_fields_for(:relationship), items, model_to_relate_as_resource)
       else
         html << <<-HTML
-  <div id="flash" class="notice"><p>#{I18n.t("There are no {{records}}.", :records => I18n.t(field.titleize.downcase, :default => field.titleize.downcase), :default => "There are no {{records}}.")}</p></div>
+  <div id="flash" class="notice"><p>#{I18n.t("There are no {{records}}.", :records => I18n.t(field.humanize, :default => field.humanize), :default => "There are no {{records}}.")}</p></div>
         HTML
       end
       html << <<-HTML

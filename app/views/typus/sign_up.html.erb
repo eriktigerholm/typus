@@ -1,7 +1,7 @@
 <% form_tag admin_sign_up_path do %>
   <ul>
-  <li><label for="email"><%= t("Email") %></label>
+  <li><label for="email"><%= t("Email", :default => "Email") %></label>
   <%= text_field :user, :email, :size => 20, :class => 'text' %></li>
-  <li><%= submit_tag t("Sign up"), :class => 'button' %></li>
+  <li><%= submit_tag t("Sign up", :default => "Sign up"), :class => 'button' %></li>
   </ul>
 <% end %>

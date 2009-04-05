@@ -10,7 +10,7 @@ class TypusUserRolesTest < ActiveSupport::TestCase
   def test_admin_role_settings
 
     typus_user = typus_users(:admin)
-    assert_equal 'admin', typus_user.roles
+    assert_equal 'admin', typus_user.role
 
     models = %w( Asset Category Comment Git Page Post Status TypusUser WatchDog )
     assert_equal models, typus_user.resources.map(&:first).sort
@@ -41,7 +41,7 @@ class TypusUserRolesTest < ActiveSupport::TestCase
   def test_editor_role_settings
 
     typus_user = typus_users(:editor)
-    assert_equal 'editor', typus_user.roles
+    assert_equal 'editor', typus_user.role
 
     %w( Category Comment Git Post TypusUser ).each do |model|
       assert typus_user.resources.map(&:first).include?(model)
@@ -68,7 +68,7 @@ class TypusUserRolesTest < ActiveSupport::TestCase
   def test_designer_role_settings
 
     typus_user = typus_users(:designer)
-    assert_equal 'designer', typus_user.roles
+    assert_equal 'designer', typus_user.role
 
     models = %w( Category Comment Post )
     assert_equal models, typus_user.resources.map(&:first).sort

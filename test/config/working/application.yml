@@ -23,14 +23,16 @@ Comment:
 Page:
   fields:
     # Body field is overwrited from a Page class method.
-    list: title, body, status
-    form: title, body, status
+    list: title, is_published?
+    form: title, body, is_published?
+    options:
+      booleans:
+        is_published: ["Yes, it is", "No, it isn't"]
   actions:
     index: rebuild_all
     edit: rebuild
-  relationships:
-    has_many: assets
   application: Site
+  filters: is_published?
   options:
     form_rows: 25
 
@@ -43,7 +45,6 @@ Post:
       selectors: status
       read_only: permalink
       auto_generated: created_at
-      questions: status
       date_formats:
         created_at: post_short
       templates:

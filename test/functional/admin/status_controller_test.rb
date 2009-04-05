@@ -28,7 +28,7 @@ class Admin::StatusControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to admin_dashboard_path
     assert flash[:notice]
-    assert_match /#{@typus_user.roles.capitalize} can't go to show on status./, flash[:notice]
+    assert_equal "#{@typus_user.role.capitalize} can't go to show on status.", flash[:notice]
   end
 
   def test_should_verify_editor_can_not_go_to_index
@@ -37,7 +37,7 @@ class Admin::StatusControllerTest < ActionController::TestCase
     get :index
     assert_response :redirect
     assert flash[:notice]
-    assert_match /#{typus_user.roles.capitalize} can't go to index on status./, flash[:notice]
+    assert_equal "#{typus_user.role.capitalize} can't go to index on status.", flash[:notice]
   end
 
 end

@@ -2,10 +2,7 @@ require 'test/helper'
 
 class RoutesTest < ActiveSupport::TestCase
 
-  unless Rails.version == '2.2.2'
-    include ActionController::TestCase::Assertions
-    include ActionController::Assertions::RoutingAssertions
-  end
+  include ActionController::TestCase::Assertions
 
   def test_should_verify_admin_named_routes
 
@@ -25,9 +22,7 @@ class RoutesTest < ActiveSupport::TestCase
     routes = ActionController::Routing::Routes.named_routes.routes.keys
 
     expected = [ :admin_typus_users, 
-                 :admin_typus_user, 
-                 :position_admin_typus_user, 
-                 :toggle_admin_typus_user ]
+                 :admin_typus_user ]
 
     expected.each { |route| assert routes.include?(route) }
 
@@ -43,11 +38,7 @@ class RoutesTest < ActiveSupport::TestCase
     routes = ActionController::Routing::Routes.named_routes.routes.keys
 
     expected = [ :admin_posts, 
-                 :admin_post, 
-                 :position_admin_post, 
-                 :toggle_admin_post, 
-                 :relate_admin_post,
-                 :unrelate_admin_post ]
+                 :admin_post ]
 
     expected.each { |route| assert routes.include?(route) }
 

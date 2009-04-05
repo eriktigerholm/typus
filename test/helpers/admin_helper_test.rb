@@ -27,7 +27,7 @@ class AdminHelperTest < ActiveSupport::TestCase
   def test_build_list_when_returns_a_typus_table
 
     model = TypusUser
-    fields = [ 'email', 'roles', 'status' ]
+    fields = [ 'email', 'role', 'status' ]
     items = TypusUser.find(:all)
     resource = 'typus_users'
 
@@ -43,7 +43,7 @@ class AdminHelperTest < ActiveSupport::TestCase
   def test_build_list_when_returns_a_template
 
     model = TypusUser
-    fields = [ 'email', 'roles', 'status' ]
+    fields = [ 'email', 'role', 'status' ]
     items = TypusUser.find(:all)
     resource = 'typus_users'
 

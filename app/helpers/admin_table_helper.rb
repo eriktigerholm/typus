@@ -21,7 +21,7 @@ module AdminTableHelper
 
         fields.each do |key, value|
           case value
-          when :boolean:           html << typus_table_boolean_field(key, item)
+          when :boolean:           html << typus_table_boolean_field(key.typus_cleaner, item)
           when :datetime:          html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
           when :date:              html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
           when :time:              html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
@@ -49,14 +49,17 @@ module AdminTableHelper
         when 'index'
           perform = link_to image_tag('admin/trash.gif'), { :action => 'destroy', 
                                                             :id => item.id }, 
-                                                            :confirm => 'Remove entry?', 
+                                                            :confirm => t('Remove entry?', :default => "Remove entry?"), 
                                                             :method => :delete
         else
           perform = link_to image_tag('admin/trash.gif'), { :action => 'unrelate', 
                                                             :id => params[:id], 
                                                             :resource => item.class.name.tableize, 
                                                             :resource_id => item.id }, 
-                                                            :confirm => "Unrelate #{model.name.humanize.singularize} from #{@resource[:class_name]}?"
+                                                            :confirm => t("Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
+                                                                          :default => "Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
+                                                                          :unrelate_model => model.name.humanize.singularize, 
+                                                                          :unrelate_model_from => @resource[:class_name])
         end
 
       end
@@ -84,13 +87,13 @@ module AdminTableHelper
 
         content = I18n.t(key.humanize, :default => key.humanize)
 
-        if (model.model_fields.map(&:first).collect { |i| i.to_s }.include?(key) || model.reflect_on_all_associations(:belongs_to).map(&:name).include?(key.to_sym)) && params[:action] == 'index'
+        if (model.model_fields.map(&:first).collect { |i| i.to_s }.include?(key.typus_cleaner) || model.reflect_on_all_associations(:belongs_to).map(&:name).include?(key.to_sym)) && params[:action] == 'index'
           sort_order = case params[:sort_order]
                        when 'asc':  'desc'
                        when 'desc': 'asc'
                        end
-          order_by = model.reflect_on_association(key.to_sym).primary_key_name rescue key
-          switch = (params[:order_by] == key) ? sort_order : ''
+          order_by = model.reflect_on_association(key.to_sym).primary_key_name rescue key.typus_cleaner
+          switch = (params[:order_by] == key.typus_cleaner) ? sort_order : ''
           options = { :order_by => order_by, :sort_order => sort_order }
           content = (link_to "<div class=\"#{switch}\">#{content}</div>", params.merge(options))
         end
@@ -156,7 +159,7 @@ module AdminTableHelper
                   :go => position.last }
 
       html_position << <<-HTML
-#{link_to t(position.first), params.merge(options)}
+#{link_to t(position.first, :default => position.first), params.merge(options)}
       HTML
 
     end
@@ -199,7 +202,7 @@ module AdminTableHelper
     options = { :controller => item.class.name.tableize, :action => 'toggle', :field => attribute, :id => item.id }
 
     content = if item.class.typus_options_for(:toggle) && !item.send(attribute).nil?
-                link_to link_text, params.merge(options), :confirm => "Change #{attribute.humanize.downcase}?"
+                link_to link_text, params.merge(options), :confirm => t("Change {{attribute}}?", :default => "Change {{attribute}}?", :attribute => attribute.humanize.downcase)
               else
                 link_text
               end

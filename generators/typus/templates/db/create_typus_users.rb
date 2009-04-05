@@ -4,7 +4,7 @@ class CreateTypusUsers < ActiveRecord::Migration
     create_table :typus_users do |t|
       t.string :first_name, :default => "", :null => false
       t.string :last_name, :default => "", :null => false
-      t.string :roles, :null => false
+      t.string :role, :null => false
       t.string :email, :null => false
       t.boolean :status, :default => false
       t.string :token, :null => false

@@ -22,4 +22,8 @@ class StringTest < ActiveSupport::TestCase
     assert 'Post'.typus_actions_for(:index).kind_of?(Array)
   end
 
+  def test_typus_cleaner
+    assert_equal "hello_world", "hello_world?".typus_cleaner
+  end
+
 end

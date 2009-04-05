@@ -4,7 +4,7 @@ admin:
   id: 1
   first_name: Admin
   last_name: Example
-  roles: admin
+  role: admin
   email: admin@example.com
   status: true
   token: 1A2B3C4D5E6F
@@ -15,7 +15,7 @@ editor:
   id: 2
   first_name: Editor
   last_name: Example
-  roles: editor
+  role: editor
   email: editor@example.com
   status: true
   token: A2B3C4D5E6F1
@@ -26,7 +26,7 @@ disabled_user:
   id: 3
   first_name: Typus
   last_name: User
-  roles: editor
+  role: editor
   email: disabled_user@example.com
   status: false
   token: 2B3C4D5E6F1A
@@ -37,7 +37,7 @@ designer:
   id: 4
   first_name: Designer
   last_name: Example
-  roles: designer
+  role: designer
   email: designer@example.com
   status: true
   token: B3C4D5E6F1A2
@@ -48,7 +48,7 @@ removed_role:
   id: 5
   first_name: Removed
   last_name: Example
-  roles: removed
+  role: removed
   email: removed@example.com
   status: true
   token: 3C4D5E6F1A2B

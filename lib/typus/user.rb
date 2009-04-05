@@ -1,6 +1,6 @@
 module Typus
 
-  module User
+  module EnableAsTypusUser
 
     def self.included(base)
       base.extend(ClassMethods)
@@ -22,7 +22,7 @@ module Typus
         validates_length_of :password, :within => 8..40, :if => :password_required?
         validates_presence_of :password, :if => :password_required?
 
-        validates_inclusion_of :roles, :in => roles, :message => "has to be #{Typus.roles_sentence}."
+        validates_presence_of :role
 
         before_save :initialize_salt, :encrypt_password, :initialize_token
 
@@ -34,13 +34,21 @@ module Typus
 
     module ClassMethodsMixin
 
-      def roles
+      def role
         Typus::Configuration.roles.keys.sort
       end
 
       def authenticate(email, password)
         user = find_by_email_and_status(email, true)
         user && user.authenticated?(password) ? user : nil
+      end
+
+      def generate(email, password, role = Typus::Configuration.options[:root], status = true)
+        new :email => email, 
+            :password => password, 
+            :password_confirmation => password, 
+            :role => role, 
+            :status => status
       end
 
     end
@@ -50,7 +58,7 @@ module Typus
       def full_name(*args)
         options = args.extract_options!
         full_name = (!first_name.empty? && !last_name.empty?) ? "#{first_name} #{last_name}" : email
-        full_name << " (#{roles})" if options[:display_role]
+        full_name << " (#{role})" if options[:display_role]
         return full_name
       end
 
@@ -58,11 +66,8 @@ module Typus
         crypted_password == encrypt(password)
       end
 
-      ##
-      # Resources TypusUser has access to ...
-      #
       def resources
-        Typus::Configuration.roles[roles].compact
+        Typus::Configuration.roles[role].compact
       end
 
       def can_perform?(resource, action, options = {})
@@ -89,7 +94,7 @@ module Typus
       end
 
       def is_root?
-        roles == Typus::Configuration.options[:root]
+        role == Typus::Configuration.options[:root]
       end
 
     protected
@@ -116,7 +121,7 @@ module Typus
       end
 
       def generate_token
-        self.token = encrypt("--#{Time.now.utc.to_s}--#{password}--")
+        self.token = encrypt("--#{Time.now.utc.to_s}--#{password}--").first(12)
       end
 
       def password_required?
@@ -129,4 +134,4 @@ module Typus
 
 end
 
-ActiveRecord::Base.send :include, Typus::User
+ActiveRecord::Base.send :include, Typus::EnableAsTypusUser

@@ -36,7 +36,8 @@ class TypusController < ApplicationController
   # Application Dashboard
   #
   def dashboard
-    flash[:notice] = t("There are not defined applications in config/typus/*.yml.") if Typus.applications.empty?
+    flash[:notice] = t("There are not defined applications in config/typus/*.yml.", 
+                       :default => "There are not defined applications in config/typus/*.yml.") if Typus.applications.empty?
   end
 
   ##
@@ -47,12 +48,12 @@ class TypusController < ApplicationController
     redirect_to admin_sign_up_path and return if Typus.user_class.count.zero?
 
     if request.post?
-      user = Typus.user_class.authenticate(params[:user][:email], params[:user][:password])
-      if user
+      if user = Typus.user_class.authenticate(params[:user][:email], params[:user][:password])
         session[:typus] = user.id
         redirect_to params[:back_to] || admin_dashboard_path
       else
-        flash[:error] = t("The Email and/or Password you entered is invalid.")
+        flash[:error] = t("The email and/or password you entered is invalid", 
+                          :default => "The email and/or password you entered is invalid.")
         redirect_to admin_sign_in_path
       end
     end
@@ -72,11 +73,11 @@ class TypusController < ApplicationController
   #
   def recover_password
     if request.post?
-      user = Typus.user_class.find_by_email(params[:user][:email])
-      if user
+      if user = Typus.user_class.find_by_email(params[:user][:email])
         ActionMailer::Base.default_url_options[:host] = request.host_with_port
         TypusMailer.deliver_reset_password_link(user)
-        flash[:success] = t("Password recovery link sent to your email.")
+        flash[:success] = t("Password recovery link sent to your email", 
+                            :default => "Password recovery link sent to your email.")
         redirect_to admin_sign_in_path
       else
         redirect_to admin_recover_password_path
@@ -92,10 +93,12 @@ class TypusController < ApplicationController
     @user = Typus.user_class.find_by_token!(params[:token])
     if request.post?
       if @user.update_attributes(params[:user])
-        flash[:success] = t("You can login with your new password.")
+        flash[:success] = t("You can login with your new password", 
+                            :default => "You can login with your new password.")
         redirect_to admin_sign_in_path
       else
-        flash[:error] = t("Passwords don't match.")
+        flash[:error] = t("Passwords don't match", 
+                          :default => "Passwords don't match.")
         redirect_to admin_reset_password_path, :token => params[:token]
       end
     end
@@ -107,26 +110,24 @@ class TypusController < ApplicationController
 
     if request.post?
 
-      password = generate_password
-
-      user = Typus.user_class.new :email => params[:user][:email], 
-                                  :password => password, 
-                                  :password_confirmation => password, 
-                                  :roles => Typus::Configuration.options[:root], 
-                                  :status => true
+      email, password = params[:user][:email], 'hocus-pocus'
+      user = Typus.user_class.generate(email, password)
 
       if user.save
         session[:typus] = user.id
-        flash[:notice] = t("Your new password is '{{password}}'.", :password => password)
+        flash[:notice] = t("Password set to \"{{password}}\"", 
+                           :default => "Password set to \"{{password}}\".", 
+                           :password => password)
         redirect_to admin_dashboard_path
       else
-        flash[:error] = t("That doesn't seem like a valid email address.")
-        redirect_to admin_sign_up_path
+        flash[:error] = t("That doesn't seem like a valid email address", 
+                          :default => "That doesn't seem like a valid email address.")
       end
 
     else
 
-      flash[:notice] = t("Enter your email below to create the first user.")
+      flash[:notice] = t("Enter your email below to create the first user", 
+                         :default => "Enter your email below to create the first user.")
 
     end
 

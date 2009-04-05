@@ -3,6 +3,8 @@ require 'test/helper'
 class TypusTest < ActiveSupport::TestCase
 
   def test_should_return_locales
+    initializer = "#{Rails.root}/config/initializers/typus.rb"
+    return if File.exists?(initializer)
     assert Typus.respond_to?(:locales)
     assert Typus.locales.kind_of?(Array)
     assert_equal [["English", :en]], Typus.locales
@@ -96,19 +98,6 @@ class TypusTest < ActiveSupport::TestCase
     options = { :user_fk => 'my_user_fk' }
     Typus::Configuration.stubs(:options).returns(options)
     assert_equal 'my_user_fk', Typus.user_fk
-  end
-
-  def test_should_verify_to_sentence_options
-
-    assert Typus.respond_to?(:to_sentence_options)
-    assert Typus.to_sentence_options.kind_of?(Hash)
-
-    expected = { :words_connector => ', ', :last_word_connector => ' & ' }
-    assert_equal expected, Typus.to_sentence_options
-
-    expected = { :words_connector => ', ', :last_word_connector => ' or ' }
-    assert_equal expected, Typus.to_sentence_options('or')
-
   end
 
 end
