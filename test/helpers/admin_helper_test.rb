@@ -2,7 +2,7 @@ require 'test/helper'
 
 class AdminHelperTest < ActiveSupport::TestCase
 
-  include AdminHelper
+  include Admin::MasterHelper
   include ActionView::Helpers::UrlHelper
   include ActionView::Helpers::TagHelper
 

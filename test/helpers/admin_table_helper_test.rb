@@ -2,7 +2,7 @@ require 'test/helper'
 
 class AdminTableHelperTest < ActiveSupport::TestCase
 
-  include AdminTableHelper
+  include Admin::TableHelper
   include ActionView::Helpers::UrlHelper
   include ActionController::UrlWriter
 
@@ -21,9 +21,9 @@ class AdminTableHelperTest < ActiveSupport::TestCase
     output = typus_table_header(TypusUser, fields)
     expected = <<-HTML
 <tr>
-<th><a href="http://test.host/typus/typus_users?order_by=email"><div class="">Email</div></a></th>
-<th><a href="http://test.host/typus/typus_users?order_by=role"><div class="">Role</div></a></th>
-<th><a href="http://test.host/typus/typus_users?order_by=status"><div class="">Status</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=email"><div class="">Email</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=role"><div class="">Role</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=status"><div class="">Status</div></a></th>
 <th>&nbsp;</th>
 </tr>
     HTML
@@ -46,7 +46,7 @@ class AdminTableHelperTest < ActiveSupport::TestCase
     comment = comments(:with_post_id)
     output = typus_table_belongs_to_field('post', comment)
     expected = <<-HTML
-<td><a href="http://test.host/posts/edit/1">Post#1</a></td>
+<td><a href="http://test.host/admin/posts/edit/1">Post#1</a></td>
     HTML
 
     assert_equal expected, output
@@ -83,7 +83,7 @@ class AdminTableHelperTest < ActiveSupport::TestCase
     post = posts(:published)
     output = typus_table_string_field(:title, post, :title)
     expected = <<-HTML
-<td><a href="http://test.host/posts/edit/#{post.id}">#{post.title}</a></td>
+<td><a href="http://test.host/admin/posts/edit/#{post.id}">#{post.title}</a></td>
     HTML
 
     assert_equal expected, output
@@ -147,7 +147,7 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 
     output = typus_table_datetime_field(:created_at, post, :created_at)
     expected = <<-HTML
-<td><a href="http://test.host/posts/edit/#{post.id}">11/07</a></td>
+<td><a href="http://test.host/admin/posts/edit/#{post.id}">11/07</a></td>
     HTML
 
     assert_equal expected, output

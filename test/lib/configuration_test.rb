@@ -36,11 +36,6 @@ class ConfigurationTest < ActiveSupport::TestCase
     assert_equal true, Typus::Configuration.options[:toggle]
   end
 
-  def test_should_verify_options_which_are_only_overwrittable_from_environments
-    assert_equal true, Typus::Configuration.options[:ignore_missing_translations]
-    assert_equal 'typus', Typus::Configuration.options[:path_prefix]
-  end
-
   def test_should_verify_typus_roles_is_loaded
     assert Typus::Configuration.respond_to?(:roles!)
     assert Typus::Configuration.roles!.kind_of?(Hash)

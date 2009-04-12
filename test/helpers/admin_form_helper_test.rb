@@ -2,7 +2,7 @@ require 'test/helper'
 
 class AdminFormHelperTest < ActiveSupport::TestCase
 
-  include AdminFormHelper
+  include Admin::FormHelper
   include ActionView::Helpers::FormHelper
   include ActionView::Helpers::FormOptionsHelper
   include ActionView::Helpers::DateHelper
@@ -39,7 +39,7 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 
     default_url_options[:host] = 'test.host'
 
-    params = { :controller => 'admin/post', :id => 1, :action => :create }
+    params = { :controller => 'admin/post', :id => 1, :action => :edit }
     self.expects(:params).at_least_once.returns(params)
 
     @current_user = mock()
@@ -47,7 +47,7 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 
     expected = <<-HTML
 <li><label for="item_favorite_comment">Favorite comment
-    <small><a href="http://test.host/comments/new?back_to=%2Ftypus%2Fpost%2F1%2Fcreate&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost.\\n\\nClick OK to continue, or click Cancel to stay on this page.');">Add new</a></small>
+    <small><a href="http://test.host/admin/comments/new?back_to=%2Fadmin%2Fpost%2Fedit%2F1&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost.\\n\\nClick OK to continue, or click Cancel to stay on this page.');">Add new</a></small>
     </label>
 <select id="item_favorite_comment_id" name="item[favorite_comment_id]"><option value=""></option>
 <option value="1">John</option>
@@ -218,7 +218,7 @@ class AdminFormHelperTest < ActiveSupport::TestCase
   def test_typus_form_has_many_with_items
 
     @current_user = typus_users(:admin)
-    @resource = { :class => Post }
+    @resource = { :class => Post, :self => 'posts' }
     @item = Post.find(1)
 
     params = { :controller => 'admin/posts', :id => 1, :action => 'edit' }
@@ -231,8 +231,8 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 <a name="comments"></a>
 <div class="box_relationships">
   <h2>
-  <a href="http://test.host/comments">Comments</a>
-  <small><a href="http://test.host/comments/new?resource_id=1">Add new</a></small>
+  <a href="http://test.host/admin/comments">Comments</a>
+  <small><a href="http://test.host/admin/comments/new?resource=posts">Add new</a></small>
   </h2>
 <!-- a_nice_list --></div>
     HTML
@@ -244,7 +244,7 @@ class AdminFormHelperTest < ActiveSupport::TestCase
   def test_typus_form_has_many_without_items
 
     @current_user = typus_users(:admin)
-    @resource = { :class => Post }
+    @resource = { :class => Post, :self => 'posts' }
     @item = Post.find(1)
     @item.comments.destroy_all
 
@@ -256,8 +256,8 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 <a name="comments"></a>
 <div class="box_relationships">
   <h2>
-  <a href="http://test.host/comments">Comments</a>
-  <small><a href="http://test.host/comments/new?resource_id=1">Add new</a></small>
+  <a href="http://test.host/admin/comments">Comments</a>
+  <small><a href="http://test.host/admin/comments/new?resource=posts">Add new</a></small>
   </h2>
   <div id="flash" class="notice"><p>There are no comments.</p></div>
 </div>

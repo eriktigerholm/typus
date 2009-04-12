@@ -40,9 +40,6 @@ class TypusController < ApplicationController
                        :default => "There are not defined applications in config/typus/*.yml.") if Typus.applications.empty?
   end
 
-  ##
-  # Login
-  #
   def sign_in
 
     redirect_to admin_sign_up_path and return if Typus.user_class.count.zero?
@@ -60,17 +57,11 @@ class TypusController < ApplicationController
 
   end
 
-  ##
-  # Logout and redirect to +admin_login+.
-  #
   def sign_out
     session[:typus] = nil
     redirect_to admin_sign_in_path
   end
 
-  ##
-  # Email password when lost
-  #
   def recover_password
     if request.post?
       if user = Typus.user_class.find_by_email(params[:user][:email])
@@ -86,8 +77,7 @@ class TypusController < ApplicationController
   end
 
   ##
-  # Available if Typus::Configuration.options[:recover_password] is
-  # enabled. Enabled by default.
+  # Available if Typus::Configuration.options[:recover_password] is enabled.
   #
   def reset_password
     @user = Typus.user_class.find_by_token!(params[:token])

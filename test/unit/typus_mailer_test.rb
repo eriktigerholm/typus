@@ -22,7 +22,7 @@ class TypusMailerTest < ActiveSupport::TestCase
   end
 
   def test_should_verify_email_contains_reset_password_link_with_token
-    expected = "http://test.host/typus/reset_password?token=1A2B3C4D5E6F"
+    expected = "http://test.host/admin/reset_password?token=1A2B3C4D5E6F"
     assert_match expected, @response.body
   end
 

@@ -3,7 +3,6 @@ require 'sha1'
 
 if Rails.env.test?
   Typus::Configuration.options[:config_folder] = 'vendor/plugins/typus/test/config/working'
-  Typus::Configuration.options[:path_prefix] = 'typus'
 end
 
 ##

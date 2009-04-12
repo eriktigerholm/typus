@@ -93,14 +93,14 @@ class Admin::CommentsControllerTest < ActionController::TestCase
 
   def test_should_verify_new_comment_contains_a_link_to_add_a_new_post
     get :new
-    match = '/typus/posts/new?back_to=%2Ftypus%2Fcomments%2Fnew&amp;selected=post_id'
+    match = '/admin/posts/new?back_to=%2Fadmin%2Fcomments%2Fnew&amp;selected=post_id'
     assert_match match, @response.body
   end
 
   def test_should_verify_edit_comment_contains_a_link_to_add_a_new_post
     comment = comments(:first)
     get :edit, :id => comment.id
-    match = "/typus/posts/new?back_to=%2Ftypus%2Fcomments%2F#{comment.id}%2Fedit&amp;selected=post_id"
+    match = "/admin/posts/new?back_to=%2Fadmin%2Fcomments%2Fedit%2F#{comment.id}&amp;selected=post_id"
     assert_match match, @response.body
   end
 

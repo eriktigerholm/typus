@@ -71,9 +71,7 @@ You can overwrite the following settings.
     Typus::Configuration.options[:app_name]
     Typus::Configuration.options[:config_folder]
     Typus::Configuration.options[:email]
-    Typus::Configuration.options[:ignore_missing_translations]
     Typus::Configuration.options[:locales]
-    Typus::Configuration.options[:path_prefix]
     Typus::Configuration.options[:recover_password]
     Typus::Configuration.options[:root]
     Typus::Configuration.options[:ssl]
@@ -149,22 +147,6 @@ Remember to install the <tt>ssl_requirement</tt> plugin to be able to
 use this feature.
 
     $ rake typus:ssl
-
-=== Special Route
-
-To overwrite default <tt>prefix_path</tt> of your application place the 
-following configuration option on <tt>development.rb</tt>, <tt>production.rb</tt> 
-on the <tt>config/environments</tt> folder.
-
-    Typus::Configuration.options[:path_prefix] = 'backoffice'
-
-=== View Missing Translations
-
-If you are a developer who wants to translate Typus, add the following 
-setting on <tt>development.rb</tt> on the <tt>config/environments</tt> 
-folder so all missing translations messages will be shown.
-
-    Typus::Configuration.options[:ignore_missing_translations] = false
 
 === Disable password recover
 
@@ -556,10 +538,11 @@ You need to have <tt>mocha</tt> installed to test the plugin.
 
     $ sudo gem install mocha
 
-Use the following steps to test the plugin.
+To test the plugin create an empty application and remove the default 
+routes on <tt>routes.rb</tt>, once the application is created install 
+the plugin and run rake.
 
-    $ rails typus_test
-    $ cd typus_test/vendor/plugins
+    $ cd YOUR_APPLICATION/vendor/plugins
     $ git clone git://github.com/fesplugas/typus.git
     $ rake
 
@@ -619,6 +602,7 @@ to see in Typus in the near future.
 - Felipe Talavera (Code) http://github.com/flype
 - Erik Tigerholm (Code) http://github.com/eriktigerholm
 - George Guimarães (Translation to Brazilian Portuguese and code) http://github.com/georgeguimaraes
+- José Valim (Code) http://github.com/josevalim
 
 == Author, contact, bugs, mailing list and more
 

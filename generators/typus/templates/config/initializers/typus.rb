@@ -1,12 +1,5 @@
 # Be sure to restart your server when you modify this file.
 
-# Typus configuration options which you only can set from the 
-# environments. Set them on `production.rb`, `development.rb` on 
-# `config/environments` folder.
-
-# Typus::Configuration.options[:ignore_missing_translations] = true
-# Typus::Configuration.options[:path_prefix] = 'admin'
-
 # System wide options
 
 Typus::Configuration.options[:app_name] = '<%= application %>'
@@ -20,7 +13,7 @@ Typus::Configuration.options[:app_name] = '<%= application %>'
 # Typus::Configuration.options[:user_class_name] = 'TypusUser'
 # Typus::Configuration.options[:user_fk] = 'typus_user_id'
 
-# Model options.
+# Model options
 
 # Typus::Configuration.options[:edit_after_create] = true
 # Typus::Configuration.options[:end_year] = Time.now.year + 1

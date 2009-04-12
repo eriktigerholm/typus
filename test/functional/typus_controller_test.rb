@@ -236,7 +236,7 @@ class TypusControllerTest < ActionController::TestCase
     get :dashboard
     assert_response :success
 
-    assert_match "href=\"\/typus\/typus_users\/#{typus_user.id}\/edit\"", @response.body
+    assert_match "href=\"\/admin\/typus_users\/edit\/#{typus_user.id}\"", @response.body
 
     assert_select 'body div#header' do
       assert_select 'a', 'Admin Example (admin)'
@@ -251,7 +251,7 @@ class TypusControllerTest < ActionController::TestCase
     get :dashboard
     assert_response :success
 
-    assert_match "href=\"\/typus\/sign_out\"", @response.body
+    assert_match "href=\"\/admin\/sign_out\"", @response.body
 
   end
 
@@ -261,7 +261,7 @@ class TypusControllerTest < ActionController::TestCase
     get :dashboard
 
     %w( typus_users posts pages assets ).each do |resource|
-      assert_match "/typus/#{resource}/new", @response.body
+      assert_match "/admin/#{resource}/new", @response.body
     end
 
     %w( statuses orders ).each do |resource|
@@ -274,7 +274,7 @@ class TypusControllerTest < ActionController::TestCase
     editor = typus_users(:editor)
     @request.session[:typus] = editor.id
     get :dashboard
-    assert_match '/typus/posts/new', @response.body
+    assert_match '/admin/posts/new', @response.body
     assert_no_match /\/admin\/typus_users\/new/, @response.body
     # We have loaded categories as a module, so are not displayed 
     # on the applications list.

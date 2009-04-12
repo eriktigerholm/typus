@@ -8,7 +8,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
   def setup
     user = typus_users(:editor)
     @request.session[:typus] = user.id
-    @request.env['HTTP_REFERER'] = '/typus/categories'
+    @request.env['HTTP_REFERER'] = '/admin/categories'
   end
 
   def test_should_position_item_one_step_down

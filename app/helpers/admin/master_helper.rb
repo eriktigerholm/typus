@@ -1,10 +1,10 @@
-module AdminHelper
+module Admin::MasterHelper
 
   include TypusHelper
 
-  include AdminSidebarHelper
-  include AdminFormHelper
-  include AdminTableHelper
+  include Admin::SidebarHelper
+  include Admin::FormHelper
+  include Admin::TableHelper
 
   def display_link_to_previous(klass_name = @resource[:class_name], _params = params)
 

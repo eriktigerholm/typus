@@ -1,4 +1,4 @@
-module AdminSidebarHelper
+module Admin::SidebarHelper
 
   def actions
 

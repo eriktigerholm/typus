@@ -1,8 +1,4 @@
-module AdminFormHelper
-
-  ##
-  # All helpers related to form.
-  #
+module Admin::FormHelper
 
   def build_form(fields)
 
@@ -45,11 +41,7 @@ module AdminFormHelper
     #
     params[:action] = (params[:action] == 'create') ? 'new' : params[:action]
 
-    back_to = [ Typus::Configuration.options[:path_prefix], 
-                params[:controller].split('/').last, 
-                params[:id], 
-                params[:action] ]
-
+    back_to = [ params[:controller], params[:action], params[:id] ]
     back_to = "/#{back_to.compact.join('/')}"
 
     related = klass.reflect_on_association(attribute.to_sym).class_name.constantize
@@ -69,7 +61,7 @@ module AdminFormHelper
       else
         html << <<-HTML
 <li><label for="item_#{attribute}">#{I18n.t(related_fk.humanize, :default => related_fk.humanize)}
-    <small>#{link_to I18n.t("Add new", :default => "Add new"), { :controller => related.class_name.tableize, :action => 'new', :back_to => back_to, :selected => related_fk }, :confirm => message.join("\n\n") if @current_user.can_perform?(related, 'create')}</small>
+    <small>#{link_to I18n.t("Add new", :default => "Add new"), { :controller => "admin/#{related.class_name.tableize}", :action => 'new', :back_to => back_to, :selected => related_fk }, :confirm => message.join("\n\n") if @current_user.can_perform?(related, 'create')}</small>
     </label>
 #{select :item, related_fk, related.find(:all, :order => related.typus_order_by).collect { |p| [p.typus_name, p.id] }, { :include_blank => true }, { :disabled => attribute_disabled?(attribute, klass) } }</li>
         HTML
@@ -188,10 +180,9 @@ module AdminFormHelper
 
   def typus_relationships
 
-    back_to = [ Typus::Configuration.options[:path_prefix], 
-                params[:controller].split('/').last, 
-                params[:id], 
-                params[:action] ]
+    back_to = [ params[:controller], 
+                params[:action], 
+                params[:id] ]
 
     @back_to = "/#{back_to.compact.join('/')}"
 
@@ -212,12 +203,21 @@ module AdminFormHelper
     returning(String.new) do |html|
       model_to_relate = @resource[:class].reflect_on_association(field.to_sym).class_name.constantize
       model_to_relate_as_resource = model_to_relate.name.tableize
+
+      foreign_key = @resource[:class].reflections[field.to_sym].primary_key_name
+
+      link_options = { :controller => "admin/#{field}", 
+                       :action => 'new', 
+                       :back_to => @back_to, 
+                       :resource => @resource[:self], 
+                       foreign_key => @item.id }
+
       html << <<-HTML
 <a name="#{field}"></a>
 <div class="box_relationships">
   <h2>
-  #{link_to I18n.t(field.humanize, :default => field.humanize), :controller => field}
-  <small>#{link_to I18n.t("Add new", :default => "Add new"), :controller => field, :action => 'new', :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id if @current_user.can_perform?(model_to_relate, 'create')}</small>
+  #{link_to I18n.t(field.humanize, :default => field.humanize), :controller => "admin/#{field}"}
+  <small>#{link_to I18n.t("Add new", :default => "Add new"), link_options if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
       items = @resource[:class].find(params[:id]).send(field)
@@ -254,7 +254,7 @@ module AdminFormHelper
       items_to_relate = (model_to_relate.find(:all) - @item.send(field))
       unless items_to_relate.empty?
         html << <<-HTML
-  #{form_tag :action => 'relate'}
+  #{form_tag :action => 'relate', :id => @item.id}
   #{hidden_field :related, :model, :value => model_to_relate}
   <p>#{ select :related, :id, items_to_relate.collect { |f| [f.typus_name, f.id] }.sort_by { |e| e.first } } &nbsp; #{submit_tag "Add", :class => 'button'}</p>
   </form>

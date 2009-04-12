@@ -115,7 +115,6 @@ module Typus
 
       # Mixins
       require 'typus/authentication'
-      require 'typus/export'
       require 'typus/locale'
       require 'typus/user'
       require 'typus/generator'

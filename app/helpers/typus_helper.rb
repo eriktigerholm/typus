@@ -23,8 +23,8 @@ module TypusHelper
 
         available.compact.each do |model|
           description = Typus.module_description(model)
-          admin_items_path = "/#{Typus::Configuration.options[:path_prefix]}/#{model.tableize}"
-          new_admin_item_path = "/#{Typus::Configuration.options[:path_prefix]}/#{model.tableize}/new"
+          admin_items_path = { :controller => "admin/#{model.tableize}" }
+          new_admin_item_path = { :controller => "admin/#{model.tableize}", :action => 'new'}
           html << <<-HTML
 <tr class="#{cycle('even', 'odd')}">
 <td>#{link_to I18n.t(model.titleize.capitalize.pluralize, :default => model.titleize.capitalize.pluralize), admin_items_path}<br /><small>#{I18n.t(description, :default => "#{description}")}</small></td>
@@ -66,9 +66,11 @@ module TypusHelper
 
       available.compact.each do |resource|
 
+        resource_path = { :controller => "admin/#{resource.underscore}" }
+
         html << <<-HTML
 <tr class="#{cycle('even', 'odd')}">
-<td>#{link_to I18n.t(resource.humanize, :default => resource.humanize), "#{Typus::Configuration.options[:path_prefix]}/#{resource.underscore}"}</td>
+<td>#{link_to I18n.t(resource.humanize, :default => resource.humanize), resource_path}</td>
 <td align="right" style="vertical-align: bottom;"></td>
 </tr>
         HTML
@@ -120,7 +122,9 @@ module TypusHelper
 
   def login_info(user = @current_user)
 
-    admin_edit_typus_user_path = "/#{Typus::Configuration.options[:path_prefix]}/#{Typus::Configuration.options[:user_class_name].tableize}/#{user.id}/edit"
+    admin_edit_typus_user_path = { :controller => "admin/#{Typus::Configuration.options[:user_class_name].tableize}", 
+                                   :action => 'edit', 
+                                   :id => user.id }
 
     <<-HTML
 <ul>

@@ -2,7 +2,7 @@ require 'test/helper'
 
 class AdminPublicHelperTest < ActiveSupport::TestCase
 
-  include AdminPublicHelper
+  include Admin::PublicHelper
 
   def test_quick_edit
 

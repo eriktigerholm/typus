@@ -2,7 +2,7 @@ require 'test/helper'
 
 class AdminSidebarHelperTest < ActiveSupport::TestCase
 
-  include AdminSidebarHelper
+  include Admin::SidebarHelper
   include ActionView::Helpers::UrlHelper
   include ActionController::UrlWriter
   include ActionView::Helpers::TagHelper
@@ -64,7 +64,7 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     self.expects(:params).at_least_once.returns(params)
 
     output = non_crud_actions
-    expected = [ "<a href=\"http://test.host/typus/pages/rebuild_all\">Rebuild all</a>" ]
+    expected = [ "<a href=\"http://test.host/admin/pages/rebuild_all\">Rebuild all</a>" ]
     assert output.kind_of?(Array)
     assert_equal expected, output
 
@@ -74,7 +74,7 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     self.expects(:params).at_least_once.returns(params)
 
     output = non_crud_actions
-    expected = [ "<a href=\"http://test.host/typus/pages/rebuild_all?status=true\">Rebuild all</a>" ]
+    expected = [ "<a href=\"http://test.host/admin/pages/rebuild_all?status=true\">Rebuild all</a>" ]
     assert output.kind_of?(Array)
     assert_equal expected, output
 
@@ -84,7 +84,7 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     self.expects(:params).at_least_once.returns(params)
 
     output = non_crud_actions
-    expected = [ "<a href=\"http://test.host/typus/pages/1/rebuild\">Rebuild</a>" ]
+    expected = [ "<a href=\"http://test.host/admin/pages/rebuild/1\">Rebuild</a>" ]
     assert output.kind_of?(Array)
     assert_equal expected, output
 
@@ -136,7 +136,7 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     @previous, @next = typus_user.previous_and_next
 
     output = previous_and_next
-    expected = [ "<a href=\"http://test.host/typus/typus_users/#{@next.id}/edit\">Next</a>" ]
+    expected = [ "<a href=\"http://test.host/admin/typus_users/edit/#{@next.id}\">Next</a>" ]
     assert_equal expected, output
 
     # Test when we are on the last item.
@@ -145,7 +145,7 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     @previous, @next = typus_user.previous_and_next
 
     output = previous_and_next
-    expected = [ "<a href=\"http://test.host/typus/typus_users/#{@previous.id}/edit\">Previous</a>" ]
+    expected = [ "<a href=\"http://test.host/admin/typus_users/edit/#{@previous.id}\">Previous</a>" ]
     assert_equal expected, output
 
     # Test when we are on the middle.
@@ -154,8 +154,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     @previous, @next = typus_user.previous_and_next
 
     output = previous_and_next
-    expected = [ "<a href=\"http://test.host/typus/typus_users/#{@next.id}/edit\">Next</a>", 
-                 "<a href=\"http://test.host/typus/typus_users/#{@previous.id}/edit\">Previous</a>" ]
+    expected = [ "<a href=\"http://test.host/admin/typus_users/edit/#{@next.id}\">Next</a>", 
+                 "<a href=\"http://test.host/admin/typus_users/edit/#{@previous.id}\">Previous</a>" ]
     assert_equal expected, output
 
   end
@@ -216,10 +216,10 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Created at</h2>
 <ul>
-<li><a href="http://test.host/typus/typus_users?created_at=today" class="off">Today</a></li>
-<li><a href="http://test.host/typus/typus_users?created_at=past_7_days" class="off">Past 7 days</a></li>
-<li><a href="http://test.host/typus/typus_users?created_at=this_month" class="off">This month</a></li>
-<li><a href="http://test.host/typus/typus_users?created_at=this_year" class="off">This year</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=today" class="off">Today</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=past_7_days" class="off">Past 7 days</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=this_month" class="off">This month</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=this_year" class="off">This year</a></li>
 </ul>
     HTML
     assert_equal expected, output
@@ -229,10 +229,10 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Created at</h2>
 <ul>
-<li><a href="http://test.host/typus/typus_users?created_at=today" class="on">Today</a></li>
-<li><a href="http://test.host/typus/typus_users?created_at=past_7_days" class="off">Past 7 days</a></li>
-<li><a href="http://test.host/typus/typus_users?created_at=this_month" class="off">This month</a></li>
-<li><a href="http://test.host/typus/typus_users?created_at=this_year" class="off">This year</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=today" class="on">Today</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=past_7_days" class="off">Past 7 days</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=this_month" class="off">This month</a></li>
+<li><a href="http://test.host/admin/typus_users?created_at=this_year" class="off">This year</a></li>
 </ul>
     HTML
     assert_equal expected, output
@@ -254,8 +254,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Status</h2>
 <ul>
-<li><a href="http://test.host/typus/typus_users?status=true" class="on">Active</a></li>
-<li><a href="http://test.host/typus/typus_users?status=false" class="off">Inactive</a></li>
+<li><a href="http://test.host/admin/typus_users?status=true" class="on">Active</a></li>
+<li><a href="http://test.host/admin/typus_users?status=false" class="off">Inactive</a></li>
 </ul>
     HTML
     assert_equal expected, output
@@ -267,8 +267,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Status</h2>
 <ul>
-<li><a href="http://test.host/typus/typus_users?status=true" class="off">Active</a></li>
-<li><a href="http://test.host/typus/typus_users?status=false" class="on">Inactive</a></li>
+<li><a href="http://test.host/admin/typus_users?status=true" class="off">Active</a></li>
+<li><a href="http://test.host/admin/typus_users?status=false" class="on">Inactive</a></li>
 </ul>
     HTML
     assert_equal expected, output
@@ -288,8 +288,8 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Is published?</h2>
 <ul>
-<li><a href="http://test.host/typus/pages?is_published=true" class="off">Yes, it is</a></li>
-<li><a href="http://test.host/typus/pages?is_published=false" class="on">No, it isn't</a></li>
+<li><a href="http://test.host/admin/pages?is_published=true" class="off">Yes, it is</a></li>
+<li><a href="http://test.host/admin/pages?is_published=false" class="on">No, it isn't</a></li>
 </ul>
     HTML
     assert_equal expected, output
@@ -312,9 +312,9 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Role</h2>
 <ul>
-<li><a href="http://test.host/typus/typus_users?role=admin" class="on">Admin</a></li>
-<li><a href="http://test.host/typus/typus_users?role=designer" class="off">Designer</a></li>
-<li><a href="http://test.host/typus/typus_users?role=editor" class="off">Editor</a></li>
+<li><a href="http://test.host/admin/typus_users?role=admin" class="on">Admin</a></li>
+<li><a href="http://test.host/admin/typus_users?role=designer" class="off">Designer</a></li>
+<li><a href="http://test.host/admin/typus_users?role=editor" class="off">Editor</a></li>
 </ul>
     HTML
     assert_equal expected, output
@@ -327,9 +327,9 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Role</h2>
 <ul>
-<li><a href="http://test.host/typus/typus_users?role=admin" class="off">Admin</a></li>
-<li><a href="http://test.host/typus/typus_users?role=designer" class="off">Designer</a></li>
-<li><a href="http://test.host/typus/typus_users?role=editor" class="on">Editor</a></li>
+<li><a href="http://test.host/admin/typus_users?role=admin" class="off">Admin</a></li>
+<li><a href="http://test.host/admin/typus_users?role=designer" class="off">Designer</a></li>
+<li><a href="http://test.host/admin/typus_users?role=editor" class="on">Editor</a></li>
 </ul>
     HTML
     assert_equal expected, output
@@ -354,9 +354,9 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <h2>Role</h2>
 <ul>
-<li><a href="http://test.host/typus/typus_users?role=admin" class="on">Administrador</a></li>
-<li><a href="http://test.host/typus/typus_users?role=designer" class="off">Diseñador</a></li>
-<li><a href="http://test.host/typus/typus_users?role=editor" class="off">Editor</a></li>
+<li><a href="http://test.host/admin/typus_users?role=admin" class="on">Administrador</a></li>
+<li><a href="http://test.host/admin/typus_users?role=designer" class="off">Diseñador</a></li>
+<li><a href="http://test.host/admin/typus_users?role=editor" class="off">Editor</a></li>
 </ul>
     HTML
 

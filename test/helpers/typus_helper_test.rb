@@ -29,13 +29,14 @@ class TypusHelperTest < ActiveSupport::TestCase
   end
 
   def test_header_with_root_path
+
     # Add root named route
-    ActionController::Routing::Routes.add_named_route :root, "/", {:controller => "posts"}
-    
+    ActionController::Routing::Routes.add_named_route :root, "/", { :controller => "posts" }
+
     # ActionView::Helpers::UrlHelper does not support strings, which are returned by named routes
     # link root_path
     self.stubs(:link_to).returns(%(<a href="/">View site</a>))
-    
+
     output = header
     expected = <<-HTML
 <h1>#{Typus::Configuration.options[:app_name]} <small><a href="/">View site</a></small>
@@ -47,9 +48,10 @@ class TypusHelperTest < ActiveSupport::TestCase
   end
   
   def test_header_without_root_path
+
     # Remove root route from list
     ActionController::Routing::Routes.named_routes.routes.reject! {|key, route| key == :root }
-    
+
     output = header
     expected = <<-HTML
 <h1>#{Typus::Configuration.options[:app_name]} </h1>

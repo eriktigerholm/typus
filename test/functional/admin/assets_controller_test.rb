@@ -22,11 +22,11 @@ class Admin::AssetsControllerTest < ActionController::TestCase
     post_ = posts(:published)
 
     assert_difference('post_.assets.count') do
-      post :create, { :back_to => "/admin/posts/#{post_.id}/edit", :resource => post_.class.name, :resource_id => post_.id }
+      post :create, { :back_to => "/admin/posts/edit/#{post_.id}", :resource => post_.class.name, :resource_id => post_.id }
     end
 
     assert_response :redirect
-    assert_redirected_to '/admin/posts/1/edit#assets'
+    assert_redirected_to '/admin/posts/edit/1#assets'
     assert flash[:success]
     assert_equal 'Asset successfully assigned to Post.', flash[:success]
 
