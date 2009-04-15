@@ -17,7 +17,7 @@ class TypusControllerTest < ActionController::TestCase
     typus_user = typus_users(:admin)
     post :sign_in, { :user => { :email => typus_user.email, 
                                 :password => '12345678' } }
-    assert_equal typus_user.id, @request.session[:typus]
+    assert_equal typus_user.id, @request.session[:typus_user_id]
     assert_response :redirect
     assert_redirected_to admin_dashboard_path
   end
@@ -35,7 +35,7 @@ class TypusControllerTest < ActionController::TestCase
     typus_user = typus_users(:disabled_user)
     post :sign_in, { :user => { :email => typus_user.email, 
                                 :password => '12345678' } }
-    assert_nil @request.session[:typus]
+    assert_nil @request.session[:typus_user_id]
     assert_response :redirect
     assert_redirected_to admin_sign_in_path
   end
@@ -44,12 +44,12 @@ class TypusControllerTest < ActionController::TestCase
     typus_user = typus_users(:removed_role)
     post :sign_in, { :user => { :email => typus_user.email, 
                                 :password => '12345678' } }
-    assert_equal typus_user.id, @request.session[:typus]
+    assert_equal typus_user.id, @request.session[:typus_user_id]
     assert_response :redirect
     assert_redirected_to admin_dashboard_path
     get :dashboard
     assert_redirected_to admin_sign_in_path
-    assert_nil @request.session[:typus]
+    assert_nil @request.session[:typus_user_id]
     assert flash[:notice]
     assert_equal 'Role does no longer exists.', flash[:notice]
   end
@@ -72,9 +72,9 @@ class TypusControllerTest < ActionController::TestCase
 
   def test_should_sign_out
     admin = typus_users(:admin)
-    @request.session[:typus] = admin.id
+    @request.session[:typus_user_id] = admin.id
     get :sign_out
-    assert_nil @request.session[:typus]
+    assert_nil @request.session[:typus_user_id]
     assert_response :redirect
     assert_redirected_to admin_sign_in_path
     [ :notice, :error, :warning ].each { |f| assert !flash[f] }
@@ -83,7 +83,7 @@ class TypusControllerTest < ActionController::TestCase
   def test_should_verify_we_can_disable_users_and_block_acess_on_the_fly
 
     admin = typus_users(:admin)
-    @request.session[:typus] = admin.id
+    @request.session[:typus_user_id] = admin.id
     get :dashboard
     assert_response :success
 
@@ -97,7 +97,7 @@ class TypusControllerTest < ActionController::TestCase
 
     assert flash[:notice]
     assert_equal "Typus user has been disabled.", flash[:notice]
-    assert_nil @request.session[:typus]
+    assert_nil @request.session[:typus_user_id]
 
   end
 
@@ -165,7 +165,7 @@ class TypusControllerTest < ActionController::TestCase
   def test_should_create_first_typus_user
 
     TypusUser.destroy_all
-    assert_nil @request.session[:typus]
+    assert_nil @request.session[:typus_user_id]
     assert TypusUser.find(:all).empty?
 
     get :sign_in
@@ -186,11 +186,11 @@ class TypusControllerTest < ActionController::TestCase
     assert_redirected_to admin_dashboard_path
     assert flash[:notice]
     assert_equal "Password set to \"hocus-pocus\".", flash[:notice]
-    assert @request.session[:typus]
+    assert @request.session[:typus_user_id]
     assert !TypusUser.find(:all).empty?
 
     get :sign_out
-    assert_nil @request.session[:typus]
+    assert_nil @request.session[:typus_user_id]
     assert_redirected_to admin_sign_in_path
 
     get :sign_up
@@ -199,14 +199,14 @@ class TypusControllerTest < ActionController::TestCase
   end
 
   def test_should_redirect_to_login_if_not_logged
-    @request.session[:typus] = nil
+    @request.session[:typus_user_id] = nil
     get :dashboard
     assert_response :redirect
     assert_redirected_to admin_sign_in_path
   end
 
   def test_should_render_dashboard
-    @request.session[:typus] = typus_users(:admin).id
+    @request.session[:typus_user_id] = typus_users(:admin).id
     get :dashboard
     assert_response :success
     assert_template 'dashboard'
@@ -215,7 +215,7 @@ class TypusControllerTest < ActionController::TestCase
   end
 
   def test_should_verify_sign_up_works
-    @request.session[:typus] = typus_users(:admin).id
+    @request.session[:typus_user_id] = typus_users(:admin).id
     TypusUser.destroy_all
     get :sign_up
     assert_response :success
@@ -224,7 +224,7 @@ class TypusControllerTest < ActionController::TestCase
   end
 
   def test_should_verify_page_title_on_dashboard
-    @request.session[:typus] = typus_users(:admin).id
+    @request.session[:typus_user_id] = typus_users(:admin).id
     get :dashboard
     assert_select 'title', "#{Typus::Configuration.options[:app_name]} &rsaquo; Dashboard"
   end
@@ -232,7 +232,7 @@ class TypusControllerTest < ActionController::TestCase
   def test_should_verify_link_to_edit_typus_user
 
     typus_user = typus_users(:admin)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     get :dashboard
     assert_response :success
 
@@ -247,7 +247,7 @@ class TypusControllerTest < ActionController::TestCase
 
   def test_should_verify_link_to_sign_out
 
-    @request.session[:typus] = typus_users(:admin).id
+    @request.session[:typus_user_id] = typus_users(:admin).id
     get :dashboard
     assert_response :success
 
@@ -257,7 +257,7 @@ class TypusControllerTest < ActionController::TestCase
 
   def test_should_show_add_links_in_resources_list_for_admin
 
-    @request.session[:typus] = typus_users(:admin).id
+    @request.session[:typus_user_id] = typus_users(:admin).id
     get :dashboard
 
     %w( typus_users posts pages assets ).each do |resource|
@@ -272,7 +272,7 @@ class TypusControllerTest < ActionController::TestCase
 
   def test_should_show_add_links_in_resources_list_for_editor
     editor = typus_users(:editor)
-    @request.session[:typus] = editor.id
+    @request.session[:typus_user_id] = editor.id
     get :dashboard
     assert_match '/admin/posts/new', @response.body
     assert_no_match /\/admin\/typus_users\/new/, @response.body
@@ -283,7 +283,7 @@ class TypusControllerTest < ActionController::TestCase
 
   def test_should_show_add_links_in_resources_list_for_designer
     designer = typus_users(:designer)
-    @request.session[:typus] = designer.id
+    @request.session[:typus_user_id] = designer.id
     get :dashboard
     assert_no_match /\/admin\/posts\/new/, @response.body
     assert_no_match /\/admin\/typus_users\/new/, @response.body
@@ -291,7 +291,7 @@ class TypusControllerTest < ActionController::TestCase
 
   def test_should_render_application_dashboard_template_extensions
     admin = typus_users(:admin)
-    @request.session[:typus] = admin.id
+    @request.session[:typus_user_id] = admin.id
     get :dashboard
     assert_response :success
     partials = %w( _sidebar.html.erb _top.html.erb _bottom.html.erb )

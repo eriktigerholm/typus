@@ -2,9 +2,10 @@ class Admin::MasterController < ApplicationController
 
   layout 'admin'
 
-  include Authentication
-  include Typus::Configuration::Reloader
+  include Typus::Authentication
+  include Typus::Format
   include Typus::Locale
+  include Typus::Reloader
 
   if Typus::Configuration.options[:ssl]
     include SslRequirement
@@ -36,24 +37,14 @@ class Admin::MasterController < ApplicationController
   #
   def index
 
-    # Build the conditions
-    conditions, joins = @resource[:class].build_conditions(params)
+    @conditions, @joins = @resource[:class].build_conditions(params)
 
-    # Pagination
-    items_count = @resource[:class].count(:joins => joins, :conditions => conditions)
-    items_per_page = @resource[:class].typus_options_for(:per_page).to_i
-    @pager = ::Paginator.new(items_count, items_per_page) do |offset, per_page|
-      @resource[:class].find(:all, 
-                             :joins => joins, 
-                             :conditions => conditions, 
-                             :order => @order, 
-                             :limit => per_page, 
-                             :offset => offset)
+    respond_to do |format|
+      format.html { generate_html }
+      @resource[:class].typus_export_formats.each do |f|
+        format.send(f) { send("generate_#{f}") }
+      end
     end
-
-    @items = @pager.page(params[:page])
-
-    select_template :index
 
   rescue Exception => error
     error_handler(error)
@@ -85,7 +76,7 @@ class Admin::MasterController < ApplicationController
     @item = @resource[:class].new(params[:item])
 
     if @item.attributes.include?(Typus.user_fk)
-      @item.attributes = { Typus.user_fk => session[:typus] }
+      @item.attributes = { Typus.user_fk => session[:typus_user_id] }
     end
 
     if @item.valid?
@@ -122,7 +113,12 @@ class Admin::MasterController < ApplicationController
   #
   def show
     @previous, @next = @item.previous_and_next
-    select_template :show
+
+    respond_to do |format|
+      format.html { select_template :show }
+      format.xml  { render :xml => @item }
+    end
+
   end
 
   ##
@@ -288,7 +284,7 @@ private
     return unless @item.respond_to?(Typus.user_fk)
 
     # If the record is owned by the user ...
-    unless @item.send(Typus.user_fk) == session[:typus]
+    unless @item.send(Typus.user_fk) == session[:typus_user_id]
       flash[:notice] = t("Record owned by another user", 
                          :default => "Record owned by another user.")
       redirect_to :action => 'show', :id => @item.id

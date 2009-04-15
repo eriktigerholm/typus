@@ -1,161 +1,165 @@
-module Authentication
+module Typus
 
-protected
+  module Authentication
 
-  ##
-  # Require login checks if the user is logged on Typus, otherwise 
-  # is sent to the login page with a :back_to param to return where 
-  # she tried to go.
-  #
-  # Use this for demo!
-  #
-  #     session[:typus] = Typus.user_class.find(:first)
-  #
-  def require_login
-    if session[:typus]
-      set_current_user
-    else
-      back_to = (request.env['REQUEST_URI'] == '/admin') ? nil : request.env['REQUEST_URI']
+    protected
+
+    ##
+    # Require login checks if the user is logged on Typus, otherwise 
+    # is sent to the login page with a :back_to param to return where 
+    # she tried to go.
+    #
+    # Use this for demo!
+    #
+    #     session[:typus_user_id] = Typus.user_class.find(:first)
+    #
+    def require_login
+      if session[:typus_user_id]
+        set_current_user
+      else
+        back_to = (request.env['REQUEST_URI'] == '/admin') ? nil : request.env['REQUEST_URI']
+        redirect_to admin_sign_in_path(:back_to => back_to)
+      end
+    end
+
+    ##
+    # Return the current user. The important thing here is that if the 
+    # roles does not longer exist on the system the user will be logged 
+    # off from Typus.
+    #
+    def set_current_user
+
+      @current_user = Typus.user_class.find(session[:typus_user_id])
+
+      unless @current_user.respond_to?(:role)
+        raise "Run `script/generate typus_update_schema_to_01 -f && rake db:migrate` to update database schema."
+      end
+
+      unless Typus::Configuration.roles.keys.include?(@current_user.role)
+        raise "Role does no longer exists."
+      end
+
+      unless @current_user.status
+        back_to = (request.env['REQUEST_URI'] == '/admin') ? nil : request.env['REQUEST_URI']
+        raise "Typus user has been disabled."
+      end
+
+    rescue Exception => error
+      flash[:notice] = error.message
+      session[:typus_user_id] = nil
       redirect_to admin_sign_in_path(:back_to => back_to)
     end
-  end
 
-  ##
-  # Return the current user. The important thing here is that if the 
-  # roles does not longer exist on the system the user will be logged 
-  # off from Typus.
-  #
-  def set_current_user
+    ##
+    # Action is available on:
+    #
+    #     edit, update, toggle and destroy
+    #
+    def check_if_user_can_perform_action_on_user
 
-    @current_user = Typus.user_class.find(session[:typus])
+      return unless @item.kind_of?(Typus.user_class)
 
-    unless @current_user.respond_to?(:role)
-      raise "Run `script/generate typus_update_schema_to_01 -f && rake db:migrate` to update database schema."
-    end
+      current_user = (@current_user == @item)
 
-    unless Typus::Configuration.roles.keys.include?(@current_user.role)
-      raise "Role does no longer exists."
-    end
+      message = case params[:action]
+                when 'edit'
 
-    unless @current_user.status
-      back_to = (request.env['REQUEST_URI'] == '/admin') ? nil : request.env['REQUEST_URI']
-      raise "Typus user has been disabled."
-    end
+                  # Only admin and owner of Typus User can edit.
+                  if !@current_user.is_root? && !current_user
+                    t("As you're not the admin or the owner of this record you cannot edit it", 
+                      :default => "As you're not the admin or the owner of this record you cannot edit it.")
+                  end
 
-  rescue Exception => error
-    flash[:notice] = error.message
-    session[:typus] = nil
-    redirect_to admin_sign_in_path(:back_to => back_to)
-  end
+                when 'update'
 
-  ##
-  # Action is available on:
-  #
-  #     edit, update, toggle and destroy
-  #
-  def check_if_user_can_perform_action_on_user
+                  # current_user cannot change her role.
+                  if current_user && !(@item.role == params[:item][:role])
+                    t("You can't change your role", 
+                      :default => "You can't change your role.")
+                  end
 
-    return unless @item.kind_of?(Typus.user_class)
+                when 'toggle'
 
-    current_user = (@current_user == @item)
+                  # Only admin can toggle typus user status, but not herself.
+                  if @current_user.is_root? && current_user
+                    t("You can't toggle your status", 
+                      :default => "You can't toggle your status.")
+                  elsif !@current_user.is_root?
+                    t("You're not allowed to toggle status", 
+                      :default => "You're not allowed to toggle status.")
+                  end
 
-    message = case params[:action]
-              when 'edit'
+                when 'destroy'
 
-                # Only admin and owner of Typus User can edit.
-                if !@current_user.is_root? && !current_user
-                  t("As you're not the admin or the owner of this record you cannot edit it", 
-                    :default => "As you're not the admin or the owner of this record you cannot edit it.")
+                  # Admin can remove anything except herself.
+                  if @current_user.is_root? && current_user
+                    I18n.t("You can't remove yourself", 
+                           :default => "You can't remove yourself.")
+                  elsif !@current_user.is_root?
+                    t("You're not allowed to remove Typus Users", 
+                      :default => "You're not allowed to remove Typus Users.")
+                  end
+
                 end
 
-              when 'update'
+      if message
+        flash[:notice] = message
+        redirect_to :back rescue redirect_to admin_dashboard_path
+      end
 
-                # current_user cannot change her role.
-                if current_user && !(@item.role == params[:item][:role])
-                  t("You can't change your role", 
-                    :default => "You can't change your role.")
-                end
-
-              when 'toggle'
-
-                # Only admin can toggle typus user status, but not herself.
-                if @current_user.is_root? && current_user
-                  t("You can't toggle your status", 
-                    :default => "You can't toggle your status.")
-                elsif !@current_user.is_root?
-                  t("You're not allowed to toggle status", 
-                    :default => "You're not allowed to toggle status.")
-                end
-
-              when 'destroy'
-
-                # Admin can remove anything except herself.
-                if @current_user.is_root? && current_user
-                  I18n.t("You can't remove yourself", 
-                         :default => "You can't remove yourself.")
-                elsif !@current_user.is_root?
-                  t("You're not allowed to remove Typus Users", 
-                    :default => "You're not allowed to remove Typus Users.")
-                end
-
-              end
-
-    if message
-      flash[:notice] = message
-      redirect_to :back rescue redirect_to admin_dashboard_path
     end
 
-  end
+    ##
+    # This method checks if the user can perform the requested action.
+    # It works on models, so its available on the admin_controller.
+    #
+    def check_if_user_can_perform_action_on_resource
 
-  ##
-  # This method checks if the user can perform the requested action.
-  # It works on models, so its available on the admin_controller.
-  #
-  def check_if_user_can_perform_action_on_resource
+      message = case params[:action]
+                when 'index', 'show'
+                  t("{{current_user_role}} can't display items", 
+                    :default => "{{current_user_role}} can't display items.", 
+                    :current_user_role => @current_user.role.capitalize)
+                when 'edit', 'update', 'position', 'toggle', 'relate', 'unrelate'
+                when 'destroy'
+                  t("{{current_user_role}} can't delete this item", 
+                    :default => "{{current_user_role}} can't delete this item.", 
+                    :current_user_role => @current_user.role.capitalize)
+                else
+                  t("{{current_user_role}} can't perform action ({{action}})", 
+                    :default => "{{current_user_role}} can't perform action ({{action}}).", 
+                    :current_user_role => @current_user.role.capitalize, 
+                    :action => params[:action])
+                end
 
-    message = case params[:action]
-              when 'index', 'show'
-                t("{{current_user_role}} can't display items", 
-                  :default => "{{current_user_role}} can't display items.", 
-                  :current_user_role => @current_user.role.capitalize)
-              when 'edit', 'update', 'position', 'toggle', 'relate', 'unrelate'
-              when 'destroy'
-                t("{{current_user_role}} can't delete this item", 
-                  :default => "{{current_user_role}} can't delete this item.", 
-                  :current_user_role => @current_user.role.capitalize)
-              else
-                t("{{current_user_role}} can't perform action ({{action}})", 
-                  :default => "{{current_user_role}} can't perform action ({{action}}).", 
-                  :current_user_role => @current_user.role.capitalize, 
-                  :action => params[:action])
-              end
+      unless @current_user.can_perform?(@resource[:class], params[:action])
+        flash[:notice] = message || t("{{current_user_role}} can't perform action. ({{action}})", 
+                                      :default => "{{current_user_role}} can't perform action. ({{action}})", 
+                                      :current_user_role => @current_user.role.capitalize, 
+                                      :action => params[:action])
+        redirect_to :back rescue redirect_to admin_dashboard_path
+      end
 
-    unless @current_user.can_perform?(@resource[:class], params[:action])
-      flash[:notice] = message || t("{{current_user_role}} can't perform action. ({{action}})", 
-                                    :default => "{{current_user_role}} can't perform action. ({{action}})", 
-                                    :current_user_role => @current_user.role.capitalize, 
-                                    :action => params[:action])
-      redirect_to :back rescue redirect_to admin_dashboard_path
     end
 
-  end
-
-  ##
-  # This method checks if the user can perform the requested action.
-  # It works on resources, which are not models, so its available on 
-  # the typus_controller.
-  #
-  def check_if_user_can_perform_action_on_resource_without_model
-    controller = params[:controller].split('/').last
-    action = params[:action]
-    unless @current_user.can_perform?(controller.camelize, action, { :special => true })
-      flash[:notice] = t("{{current_user_role}} can't go to {{action}} on {{controller}}", 
-                         :default => "{{current_user_role}} can't go to {{action}} on {{controller}}.", 
-                         :current_user_role => @current_user.role.capitalize, 
-                         :action => action, 
-                         :controller => controller.humanize.downcase)
-      redirect_to :back rescue redirect_to admin_dashboard_path
+    ##
+    # This method checks if the user can perform the requested action.
+    # It works on resources, which are not models, so its available on 
+    # the typus_controller.
+    #
+    def check_if_user_can_perform_action_on_resource_without_model
+      controller = params[:controller].split('/').last
+      action = params[:action]
+      unless @current_user.can_perform?(controller.camelize, action, { :special => true })
+        flash[:notice] = t("{{current_user_role}} can't go to {{action}} on {{controller}}", 
+                           :default => "{{current_user_role}} can't go to {{action}} on {{controller}}.", 
+                           :current_user_role => @current_user.role.capitalize, 
+                           :action => action, 
+                           :controller => controller.humanize.downcase)
+        redirect_to :back rescue redirect_to admin_dashboard_path
+      end
     end
+
   end
 
 end

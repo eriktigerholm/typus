@@ -8,7 +8,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
   def setup
     Typus::Configuration.options[:root] = 'admin'
     @typus_user = typus_users(:admin)
-    @request.session[:typus] = @typus_user.id
+    @request.session[:typus_user_id] = @typus_user.id
   end
 
   def test_should_allow_admin_to_create_typus_users
@@ -45,7 +45,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
     @request.env['HTTP_REFERER'] = '/admin/typus_users'
     @typus_user = typus_users(:editor)
-    @request.session[:typus] = @typus_user.id
+    @request.session[:typus_user_id] = @typus_user.id
     get :toggle, { :id => @typus_user.id, :field => 'status' }
 
     assert_response :redirect
@@ -89,7 +89,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
     @request.env['HTTP_REFERER'] = '/typus/typus_users'
     typus_user = typus_users(:editor)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     get :new
 
     assert_response :redirect
@@ -105,7 +105,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
     Typus::Configuration.stubs(:options).returns(options)
 
     typus_user = typus_users(:editor)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     @request.env['HTTP_REFERER'] = "/admin/typus_users/edit/#{typus_user.id}"
     get :edit, { :id => typus_user.id }
 
@@ -127,7 +127,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
   def test_should_not_allow_editor_to_update_himself_to_become_admin
 
     typus_user = typus_users(:editor)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     @request.env['HTTP_REFERER'] = "/admin/typus_users/#{typus_user.id}/edit"
 
     assert_equal 'editor', typus_user.role
@@ -146,7 +146,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
     @request.env['HTTP_REFERER'] = '/admin/typus_users'
     typus_user = typus_users(:editor)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     get :edit, { :id => typus_user.id }
 
     assert_response :success
@@ -165,7 +165,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
     @request.env['HTTP_REFERER'] = '/admin/typus_users'
     typus_user = typus_users(:editor)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     delete :destroy, :id => typus_users(:admin).id
 
     assert_response :redirect
@@ -179,7 +179,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
     @request.env['HTTP_REFERER'] = '/admin/typus_users'
     typus_user = typus_users(:editor)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     delete :destroy, :id => typus_user.id
 
     assert_response :redirect
@@ -193,7 +193,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
     @request.env['HTTP_REFERER'] = '/admin'
     typus_user = typus_users(:designer)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     get :index
 
     assert_response :redirect
@@ -206,7 +206,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
   def test_should_change_root_to_editor_so_editor_can_edit_others_content
 
     typus_user = typus_users(:editor)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     @request.env['HTTP_REFERER'] = '/admin/typus_users'
 
     assert_equal 'editor', typus_user.role

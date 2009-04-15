@@ -8,7 +8,7 @@ class Admin::CommentsControllerTest < ActionController::TestCase
 
   def setup
     @typus_user = typus_users(:admin)
-    @request.session[:typus] = @typus_user.id
+    @request.session[:typus_user_id] = @typus_user.id
     @comment = comments(:first)
   end
 
@@ -66,7 +66,7 @@ class Admin::CommentsControllerTest < ActionController::TestCase
   def test_should_not_show_add_new_link_in_index
 
     typus_user = typus_users(:designer)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
 
     get :index
     assert_response :success
@@ -83,7 +83,7 @@ class Admin::CommentsControllerTest < ActionController::TestCase
   def test_should_not_show_remove_record_link_in_index
 
     typus_user = typus_users(:designer)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
 
     get :index
     assert_response :success

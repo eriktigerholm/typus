@@ -395,6 +395,38 @@ For feedback you can use the following flash methods.
 - <tt>flash[:error]</tt> when there's something wrong.
 - <tt>flash[:success]</tt> when the action successfully finished.
 
+== Exporting data
+
+Typus allows to export data. Only XML and CSV exporting methods are 
+implemented but you can easily add your own. You will see the export 
+links on the sidebar of your resource.
+
+    Order:
+      export: csv, pdf, xml
+
+And the actions for those export options are:
+
+    def export_csv
+      # Which is already implemented but you can overwrite. On 
+      # `admin/orders_controller.rb`.
+    end
+
+    def export_xml
+      # Which is already implemented but you can overwrite. On 
+      # `admin/orders_controller.rb`.
+    end
+
+    def export_pdf
+      # Not implemented, you will have to overwrite on 
+      # `admin/orders_controller.rb`.
+    end
+
+Please notice that in order to be able to use the export feature you 
+need the following routes at the end of your <tt>routes.rb</tt>.
+
+    map.connect ':controller.:format'
+    map.connect ':controller/:action/:id.:format'
+
 === Applications, modules and submodules
 
 To group modules into an application use *application*.
@@ -603,6 +635,10 @@ to see in Typus in the near future.
 - Erik Tigerholm (Code) http://github.com/eriktigerholm
 - George Guimarães (Translation to Brazilian Portuguese and code) http://github.com/georgeguimaraes
 - José Valim (Code) http://github.com/josevalim
+
+== Acknowledgments
+
+- Typus uses "Paginator" by Bruce Williams http://codefluency.com
 
 == Author, contact, bugs, mailing list and more
 

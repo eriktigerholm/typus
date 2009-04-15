@@ -1,7 +1,7 @@
 require 'typus'
 require 'sha1'
 
-if Rails.env.test?
+if Typus.testing?
   Typus::Configuration.options[:config_folder] = 'vendor/plugins/typus/test/config/working'
 end
 
@@ -15,5 +15,5 @@ scripts = %w( script/generate script/destroy )
 
 unless scripts.include?($0)
   Typus.enable
-  Typus.generator unless Rails.env.test?
+  Typus.generator unless Typus.testing?
 end

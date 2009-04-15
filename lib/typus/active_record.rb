@@ -135,7 +135,11 @@ module Typus
       end
 
       return (!value.nil?) ? value : Typus::Configuration.options[filter.to_sym]
+    end
 
+    def typus_export_formats
+      data = Typus::Configuration.config[name]
+      !data['export'].nil? ? data['export'].split(', ') : []
     end
 
     ##

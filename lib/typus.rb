@@ -94,6 +94,10 @@ module Typus
       Typus::Configuration.options[:user_fk]
     end
 
+    def testing?
+      Rails.env.test? && Dir.pwd == "#{Rails.root}/vendor/plugins/typus"
+    end
+
     ##
     # Load configuration files, translations, modules and extensions.
     #
@@ -107,7 +111,7 @@ module Typus
       Typus::Configuration.roles!
       I18n.load_path += Dir[File.join("#{Rails.root}/vendor/plugins/typus/config/locales/*.yml")]
 
-      require File.dirname(__FILE__) + '/../test/models' if Rails.env.test?
+      require File.dirname(__FILE__) + '/../test/models' if Typus.testing?
 
       # Rails Extensions
       require 'typus/active_record'
@@ -115,9 +119,12 @@ module Typus
 
       # Mixins
       require 'typus/authentication'
-      require 'typus/locale'
-      require 'typus/user'
+      require 'typus/format'
       require 'typus/generator'
+      require 'typus/locale'
+      require 'typus/reloader'
+      require 'typus/quick_edit'
+      require 'typus/user'
 
       # Vendor
       require 'vendor/active_record'

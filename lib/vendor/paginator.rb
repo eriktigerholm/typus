@@ -2,7 +2,7 @@ require 'forwardable'
 
 class Paginator
 
-  VERSION = '1.1.0'
+  VERSION = '1.1.1'
 
   include Enumerable
 
@@ -83,15 +83,20 @@ class Paginator
       @items ||= @select.call
     end
 
+    # Does this page have any items?
+    def empty?
+      items.empty?
+    end
+
     # Checks to see if there's a page before this one
     def prev?
       @number > 1
     end
 
-    # Get previous page (if possible)
-    def prev
-      @pager.page(@number - 1) if prev?
-    end
+   # Get previous page (if possible)
+   def prev
+     @pager.page(@number - 1) if prev?
+   end
 
     # Checks to see if there's a page after this one
     def next?
@@ -99,9 +104,9 @@ class Paginator
     end
 
     # Get next page (if possible)
-    def next
-      @pager.page(@number + 1) if next?
-    end
+   def next
+     @pager.page(@number + 1) if next?
+   end
 
     # The "item number" of the first item on this page
     def first_item_number

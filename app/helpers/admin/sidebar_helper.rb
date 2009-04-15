@@ -9,6 +9,10 @@ module Admin::SidebarHelper
 #{build_typus_list(previous_and_next, 'go_to')}
       HTML
 
+      html << <<-HTML
+#{build_typus_list(export, 'export')}
+      HTML
+
       %w( parent_module submodules ).each do |block|
         html << <<-HTML
 #{build_typus_list(modules(block), block)}
@@ -47,6 +51,15 @@ module Admin::SidebarHelper
         if @current_user.can_perform?(@resource[:class], action)
           actions << (link_to action.humanize, params.merge(:action => action))
         end
+      end
+    end
+  end
+
+  def export
+    return [] unless params[:action] == 'index'
+    returning(Array.new) do |format|
+      @resource[:class].typus_export_formats.each do |f|
+        format << (link_to f.upcase, params.merge(:format => f))
       end
     end
   end

@@ -100,7 +100,10 @@ br:
   "Unrelate {{unrelate_model}} from {{unrelate_model_from}}?": "Desvincular {{unrelate_model}} de {{unrelate_model_from}}?"
   "Change {{attribute}}?": "Mudar {{attribute}}?"
   "Set language": "Mudar idioma"
-  "Today": "Today (missing)"
+  "Today": "Hoje"
   "Past 7 days": "Últimos 7 dias"
   "This month": "Este mês"
   "This year": "Este ano"
+  "Created at": "Criado em"
+  "Updated at": "Atualizado em"
+  

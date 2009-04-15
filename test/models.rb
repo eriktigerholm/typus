@@ -23,7 +23,7 @@ class Comment < ActiveRecord::Base
 
 end
 
-class CustomUser
+class CustomUser < ActiveRecord::Base
 end
 
 class Page < ActiveRecord::Base

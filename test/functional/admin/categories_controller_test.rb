@@ -7,7 +7,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
 
   def setup
     user = typus_users(:editor)
-    @request.session[:typus] = user.id
+    @request.session[:typus_user_id] = user.id
     @request.env['HTTP_REFERER'] = '/admin/categories'
   end
 
@@ -66,13 +66,13 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
 
   def test_should_allow_admin_to_add_a_category
     admin = typus_users(:admin)
-    @request.session[:typus] = admin.id
+    @request.session[:typus_user_id] = admin.id
     assert admin.can_perform?('Category', 'create')
   end
 
   def test_should_not_allow_designer_to_add_a_category
     designer = typus_users(:designer)
-    @request.session[:typus] = designer.id
+    @request.session[:typus_user_id] = designer.id
     category = categories(:first)
     get :new
     assert_response :redirect
@@ -83,7 +83,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
 
   def test_should_allow_admin_to_destroy_a_category
     admin = typus_users(:admin)
-    @request.session[:typus] = admin.id
+    @request.session[:typus_user_id] = admin.id
     category = categories(:first)
     get :destroy, { :id => category.id }
     assert_response :redirect
@@ -94,7 +94,7 @@ class Admin::CategoriesControllerTest < ActionController::TestCase
 
   def test_should_not_allow_designer_to_destroy_a_category
     designer = typus_users(:designer)
-    @request.session[:typus] = designer.id
+    @request.session[:typus_user_id] = designer.id
     category = categories(:first)
     get :destroy, { :id => category.id, :method => :delete }
     assert_response :redirect

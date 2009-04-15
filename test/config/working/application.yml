@@ -58,6 +58,8 @@ Post:
   order_by: title, -created_at
   application: Blog
 
-User:
+CustomUser:
   fields:
     list: first_name, last_name, email
+    csv: first_name, last_name, email
+  export: csv

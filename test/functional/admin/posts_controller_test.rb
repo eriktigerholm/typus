@@ -10,12 +10,12 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
   def setup
     typus_user = typus_users(:admin)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
   end
 
   def test_should_redirect_to_login
 
-    @request.session[:typus] = nil
+    @request.session[:typus_user_id] = nil
 
     get :index
     assert_response :redirect
@@ -115,7 +115,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
   def test_should_perform_a_search
     typus_user = typus_users(:admin)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
     get :index, { :search => 'neinonon' }
     assert_response :success
     assert_template 'index'
@@ -169,7 +169,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
   def test_should_check_redirection_when_theres_no_http_referer_on_new
 
     typus_user = typus_users(:designer)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
 
     get :new
     assert_response :redirect
@@ -181,7 +181,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
     @request.env['HTTP_REFERER'] = '/admin/posts'
 
     typus_user = typus_users(:designer)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
 
     get :new
     assert_response :redirect

@@ -16,6 +16,7 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
 
     self.expects(:default_actions).returns(['action1', 'action2'])
     self.expects(:previous_and_next).returns(['previous', 'next'])
+    self.expects(:export).returns(['csv', 'pdf'])
     self.expects(:modules).with('parent_module').returns(['parent_module'])
     self.expects(:modules).with('submodules').returns(['submodules'])
 
@@ -31,6 +32,12 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
 <ul>
 <li>previous</li>
 <li>next</li>
+</ul>
+
+<h2>Export</h2>
+<ul>
+<li>csv</li>
+<li>pdf</li>
 </ul>
 
 <h2>Parent module</h2>
@@ -86,6 +93,20 @@ class AdminSidebarHelperTest < ActiveSupport::TestCase
     output = non_crud_actions
     expected = [ "<a href=\"http://test.host/admin/pages/rebuild/1\">Rebuild</a>" ]
     assert output.kind_of?(Array)
+    assert_equal expected, output
+
+  end
+
+  def test_export
+
+    @resource = { :class => CustomUser }
+
+    params = { :controller => 'admin/custom_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = export
+    expected = ["<a href=\"http://test.host/admin/custom_users.csv\">CSV</a>"]
+
     assert_equal expected, output
 
   end

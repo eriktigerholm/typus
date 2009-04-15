@@ -19,6 +19,7 @@
 #     index: cleanup
 #     edit: send_as_newsletter
 #     show: rebuild
+#   export: csv, xml, pdf
 #   order_by: created_at
 #   relationships:
 #   filters: is_published?, created_at, category_id
@@ -58,6 +59,7 @@
   actions:
     index:
     edit:
+  export:
   order_by:
   relationships: <%= relationships.sort.join(', ') %>
   filters:

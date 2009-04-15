@@ -58,7 +58,7 @@ class TypusTest < ActiveSupport::TestCase
   def test_should_return_models_and_should_be_sorted
     assert Typus.respond_to?(:models)
     assert Typus.models.kind_of?(Array)
-    assert_equal %w( Asset Category Comment Page Post TypusUser User ), Typus.models
+    assert_equal %w( Asset Category Comment CustomUser Page Post TypusUser ), Typus.models
   end
 
   def test_should_verify_resources_class_method

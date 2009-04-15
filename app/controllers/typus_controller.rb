@@ -2,9 +2,10 @@ class TypusController < ApplicationController
 
   layout :select_layout
 
-  include Authentication
-  include Typus::Configuration::Reloader
+  include Typus::Authentication
   include Typus::Locale
+  include Typus::QuickEdit
+  include Typus::Reloader
 
   if Typus::Configuration.options[:ssl]
     include SslRequirement
@@ -46,7 +47,7 @@ class TypusController < ApplicationController
 
     if request.post?
       if user = Typus.user_class.authenticate(params[:user][:email], params[:user][:password])
-        session[:typus] = user.id
+        session[:typus_user_id] = user.id
         redirect_to params[:back_to] || admin_dashboard_path
       else
         flash[:error] = t("The email and/or password you entered is invalid", 
@@ -58,7 +59,7 @@ class TypusController < ApplicationController
   end
 
   def sign_out
-    session[:typus] = nil
+    session[:typus_user_id] = nil
     redirect_to admin_sign_in_path
   end
 
@@ -104,7 +105,7 @@ class TypusController < ApplicationController
       user = Typus.user_class.generate(email, password)
 
       if user.save
-        session[:typus] = user.id
+        session[:typus_user_id] = user.id
         flash[:notice] = t("Password set to \"{{password}}\"", 
                            :default => "Password set to \"{{password}}\".", 
                            :password => password)
@@ -120,32 +121,6 @@ class TypusController < ApplicationController
                          :default => "Enter your email below to create the first user.")
 
     end
-
-  end
-
-  def quick_edit
-
-    render :text => '' and return unless session[:typus]
-
-    url = url_for :controller => "admin/#{params[:resource]}", 
-                  :action => 'edit', 
-                  :id => params[:id]
-
-    @content = <<-HTML
-var links = '';
-links += '<div id="quick_edit">';
-links += '<a href=\"#{url}\">#{params[:message]}</a>';
-links += '</div>';
-links += '<style type="text/css">';
-links += '<!--';
-links += '#quick_edit { font-size: 11px; float: right; position: fixed; right: 0px; background: #{params[:color]}; margin: 5px; padding: 3px 5px; }';
-links += '#quick_edit a { color: #FFF; font-weight: bold; }'
-links += '-->';
-links += '</style>';
-document.write(links);
-      HTML
-
-    render :text => @content
 
   end
 

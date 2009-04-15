@@ -8,7 +8,7 @@ class Admin::AssetsControllerTest < ActionController::TestCase
 
   def setup
     typus_user = typus_users(:admin)
-    @request.session[:typus] = typus_user.id
+    @request.session[:typus_user_id] = typus_user.id
   end
 
   def test_should_test_polymorphic_relationship_message
