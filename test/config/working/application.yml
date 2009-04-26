@@ -16,6 +16,8 @@ Comment:
   fields:
     list: email, post, post_id
     form: email, post
+    csv: email, post_id
+  export: csv
   filters: post
   search: email, body
   application: Blog

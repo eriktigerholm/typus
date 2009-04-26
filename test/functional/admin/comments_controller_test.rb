@@ -103,4 +103,19 @@ class Admin::CommentsControllerTest < ActionController::TestCase
     assert_match match, @response.body
   end
 
+  def test_should_generate_csv
+
+    expected = <<-CSV
+Email,Post
+john@example.com,1
+me@example.com,1
+john@example.com,
+me@example.com,1
+     CSV
+
+    get :index, :format => 'csv'
+    assert_equal expected, @response.body
+
+  end
+
 end
