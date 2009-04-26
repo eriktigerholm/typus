@@ -1,8 +1,9 @@
 require 'test/helper'
 
-class AdminTableHelperTest < ActiveSupport::TestCase
+class Admin::TableHelperTest < ActiveSupport::TestCase
 
   include Admin::TableHelper
+
   include ActionView::Helpers::UrlHelper
   include ActionController::UrlWriter
 
@@ -10,8 +11,10 @@ class AdminTableHelperTest < ActiveSupport::TestCase
     assert true
   end
 
-  # TODO: Add tests with params.
   def test_typus_table_header
+
+    @current_user = mock()
+    @current_user.expects(:can_perform?).with(TypusUser, 'delete').returns(true)
 
     fields = TypusUser.typus_fields_for(:list)
 
@@ -25,6 +28,76 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 <th><a href="http://test.host/admin/typus_users?order_by=role"><div class="">Role</div></a></th>
 <th><a href="http://test.host/admin/typus_users?order_by=status"><div class="">Status</div></a></th>
 <th>&nbsp;</th>
+</tr>
+    HTML
+
+    assert_equal expected, output
+
+  end
+
+  def test_typus_table_header_with_params
+
+    @current_user = mock()
+    @current_user.expects(:can_perform?).with(TypusUser, 'delete').returns(true)
+
+    fields = TypusUser.typus_fields_for(:list)
+
+    params = { :controller => 'admin/typus_users', :action => 'index', :search => 'admin' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = typus_table_header(TypusUser, fields)
+    expected = <<-HTML
+<tr>
+<th><a href="http://test.host/admin/typus_users?order_by=email&search=admin"><div class="">Email</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=role&search=admin"><div class="">Role</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=status&search=admin"><div class="">Status</div></a></th>
+<th>&nbsp;</th>
+</tr>
+    HTML
+
+    assert_equal expected, output
+
+  end
+
+  def test_typus_table_header_when_user_cannot_delete_items
+
+    @current_user = mock()
+    @current_user.expects(:can_perform?).with(TypusUser, 'delete').returns(false)
+
+    fields = TypusUser.typus_fields_for(:list)
+
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = typus_table_header(TypusUser, fields)
+    expected = <<-HTML
+<tr>
+<th><a href="http://test.host/admin/typus_users?order_by=email"><div class="">Email</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=role"><div class="">Role</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=status"><div class="">Status</div></a></th>
+</tr>
+    HTML
+
+    assert_equal expected, output
+
+  end
+
+  def test_typus_table_header_when_user_cannot_delete_items_with_params
+
+    @current_user = mock()
+    @current_user.expects(:can_perform?).with(TypusUser, 'delete').returns(false)
+
+    fields = TypusUser.typus_fields_for(:list)
+
+    params = { :controller => 'admin/typus_users', :action => 'index', :search => 'admin' }
+    self.expects(:params).at_least_once.returns(params)
+
+    output = typus_table_header(TypusUser, fields)
+    expected = <<-HTML
+<tr>
+<th><a href="http://test.host/admin/typus_users?order_by=email&search=admin"><div class="">Email</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=role&search=admin"><div class="">Role</div></a></th>
+<th><a href="http://test.host/admin/typus_users?order_by=status&search=admin"><div class="">Status</div></a></th>
 </tr>
     HTML
 
@@ -112,9 +185,11 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 
   end
 
-  def test_typus_table_position_field
-
 =begin
+
+  # FIXME
+
+  def test_typus_table_position_field
 
     category = categories(:first)
     output = typus_table_position_field('position', category)
@@ -122,9 +197,9 @@ class AdminTableHelperTest < ActiveSupport::TestCase
 
     assert_equal expected, output
 
-=end
-
   end
+
+=end
 
   def test_typus_table_datetime_field
 

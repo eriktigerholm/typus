@@ -8,13 +8,13 @@
 #     form: title, body, is_published?, created_at
 #     relationship: title, status
 #     options:
-#       selectors:
-#       read_only:
 #       auto_generated:
-#       date_formats:
-#         created_at: post_long
 #       booleans:
 #         is_published: ["Yes, it is", "No, it isn't"]
+#       date_formats:
+#         created_at: post_long
+#       selectors:
+#       read_only:
 #   actions:
 #     index: cleanup
 #     edit: send_as_newsletter
@@ -27,10 +27,11 @@
 #   application: Application
 #   description: Some text to describe the model
 #   options:
-#     edit_after_create: false
+#     default_action_on_item: show
 #     end_year: 2015
 #     form_rows: 25
 #     icon_on_boolean: true
+#     index_after_save: false
 #     minute_step: 15
 #     nil: 'nil'
 #     per_page: 5
@@ -39,31 +40,5 @@
 #     toggle: true
 #
 ###
-<%- ar_models.each do |model| -%>
-<%- list = model.columns.reject { |c| c.sql_type == 'text' }.map(&:name) -%>
-<%- form = model.columns.reject { |c| c.name == 'id' }.map(&:name) -%>
-<%- relationships = [] -%>
-<%- [:belongs_to, :has_and_belongs_to_many, :has_many].each do |relationship| -%>
- <%- relationships += model.reflect_on_all_associations(relationship).map { |i| i.name.to_s } -%>
-<%- end -%>
 
-<%= model %>:
-  fields:
-    list: <%= list.map.join(', ') %>
-    form: <%= form.map.join(', ') %>
-    relationship:
-    options:
-      selectors:
-      read_only:
-      auto_generated:
-  actions:
-    index:
-    edit:
-  export:
-  order_by:
-  relationships: <%= relationships.sort.join(', ') %>
-  filters:
-  search:
-  application: <%= application %>
-  description:
-<%- end -%>
+<%= configuration %>

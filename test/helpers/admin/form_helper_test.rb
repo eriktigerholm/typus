@@ -1,8 +1,9 @@
 require 'test/helper'
 
-class AdminFormHelperTest < ActiveSupport::TestCase
+class Admin::FormHelperTest < ActiveSupport::TestCase
 
   include Admin::FormHelper
+
   include ActionView::Helpers::FormHelper
   include ActionView::Helpers::FormOptionsHelper
   include ActionView::Helpers::DateHelper
@@ -203,7 +204,7 @@ class AdminFormHelperTest < ActiveSupport::TestCase
 
     output = typus_string_field('test', Post)
     expected = <<-HTML
-<li><label for="item_test">Test <small></small></label>
+<li><label for="item_test">Test</label>
 <input class="text" id="item_test" name="item[test]" size="30" type="text" /></li>
     HTML
 

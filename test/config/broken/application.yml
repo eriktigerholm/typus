@@ -55,7 +55,7 @@ Comment:
 TypusUser:
   fields:
     list: first_name, last_name, email, role, status
-    form: first_name, last_name, email, role, password, password_confirmation
+    form: first_name, last_name, email, role, password
     relationship: first_name, last_name, role, email, status
     options:
       selectors: role

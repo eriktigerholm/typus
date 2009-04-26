@@ -1,6 +1,6 @@
 require 'test/helper'
 
-class AdminPublicHelperTest < ActiveSupport::TestCase
+class Admin::PublicHelperTest < ActiveSupport::TestCase
 
   include Admin::PublicHelper
 

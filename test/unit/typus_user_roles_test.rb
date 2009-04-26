@@ -26,11 +26,11 @@ class TypusUserRolesTest < ActiveSupport::TestCase
       models.each { |model| assert typus_user.can_perform?(model, action) }
     end
 
-    # The Order resource doesn't have an index action, so we 
-    # say it's not available.
+    # Order resource doesn't have an index action, so we current user 
+    # cannot perform the action.
     assert !typus_user.can_perform?('Order', 'index')
 
-    # The Status resource has an index action, but not a show one.
+    # Status resource has an index action, but not a show one.
     # We add the { :special => true } option to by-pass the action 
     # renaming performed in the TypusUser#can_perform? method.
     assert typus_user.can_perform?('Status', 'index', { :special => true })

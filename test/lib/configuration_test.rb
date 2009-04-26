@@ -24,10 +24,10 @@ class ConfigurationTest < ActiveSupport::TestCase
   def test_should_verify_model_configuration_options
     initializer = "#{Rails.root}/config/initializers/typus.rb"
     return if File.exists?(initializer)
-    assert_equal true, Typus::Configuration.options[:edit_after_create]
     assert_equal nil, Typus::Configuration.options[:end_year]
     assert_equal 10, Typus::Configuration.options[:form_rows]
     assert_equal true, Typus::Configuration.options[:icon_on_boolean]
+    assert_equal false, Typus::Configuration.options[:index_after_save]
     assert_equal 5, Typus::Configuration.options[:minute_step]
     assert_equal 'nil', Typus::Configuration.options[:nil]
     assert_equal 15, Typus::Configuration.options[:per_page]

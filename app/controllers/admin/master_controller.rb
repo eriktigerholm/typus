@@ -21,9 +21,9 @@ class Admin::MasterController < ApplicationController
   before_filter :set_locale
 
   before_filter :set_resource
-  before_filter :find_record, :only => [ :show, :edit, :update, :destroy, :toggle, :position, :relate, :unrelate ]
+  before_filter :find_item, :only => [ :show, :edit, :update, :destroy, :toggle, :position, :relate, :unrelate ]
 
-  before_filter :check_ownership_of_record, :only => [ :edit, :update, :toggle, :position, :relate, :unrelate, :destroy ]
+  before_filter :check_ownership_of_item, :only => [ :edit, :update, :toggle, :position, :relate, :unrelate, :destroy ]
 
   before_filter :check_if_user_can_perform_action_on_user, :only => [ :edit, :update, :toggle, :destroy ]
   before_filter :check_if_user_can_perform_action_on_resource
@@ -51,7 +51,7 @@ class Admin::MasterController < ApplicationController
   end
 
   ##
-  # New record.
+  # New item.
   #
   def new
 
@@ -67,9 +67,9 @@ class Admin::MasterController < ApplicationController
   end
 
   ##
-  # Create new records. There's an special case when we create a 
-  # record from another record. In this case, after the record is 
-  # created we create also the relationship between these models. 
+  # Create new items. There's an special case when we create an 
+  # item from another item. In this case, after the item is 
+  # created we also create the relationship between these items. 
   #
   def create
 
@@ -85,10 +85,10 @@ class Admin::MasterController < ApplicationController
       flash[:success] = t("{{model}} successfully created", 
                           :default => "{{model}} successfully created.", 
                           :model => @resource[:class_name_humanized])
-      if @resource[:class].typus_options_for(:edit_after_create)
-        redirect_to :action => 'edit', :id => @item.id
-      else
+      if @resource[:class].typus_options_for(:index_after_save)
         redirect_to :action => 'index'
+      else
+        redirect_to :action => @resource[:class].typus_options_for(:default_action_on_item), :id => @item.id
       end
     else
       select_template :new
@@ -97,7 +97,7 @@ class Admin::MasterController < ApplicationController
   end
 
   ##
-  # Edit a record.
+  # Edit an item.
   #
   def edit
     item_params = params.dup
@@ -109,9 +109,10 @@ class Admin::MasterController < ApplicationController
   end
 
   ##
-  # Show a record.
+  # Show an item.
   #
   def show
+
     @previous, @next = @item.previous_and_next
 
     respond_to do |format|
@@ -122,21 +123,17 @@ class Admin::MasterController < ApplicationController
   end
 
   ##
-  # Update a record.
+  # Update an item.
   #
   def update
     if @item.update_attributes(params[:item])
       flash[:success] = t("{{model}} successfully updated", 
                           :default => "{{model}} successfully updated.", 
                           :model => @resource[:class_name_humanized])
-      if @resource[:class].typus_options_for(:edit_after_create)
-        redirect_to :action => 'edit', :id => @item.id
+      if @resource[:class].typus_options_for(:index_after_save)
+        redirect_to params[:back_to] ? "#{params[:back_to]}##{@resource[:self]}" : { :action => 'index' }
       else
-        if params[:back_to]
-          redirect_to "#{params[:back_to]}##{@resource[:self]}"
-        else
-          redirect_to :action => 'index'
-        end
+        redirect_to :action => @resource[:class].typus_options_for(:default_action_on_item), :id => @item.id
       end
     else
       @previous, @next = @item.previous_and_next
@@ -145,7 +142,7 @@ class Admin::MasterController < ApplicationController
   end
 
   ##
-  # Destroy a record.
+  # Destroy an item.
   #
   def destroy
     @item.destroy
@@ -179,9 +176,9 @@ class Admin::MasterController < ApplicationController
   # installed. We can then move items:
   #
   #   params[:go] = 'move_to_top'
-  #   params[:go] = 'move_higher'
-  #   params[:go] = 'move_lower'
-  #   params[:go] = 'move_to_bottom'
+  #
+  # Available positions are move_to_top, move_higher, move_lower, 
+  # move_to_bottom.
   #
   def position
     @item.send(params[:go])
@@ -207,7 +204,10 @@ class Admin::MasterController < ApplicationController
                         :default => "{{model_a}} related to {{model_b}}.", 
                         :model_a => resource_class.name.humanize, 
                         :model_b => @resource[:class_name_humanized])
-    redirect_to :action => 'edit', :id => @item.id, :anchor => resource_tableized
+
+    redirect_to :action => @resource[:class].typus_options_for(:default_action_on_item), 
+                :id => @item.id, 
+                :anchor => resource_tableized
 
   end
 
@@ -236,7 +236,10 @@ class Admin::MasterController < ApplicationController
                           :model_b => @resource[:class_name_humanized])
     end
 
-    redirect_to :controller => @resource[:self], :action => 'edit', :id => @item.id, :anchor => resource_tableized
+    redirect_to :controller => @resource[:self], 
+                :action => @resource[:class].typus_options_for(:default_action_on_item), 
+                :id => @item.id, 
+                :anchor => resource_tableized
 
   end
 
@@ -264,17 +267,17 @@ private
   # Find model when performing an edit, update, destroy, relate, 
   # unrelate ...
   #
-  def find_record
+  def find_item
     @item = @resource[:class].find(params[:id])
   end
 
   ##
-  # If the record is owned by another user, we only can perform a 
-  # show action on the record. Updated record is also blocked.
+  # If item is owned by another user, we only can perform a 
+  # show action on the item. Updated item is also blocked.
   #
-  #   before_filter :check_ownership_of_record, :only => [ :edit, :update, :destroy ]
+  #   before_filter :check_ownership_of_item, :only => [ :edit, :update, :destroy ]
   #
-  def check_ownership_of_record
+  def check_ownership_of_item
 
     # If current_user is a root user, by-pass.
     return if @current_user.is_root?
@@ -283,7 +286,7 @@ private
     # current_user, by-pass.
     return unless @item.respond_to?(Typus.user_fk)
 
-    # If the record is owned by the user ...
+    # If item is owned by the user ...
     unless @item.send(Typus.user_fk) == session[:typus_user_id]
       flash[:notice] = t("Record owned by another user", 
                          :default => "Record owned by another user.")
@@ -300,7 +303,7 @@ private
     params[:sort_order] ||= 'desc'
     # Get @fields & @order.
     @fields = @resource[:class].typus_fields_for(:list)
-    @order = params[:order_by] ? "`#{@resource[:table_name]}`.#{params[:order_by]} #{params[:sort_order]}" : @resource[:class].typus_order_by
+    @order = params[:order_by] ? "#{@resource[:table_name]}.#{params[:order_by]} #{params[:sort_order]}" : @resource[:class].typus_order_by
   end
 
   ##
@@ -368,13 +371,10 @@ private
   ##
   # Error handler
   #
-  def error_handler(error, url = admin_dashboard_path)
-    if Rails.env.production?
-      flash[:error] = "#{error.message} (#{@resource[:class]})"
-      redirect_to url
-    else
-      raise error
-    end
+  def error_handler(error, path = admin_dashboard_path)
+    raise error unless Rails.env.production?
+    flash[:error] = "#{error.message} (#{@resource[:class]})"
+    redirect_to path
   end
 
 end

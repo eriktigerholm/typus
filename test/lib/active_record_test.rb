@@ -74,8 +74,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
                        ['last_name', :string], 
                        ['role', :selector], 
                        ['email', :string], 
-                       ['password', :password], 
-                       ['password_confirmation', :password]]
+                       ['password', :password]]
     assert_equal expected_fields.map { |i| i.first }, TypusUser.typus_fields_for('form').keys
     assert_equal expected_fields.map { |i| i.last }, TypusUser.typus_fields_for('form').values
     assert_equal expected_fields.map { |i| i.first }, TypusUser.typus_fields_for(:form).keys
@@ -220,7 +219,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
   end
 
   def test_should_return_order_by_for_model
-    assert_equal "`posts`.title ASC, `posts`.created_at DESC", Post.typus_order_by
+    assert_equal "posts.title ASC, posts.created_at DESC", Post.typus_order_by
     assert_equal %w( title -created_at ), Post.typus_defaults_for('order_by')
     assert_equal %w( title -created_at ), Post.typus_defaults_for(:order_by)
   end
@@ -229,12 +228,14 @@ class ActiveRecordTest < ActiveSupport::TestCase
     expected = "(LOWER(first_name) LIKE '%francesc%' OR LOWER(last_name) LIKE '%francesc%' OR LOWER(email) LIKE '%francesc%' OR LOWER(role) LIKE '%francesc%')"
     params = { :search => 'francesc' }
     assert_equal expected, TypusUser.build_conditions(params).first
+    params = { :search => 'Francesc' }
+    assert_equal expected, TypusUser.build_conditions(params).first
   end
 
-  def test_should_return_sql_conditions_on_search_and_filter_for_typus_user_
+  def test_should_return_sql_conditions_on_search_and_filter_for_typus_user
 
     case ENV['DB']
-    when /mysql|postgresql/
+    when /mysql/
       boolean_true = "(`typus_users`.`status` = 1)"
       boolean_false = "(`typus_users`.`status` = 0)"
     else
@@ -253,7 +254,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
   def test_should_return_sql_conditions_on_filtering_typus_users_by_status
 
     case ENV['DB']
-    when /mysql|postgresql/
+    when /mysql/
       boolean_true = "(`typus_users`.`status` = 1)"
       boolean_false = "(`typus_users`.`status` = 0)"
     else
@@ -270,32 +271,66 @@ class ActiveRecordTest < ActiveSupport::TestCase
 
   def test_should_return_sql_conditions_on_filtering_typus_users_by_created_at
 
-    expected = "(created_at BETWEEN '#{Time.today.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+    expected = case ENV['DB']
+               when /postgresql/
+                 "(created_at BETWEEN E'#{Time.today.to_s(:db)}' AND E'#{Time.today.tomorrow.to_s(:db)}')"
+               else
+                 "(created_at BETWEEN '#{Time.today.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+               end
     params = { :created_at => 'today' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
-    expected = "(created_at BETWEEN '#{6.days.ago.midnight.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+
+    expected = case ENV['DB']
+               when /postgresql/
+                 "(created_at BETWEEN E'#{6.days.ago.midnight.to_s(:db)}' AND E'#{Time.today.tomorrow.to_s(:db)}')"
+               else
+                 "(created_at BETWEEN '#{6.days.ago.midnight.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+               end
     params = { :created_at => 'past_7_days' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
-    expected = "(created_at BETWEEN '#{Time.today.last_month.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+
+    expected = case ENV['DB']
+               when /postgresql/
+                 "(created_at BETWEEN E'#{Time.today.last_month.to_s(:db)}' AND E'#{Time.today.tomorrow.to_s(:db)}')"
+               else
+                 "(created_at BETWEEN '#{Time.today.last_month.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+               end
     params = { :created_at => 'this_month' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
-    expected = "(created_at BETWEEN '#{Time.today.last_year.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+    expected = case ENV['DB']
+               when /postgresql/
+                 "(created_at BETWEEN E'#{Time.today.last_year.to_s(:db)}' AND E'#{Time.today.tomorrow.to_s(:db)}')"
+               else
+                 "(created_at BETWEEN '#{Time.today.last_year.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+               end
     params = { :created_at => 'this_year' }
     assert_equal expected, TypusUser.build_conditions(params).first
 
   end
 
   def test_should_return_sql_conditions_on_filtering_posts_by_published_at
-    expected = "(published_at BETWEEN '#{Time.today.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+    expected = case ENV['DB']
+               when /postgresql/
+                 "(published_at BETWEEN E'#{Time.today.to_s(:db)}' AND E'#{Time.today.tomorrow.to_s(:db)}')"
+               else
+                 "(published_at BETWEEN '#{Time.today.to_s(:db)}' AND '#{Time.today.tomorrow.to_s(:db)}')"
+               end
     params = { :published_at => 'today' }
     assert_equal expected, Post.build_conditions(params).first
   end
 
   def test_should_return_sql_conditions_on_filtering_posts_by_string
-    expected = "(\"typus_users\".\"role\" = 'admin')"
+    expected = case ENV['DB']
+               when /postgresql/
+                 "(\"typus_users\".\"role\" = E'admin')"
+               when /mysql/
+                 "(`typus_users`.`role` = 'admin')"
+               else
+                 "(\"typus_users\".\"role\" = 'admin')"
+               end
     params = { :role => 'admin' }
     assert_equal expected, TypusUser.build_conditions(params).first
   end

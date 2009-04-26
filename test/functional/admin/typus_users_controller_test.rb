@@ -1,7 +1,7 @@
 require 'test/helper'
 
 ##
-# Here we test what the TypusUsers can do.
+# Test what TypusUsers can do.
 #
 class Admin::TypusUsersControllerTest < ActionController::TestCase
 
@@ -101,7 +101,7 @@ class Admin::TypusUsersControllerTest < ActionController::TestCase
 
   def test_should_allow_editor_to_update_himself
 
-    options = Typus::Configuration.options.merge(:edit_after_create => true)
+    options = Typus::Configuration.options.merge(:index_after_save => false)
     Typus::Configuration.stubs(:options).returns(options)
 
     typus_user = typus_users(:editor)

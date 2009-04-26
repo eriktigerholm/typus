@@ -41,8 +41,7 @@ module Admin::FormHelper
     #
     params[:action] = (params[:action] == 'create') ? 'new' : params[:action]
 
-    back_to = [ params[:controller], params[:action], params[:id] ]
-    back_to = "/#{back_to.compact.join('/')}"
+    back_to = '/' + [ params[:controller], params[:action], params[:id] ].compact.join('/')
 
     related = klass.reflect_on_association(attribute.to_sym).class_name.constantize
     related_fk = klass.reflect_on_association(attribute.to_sym).primary_key_name
@@ -169,10 +168,13 @@ module Admin::FormHelper
       value = 'auto_generated' if %w( new edit ).include?(params[:action])
     end
 
-    comment = %w( read_only auto_generated ).include?(value) ? (value + ' field').humanize : ''
+    comment = %w( read_only auto_generated ).include?(value) ? "<small>#{value} field</small>".humanize : ''
+
+    attribute_humanized = I18n.t(attribute.humanize, :default => attribute.humanize)
+    attribute_humanized += " (#{attribute})" if attribute.include?('_id')
 
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)} <small>#{comment}</small></label>
+<li><label for="item_#{attribute}">#{attribute_humanized}#{comment}</label>
 #{text_field :item, attribute, :class => 'text', :disabled => attribute_disabled?(attribute, klass) }</li>
     HTML
 
@@ -180,11 +182,7 @@ module Admin::FormHelper
 
   def typus_relationships
 
-    back_to = [ params[:controller], 
-                params[:action], 
-                params[:id] ]
-
-    @back_to = "/#{back_to.compact.join('/')}"
+    @back_to = '/' + [ params[:controller], params[:action], params[:id] ].compact.join('/')
 
     returning(String.new) do |html|
       @item_relationships.each do |relationship|
@@ -220,7 +218,7 @@ module Admin::FormHelper
   <small>#{link_to I18n.t("Add new", :default => "Add new"), link_options if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
-      items = @resource[:class].find(params[:id]).send(field)
+      items = @resource[:class].find(params[:id]).send(field).find(:all, :order => model_to_relate.typus_order_by)
       unless items.empty?
         options = { :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id }
         html << build_list(model_to_relate, 

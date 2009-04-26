@@ -70,6 +70,8 @@ class RoutesTest < ActiveSupport::TestCase
 
 =begin
 
+  # FIXME
+
   def test_should_verify_generated_routes_for_resource_controller
     assert_routing '/admin/watch_dog', :controller => 'admin/watch_dog', :action => 'index'
     assert_routing '/admin/watch_dog/cleanup', { :controller => 'admin/watch_dog', :action => 'cleanup' }

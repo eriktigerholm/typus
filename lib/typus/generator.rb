@@ -2,7 +2,7 @@ module Typus
 
   def self.generator
 
-    logger = Logger.new("#{RAILS_ROOT}/log/#{Rails.env}.log")
+    logger = Logger.new("#{Rails.root}/log/#{Rails.env}.log")
 
     # Create app/controllers/admin if doesn't exist.
     admin_controllers_folder = "#{Rails.root}/app/controllers/admin"
@@ -41,7 +41,7 @@ class Admin::#{resource}Controller < TypusController
 
   ##
   # This controller was generated because you have defined a resource 
-  # which is not tied to a model on your `config/typus/XXXXXX_roles.yml` 
+  # which is not tied to a model on your <tt>config/typus/XXXXXX_roles.yml</tt> 
   # configuration file.
   #
   #     admin:
@@ -118,17 +118,17 @@ class Admin::#{model.pluralize}Controller < Admin::MasterController
   ##
   # You can extend Admin::MasterController with your methods.
   #
-  # This actions have to be defined in `config/typus/application.yml`.
+  # This actions have to be defined in <tt>config/typus/application.yml</tt>.
   #
   #   #{model}:
   #     actions:
   #       index: custom_action
-  #       edit: custom_action_for_a_record
+  #       edit: custom_action_for_an_item
   #
   def custom_action
   end
 
-  def custom_action_for_a_record
+  def custom_action_for_an_item
   end
 
 =end

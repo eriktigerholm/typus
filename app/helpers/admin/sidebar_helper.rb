@@ -28,16 +28,23 @@ module Admin::SidebarHelper
     items = []
 
     case params[:action]
-    when 'index', 'edit', 'update'
+    when 'index', 'edit', 'show', 'update'
       if @current_user.can_perform?(@resource[:class], 'create')
         items << (link_to t("Add entry", :default => "Add entry"), :action => 'new')
+      end
+    end
+
+    case params[:action]
+    when 'show'
+      if @current_user.can_perform?(@resource[:class], 'update')
+        items << (link_to t("Edit entry", :default => "Edit entry"), :action => 'edit', :id => @item.id)
       end
     end
 
     items += non_crud_actions
 
     case params[:action]
-    when 'new', 'create', 'edit', 'update'
+    when 'new', 'create', 'edit', 'show', 'update'
       items << (link_to t("Back to list", :default => "Back to list"), :action => 'index')
     end
 
@@ -95,10 +102,10 @@ module Admin::SidebarHelper
   end
 
   def previous_and_next
-    return [] unless %w( edit update ).include?(params[:action])
+    return [] unless %w( edit show update ).include?(params[:action])
     returning(Array.new) do |items|
-      items << (link_to I18n.t("Next", :default => "Next"), params.merge(:action => 'edit', :id => @next.id)) if @next
-      items << (link_to I18n.t("Previous", :default => "Previous"), params.merge(:action => 'edit', :id => @previous.id)) if @previous
+      items << (link_to I18n.t("Next", :default => "Next"), params.merge(:id => @next.id)) if @next
+      items << (link_to I18n.t("Previous", :default => "Previous"), params.merge(:id => @previous.id)) if @previous
     end
   end
 

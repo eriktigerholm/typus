@@ -1,8 +1,7 @@
 require 'test/helper'
 
 ##
-# Here we test polimorphic relationships using the relate & unrelate 
-# actions.
+# Test polimorphic relationships using the relate & unrelate actions.
 #
 class Admin::AssetsControllerTest < ActionController::TestCase
 
@@ -41,7 +40,7 @@ class Admin::AssetsControllerTest < ActionController::TestCase
 
   def test_should_return_to_back_to_url
 
-    options = Typus::Configuration.options.merge(:edit_after_create => false)
+    options = Typus::Configuration.options.merge(:index_after_save => true)
     Typus::Configuration.stubs(:options).returns(options)
 
     post_ = posts(:published)

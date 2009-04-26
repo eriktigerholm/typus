@@ -59,10 +59,13 @@ module Admin::TableHelper
                                                                           :unrelate_model_from => @resource[:class_name])
         end
 
+        html << <<-HTML
+<td width="10px">#{perform}</td>
+        HTML
+
       end
 
       html << <<-HTML
-<td width="10px">#{perform}</td>
 </tr>
       HTML
 
@@ -83,6 +86,7 @@ module Admin::TableHelper
       fields.each do |key, value|
 
         content = I18n.t(key.humanize, :default => key.humanize)
+        content += " (#{key})" if key.include?('_id')
 
         if (model.model_fields.map(&:first).collect { |i| i.to_s }.include?(key.typus_cleaner) || model.reflect_on_all_associations(:belongs_to).map(&:name).include?(key.to_sym)) && params[:action] == 'index'
           sort_order = case params[:sort_order]
@@ -98,7 +102,7 @@ module Admin::TableHelper
         headers << "<th>#{content}</th>"
 
       end
-      headers << "<th>&nbsp;</th>"
+      headers << "<th>&nbsp;</th>" if @current_user.can_perform?(model, 'delete')
       html << <<-HTML
 <tr>
 #{headers.join("\n")}
@@ -108,12 +112,17 @@ module Admin::TableHelper
   end
 
   def typus_table_belongs_to_field(attribute, item)
+
+    action = item.send(attribute).class.typus_options_for(:default_action_on_item) rescue 'edit'
+
     content = if !item.send(attribute).kind_of?(NilClass)
-                link_to item.send(attribute).typus_name, :controller => "admin/#{attribute.pluralize}", :action => 'edit', :id => item.send(attribute).id
+                link_to item.send(attribute).typus_name, :controller => "admin/#{attribute.pluralize}", :action => action, :id => item.send(attribute).id
               end
+
     <<-HTML
 <td>#{content}</td>
     HTML
+
   end
 
   def typus_table_has_and_belongs_to_many_field(attribute, item)
@@ -129,8 +138,10 @@ module Admin::TableHelper
   #
   def typus_table_string_field(attribute, item, first_field, link_options = {})
 
+    action = item.class.typus_options_for(:default_action_on_item)
+
     content = if first_field == attribute
-                link_to item.send(attribute) || item.class.typus_options_for(:nil), link_options.merge(:controller => "admin/#{item.class.name.tableize}", :action => 'edit', :id => item.id)
+                link_to item.send(attribute) || item.class.typus_options_for(:nil), link_options.merge(:controller => "admin/#{item.class.name.tableize}", :action => action, :id => item.id)
               else
                 item.send(attribute)
               end
@@ -170,10 +181,12 @@ module Admin::TableHelper
 
   def typus_table_datetime_field(attribute, item, first_field = nil, link_options = {} )
 
+    action = item.class.typus_options_for(:default_action_on_item)
+
     date_format = item.class.typus_date_format(attribute)
     value = !item.send(attribute).nil? ? item.send(attribute).to_s(date_format) : item.class.typus_options_for(:nil)
     content = if first_field == attribute
-                link_to value, link_options.merge(:controller => "admin/#{item.class.name.tableize}", :action => 'edit', :id => item.id )
+                link_to value, link_options.merge(:controller => "admin/#{item.class.name.tableize}", :action => action, :id => item.id )
               else
                 value
               end

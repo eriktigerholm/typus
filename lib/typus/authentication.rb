@@ -6,7 +6,7 @@ module Typus
 
     ##
     # Require login checks if the user is logged on Typus, otherwise 
-    # is sent to the login page with a :back_to param to return where 
+    # is sent to the sign in page with a :back_to param to return where 
     # she tried to go.
     #
     # Use this for demo!
@@ -23,16 +23,17 @@ module Typus
     end
 
     ##
-    # Return the current user. The important thing here is that if the 
-    # roles does not longer exist on the system the user will be logged 
-    # off from Typus.
+    # Return the current user.
+    #
+    # NOTE: If role does not longer exist on the system the user will 
+    #       be signed out from Typus.
     #
     def set_current_user
 
       @current_user = Typus.user_class.find(session[:typus_user_id])
 
       unless @current_user.respond_to?(:role)
-        raise "Run `script/generate typus_update_schema_to_01 -f && rake db:migrate` to update database schema."
+        raise "Run 'script/generate typus_update_schema_to_01 -f && rake db:migrate' to update database schema."
       end
 
       unless Typus::Configuration.roles.keys.include?(@current_user.role)

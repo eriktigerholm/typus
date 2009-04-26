@@ -1,13 +1,28 @@
 = Typus: Effortless admin interface for your Rails application
 
-As Django Admin, *Typus* is designed for a single activity:
+*Typus* is designed for a single activity:
 
     Trusted users editing structured content.
 
 *Typus* doesn't try to be all the things to all the people but it's 
 extensible enough to match lots of use cases.
 
-You can see some screenshots on the wiki[http://github.com/fesplugas/typus/wikis].
+You can see some screenshots[http://intraducibles.com/projects/typus].
+
+== Support Typus
+
+*Typus* is licensed under the MIT license. As an experiment we 
+encourage you to support this project by donating[http://intraducibles.com/donate] 
+90 euros if you are a developer or studio. Donations do allow us to spend more 
+time working and supporting the project. All contributions are much appreciated!
+
+Hire us to work on your next project. We build large and small websites.
+
+Contribute your patches to the community & support people on the 
+mailing list.
+
+Tell everybody about Typus, tell your friends and colleagues about 
+Typus and blog about Typus.
 
 == Quick demo in 3 steps
 
@@ -59,10 +74,10 @@ You can view the available tasks running:
     $ rake -T typus
     (in /Users/fesplugas/Development/typus_core)
     rake doc:plugins:typus  # Generate documentation for the typus plugin
-    rake typus:i18n         # Install simplified_translation plugin.
-    rake typus:misc         # Install Paperclip, acts_as_list, acts_as_tree.
-    rake typus:roles        # List current roles
-    rake typus:ssl          # Intall ssl_requirement plugin.
+    rake typus:misc         # Install acts_as_list, acts_as_tree and paperclip.
+    rake typus:more         # Install typus_more.
+    rake typus:roles        # List current roles.
+    rake typus:ssl          # Install ssl_requirement.
 
 == Plugin Configuration Options
 
@@ -81,10 +96,10 @@ You can overwrite the following settings.
 
 Model options.
 
-    Typus::Configuration.options[:edit_after_create]
     Typus::Configuration.options[:end_year]
     Typus::Configuration.options[:form_rows]
     Typus::Configuration.options[:icon_on_boolean]
+    Typus::Configuration.options[:index_after_save]
     Typus::Configuration.options[:minute_step]
     Typus::Configuration.options[:nil]
     Typus::Configuration.options[:per_page]
@@ -97,10 +112,10 @@ on <tt>config/typus</tt>.
 
     Post:
       options:
-        edit_after_create: false
         end_year: 2015
         form_rows: 25
         icon_on_boolean: true
+        index_after_save: false
         minute_step: 15
         nil: 'nil'
         per_page: 5
@@ -169,7 +184,7 @@ you can continue editing it. If you prefer to be redirected to the
 main index you can owerwrite the setting. This setting can be defined 
 globally or by model.
 
-    Typus::Configuration.options[:edit_after_create] = false
+    Typus::Configuration.options[:index_after_save] = false
 
 == Configuration file options
 
@@ -407,18 +422,15 @@ links on the sidebar of your resource.
 And the actions for those export options are:
 
     def export_csv
-      # Which is already implemented but you can overwrite. On 
-      # `admin/orders_controller.rb`.
+      # Already implemented but you can overwrite it.
     end
 
     def export_xml
-      # Which is already implemented but you can overwrite. On 
-      # `admin/orders_controller.rb`.
+      # Already implemented but you can overwrite it.
     end
 
     def export_pdf
-      # Not implemented, you will have to overwrite on 
-      # `admin/orders_controller.rb`.
+      # Not implemented, so you have to write it.
     end
 
 Please notice that in order to be able to use the export feature you 
@@ -459,13 +471,13 @@ Example: (Blog)
 
 == Custom Interface
 
-You can customize the interface by placing on <tt>views/admin</tt> the 
-following files.
+Customize *Typus* interface by placing on <tt>views/admin</tt> your own 
+views & partials. Typus defaults are good enough but sometimes you need more 
+features.
 
-=== Change default views
+=== Default views
 
-You can add your custom views to match your application requirements. Views 
-you can customize.
+Add your own views to match your application requirements.
 
     index.html.erb
     edit.html.erb
@@ -473,40 +485,24 @@ you can customize.
 
 Need a custom view on the Articles listing?
 
-Under <tt>app/view/admin/articles</tt> add the file <tt>index.html.erb</tt> 
-and Typus default <tt>index.html.erb</tt> will be replaced.
+Under <tt>app/view/admin/articles</tt> drop the file <tt>index.html.erb</tt> 
+and *Typus* default <tt>index.html.erb</tt> will be replaced. Easy, isn't it?
 
-=== Blocks
+=== Blocks on views (partials)
 
-Login Page
+Here's a list of available blocks you can add to your application. *Typus* 
+views will detect this files, if they're in the right place.
 
-    views/admin/login/_bottom.html.erb
-    views/admin/login/_top.html.erb
-
-Dashboard
-
-    views/admin/dashboard/_bottom.html.erb
-    views/admin/dashboard/_sidebar.html.erb
-    views/admin/dashboard/_top.html.erb
-
-Models
-
-    views/admin/<YOUR_RESOURCE>/_edit.html.erb
-    views/admin/<YOUR_RESOURCE>/_edit_bottom.html.erb
-    views/admin/<YOUR_RESOURCE>/_edit_sidebar.html.erb
-    views/admin/<YOUR_RESOURCE>/_edit_top.html.erb
-    views/admin/<YOUR_RESOURCE>/_index.html.erb
-    views/admin/<YOUR_RESOURCE>/_index_bottom.html.erb
-    views/admin/<YOUR_RESOURCE>/_index_sidebar.html.erb
-    views/admin/<YOUR_RESOURCE>/_index_top.html.erb
-    views/admin/<YOUR_RESOURCE>/_new.html.erb
-    views/admin/<YOUR_RESOURCE>/_new_bottom.html.erb
-    views/admin/<YOUR_RESOURCE>/_new_sidebar.html.erb
-    views/admin/<YOUR_RESOURCE>/_new_top.html.erb
-    views/admin/<YOUR_RESOURCE>/_show.html.erb
-    views/admin/<YOUR_RESOURCE>/_show_bottom.html.erb
-    views/admin/<YOUR_RESOURCE>/_show_sidebar.html.erb
-    views/admin/<YOUR_RESOURCE>/_show_top.html.erb
+    views/admin/login/_{bottom|top}.html.erb
+    views/admin/dashboard/_{bottom|sidebar|top}.html.erb
+    views/admin/RESOURCE/_edit.html.erb
+    views/admin/RESOURCE/_edit_{bottom|sidebar|top}.html.erb
+    views/admin/RESOURCE/_index.html.erb
+    views/admin/RESOURCE/_index_{bottom|sidebar|top}.html.erb
+    views/admin/RESOURCE/_new.html.erb
+    views/admin/RESOURCE/_new_{bottom|sidebar|top}.html.erb
+    views/admin/RESOURCE/_show.html.erb
+    views/admin/RESOURCE/_show_{bottom|sidebar|top}.html.erb
 
 === Attribute templates
 
@@ -533,9 +529,9 @@ folder with Typus::Configuration.options[:templates_folder].
 
 == Roles
 
-Typus has roles support. You can can add as many roles as you want. 
-They are defined in <tt>config/typus/application_roles.yml</tt> and you 
-can can define the allowed actions per role.
+*Typus* has roles support and you can add as many roles as you want. 
+Define them in your <tt>config/typus/application_roles.yml</tt> 
+configuration file.
 
     admin:
       Category: create, read, update, delete
@@ -566,16 +562,21 @@ created.
 
 == Testing the plugin
 
-You need to have <tt>mocha</tt> installed to test the plugin.
+<tt>Mocha</tt> is required to test the plugin.
 
     $ sudo gem install mocha
 
-To test the plugin create an empty application and remove the default 
-routes on <tt>routes.rb</tt>, once the application is created install 
-the plugin and run rake.
+Create an empty application and make sure you have the following routes 
+at the end of the file.
+
+    map.connect ':controller.:format'
+    map.connect ':controller/:action/:id.:format'
+
+Go to the plugins folder, install *Typus* and run the tests.
 
     $ cd YOUR_APPLICATION/vendor/plugins
     $ git clone git://github.com/fesplugas/typus.git
+    $ cd typus
     $ rake
 
 By default tests are be performed against a SQLite3 database in memory.
@@ -599,14 +600,14 @@ to mantain. Files are loaded by alphabetical order.
 
 == Quick edit
 
-To enable quick edit include the AdminPublicHelper on your 
+To enable quick edit include the Admin::PublicHelper on your 
 <tt>application_helper.rb</tt>.
 
     module ApplicationHelper
-      include AdminPublicHelper
+      include Admin::PublicHelper
     end
 
-Include the helper on your views.
+And you can start using the helper on your views.
 
     <%= quick_edit :resource => 'pages', 
                    :id => @page.id, 
@@ -620,8 +621,7 @@ to see in Typus in the near future.
 - Sphinx search integration when available.
 - Search in multiple models.
 - Nested models.
-- Content Management System generator.
-- Server administration tools.
+- Content Management System generator. (typus_more)
 
 == Contributors
 
@@ -638,15 +638,15 @@ to see in Typus in the near future.
 
 == Acknowledgments
 
-- Typus uses "Paginator" by Bruce Williams http://codefluency.com
+- *Typus* uses "Paginator" by Bruce Williams http://codefluency.com.
+- *Typus* has been inspired by "Django Admin" http://www.djangoproject.com.
 
 == Author, contact, bugs, mailing list and more
 
-- You can recommend me on http://workingwithrails.com/person/5061-francesc-esplugas
-- Browse source on GitHub http://github.com/fesplugas/typus/tree/master
-- Visit the wiki http://github.com/fesplugas/typus/wikis
+- Project site http://intraducibles.com/projects/typus
+- Source http://github.com/fesplugas/typus
 - Google Group http://groups.google.es/group/typus
-- Report bugs http://github.com/fesplugas/typus/wikis/bugs
+- Bugs http://github.com/fesplugas/typus/wikis/bugs
 
 Copyright (c) 2007-2009 Francesc Esplugas Marti, released under the 
 MIT license

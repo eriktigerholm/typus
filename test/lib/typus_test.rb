@@ -38,6 +38,8 @@ class TypusTest < ActiveSupport::TestCase
 
 =begin
 
+  # FIXME
+
   def test_should_verify_parent_for_module
     assert Typus.parent(TypusUser.name, 'module').kind_of?(String)
     assert_equal 'Typus', Typus.parent(TypusUser.name, 'module')
@@ -64,7 +66,7 @@ class TypusTest < ActiveSupport::TestCase
   def test_should_verify_resources_class_method
     assert Typus.respond_to?(:resources)
     models = Typus.models
-    assert_equal %w( Git Status WatchDog ), Typus.resources(models)
+    assert_equal %w( Git Order Status WatchDog ), Typus.resources(models)
   end
 
   def test_should_return_description_of_module

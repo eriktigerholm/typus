@@ -8,10 +8,10 @@ class TypusGenerator < Rails::Generator::Base
       # Default name for our application.
       #
 
-      application = File.basename(Dir.pwd)
+      application = Rails.root.basename
 
       ##
-      # To create `application.yml` and `application_roles.yml` detect 
+      # To create <tt>application.yml</tt> and <tt>application_roles.yml</tt> detect 
       # available AR models on the application.
       #
 
@@ -24,7 +24,7 @@ class TypusGenerator < Rails::Generator::Base
           klass = class_name.constantize
           ar_models << klass if klass.superclass.equal?(ActiveRecord::Base)
         rescue Exception => error
-          puts "=> [typus] #{error.message} on `#{class_name}`."
+          puts "=> [typus] #{error.message} on '#{class_name}'."
         end
       end
 
@@ -36,10 +36,61 @@ class TypusGenerator < Rails::Generator::Base
       folder = "#{Rails.root}/#{config_folder}"
       Dir.mkdir(folder) unless File.directory?(folder)
 
+      configuration = ""
+
+      ar_models.each do |model|
+
+        # By default we don't want to show in our lists text fields and created_at
+        # and updated_at attributes.
+        list = model.columns.reject { |c| c.sql_type == 'text' || %w( created_at updated_at ).include?(c.name) }.map(&:name)
+
+        # By default we don't want to show in our forms created_at and updated_at 
+        # attributes.
+        form = model.columns.reject { |c| %w( id created_at updated_at ).include?(c.name) }.map(&:name)
+
+        # Detect relationships using reflection and remove the _id part from 
+        # attributes when relationships is defined in ActiveRecord.
+        list.each do |i|
+          if i.include?('_id')
+            assoc_name = model.reflect_on_association(i.gsub(/_id/, '').to_sym).macro rescue nil
+            i.gsub!(/_id/, '') if assoc_name == :belongs_to
+          end
+        end
+
+        # Detect relationships using reflection.
+        relationships = [ :belongs_to, :has_and_belongs_to_many, :has_many ].map do |relationship|
+                          model.reflect_on_all_associations(relationship).map { |i| i.name.to_s }
+                        end.flatten.sort
+
+        configuration << <<-HTML
+#{model}:
+  fields:
+    list: #{list.join(', ')}
+    form: #{form.join(', ')}
+    relationship:
+    options:
+      auto_generated:
+      read_only:
+      selectors:
+  actions:
+    index:
+    edit:
+  export:
+  order_by:
+  relationships: #{relationships.join(', ')}
+  filters:
+  search:
+  application: #{application}
+  description:
+
+        HTML
+
+      end
+
       Dir["#{Typus.root}/generators/typus/templates/config/typus/*"].each do |f|
         base = File.basename(f)
         m.template "config/typus/#{base}", "#{config_folder}/#{base}", 
-                   :assigns => { :ar_models => ar_models, :application => application }
+                   :assigns => { :configuration => configuration, :ar_models => ar_models }
       end
 
       ##

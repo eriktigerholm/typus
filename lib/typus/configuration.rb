@@ -3,12 +3,11 @@ module Typus
   module Configuration
 
     ##
-    # Default typus options that can be overwritten from an initializer.
+    # Default Typus options which can be overwritten from the initializer.
     #
     typus_options = { :app_name => 'Typus', 
                       :config_folder => 'config/typus', 
                       :email => 'admin@example.com', 
-                      :ignore_missing_translations => true, 
                       :locales => [ [ "English", :en ] ], 
                       :recover_password => false, 
                       :root => 'admin', 
@@ -18,12 +17,13 @@ module Typus
                       :user_fk => 'typus_user_id' }
 
     ##
-    # Default model options that can be overwritten from an initializer.
+    # Default model options which can be overwritten from the initializer.
     #
-    model_options = { :edit_after_create => true, 
+    model_options = { :default_action_on_item => 'edit', 
                       :end_year => nil,
                       :form_rows => 10, 
                       :icon_on_boolean => true, 
+                      :index_after_save => false, 
                       :minute_step => 5, 
                       :nil => 'nil', 
                       :per_page => 15, 
@@ -36,7 +36,7 @@ module Typus
     mattr_accessor :options
 
     ##
-    # Read Typus Configuration file
+    # Read Typus Configuration files placed on <tt>config/typus/*.yml</tt>.
     #
     #   Typus::Configuration.config! overwrites @@config
     #
@@ -58,7 +58,7 @@ module Typus
     mattr_accessor :config
 
     ##
-    # Read Typus Roles
+    # Read Typus Roles from configuration files placed on <tt>config/typus/*_roles.yml</tt>.
     #
     #   Typus::Configuration.roles! overwrites @@roles
     #
@@ -80,6 +80,7 @@ module Typus
           end
         end
       end
+
       return @@roles.compact
 
     end

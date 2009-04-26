@@ -1,8 +1,9 @@
 require 'test/helper'
 
-class AdminHelperTest < ActiveSupport::TestCase
+class Admin::MasterHelperTest < ActiveSupport::TestCase
 
   include Admin::MasterHelper
+
   include ActionView::Helpers::UrlHelper
   include ActionView::Helpers::TagHelper
 

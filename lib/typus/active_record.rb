@@ -148,10 +148,10 @@ module Typus
     def typus_order_by
 
       fields = typus_defaults_for(:order_by)
-      return "`#{table_name}`.id ASC" if fields.empty?
+      return "#{table_name}.id ASC" if fields.empty?
 
       order = fields.map do |field|
-                (field.include?('-')) ? "`#{table_name}`.#{field.delete('-')} DESC" : "`#{table_name}`.#{field} ASC"
+                (field.include?('-')) ? "#{table_name}.#{field.delete('-')} DESC" : "#{table_name}.#{field} ASC"
               end
 
       return order.join(', ')
@@ -212,7 +212,7 @@ module Typus
       # If a search is performed.
       if query_params[:search]
         search = typus_defaults_for(:search).map do |s|
-                   ["LOWER(#{s}) LIKE '%#{query_params[:search]}%'"]
+                   ["LOWER(#{s}) LIKE '%#{query_params[:search].downcase}%'"]
                  end
         conditions = merge_conditions(conditions, search.join(' OR '))
       end
@@ -239,7 +239,7 @@ module Typus
                      when 'this_month':    Time.today.last_month..Time.today.tomorrow
                      when 'this_year':     Time.today.last_year..Time.today.tomorrow
                      end
-          condition = ["#{key} BETWEEN ? AND ?", interval.first, interval.last]
+          condition = ["#{key} BETWEEN ? AND ?", interval.first.to_s(:db), interval.last.to_s(:db)]
           conditions = merge_conditions(conditions, condition)
         when :integer, :string
           condition = { key => value }
