@@ -46,12 +46,9 @@ module Admin::FormHelper
     related = klass.reflect_on_association(attribute.to_sym).class_name.constantize
     related_fk = klass.reflect_on_association(attribute.to_sym).primary_key_name
 
-    message = [ I18n.t("Are you sure you want to leave this page?", 
-                       :default => "Are you sure you want to leave this page?"),
-                I18n.t("If you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost", 
-                       :default => "If you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost."),
-                I18n.t("Click OK to continue, or click Cancel to stay on this page", 
-                       :default => "Click OK to continue, or click Cancel to stay on this page.") ]
+    message = [ _("Are you sure you want to leave this page?"),
+                _("If you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost."), 
+                _("Click OK to continue, or click Cancel to stay on this page.") ]
 
     returning(String.new) do |html|
 
@@ -59,8 +56,8 @@ module Admin::FormHelper
         html << typus_tree_field(related_fk, related.roots, related_fk)
       else
         html << <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(related_fk.humanize, :default => related_fk.humanize)}
-    <small>#{link_to I18n.t("Add new", :default => "Add new"), { :controller => "admin/#{related.class_name.tableize}", :action => 'new', :back_to => back_to, :selected => related_fk }, :confirm => message.join("\n\n") if @current_user.can_perform?(related, 'create')}</small>
+<li><label for="item_#{attribute}">#{_(related_fk.humanize)}
+    <small>#{link_to _('Add'), { :controller => "admin/#{related.class_name.tableize}", :action => 'new', :back_to => back_to, :selected => related_fk }, :confirm => message.join("\n\n") if @current_user.can_perform?(related, 'create')}</small>
     </label>
 #{select :item, related_fk, related.find(:all, :order => related.typus_order_by).collect { |p| [p.typus_name, p.id] }, { :include_blank => true }, { :disabled => attribute_disabled?(attribute, klass) } }</li>
         HTML
@@ -72,21 +69,21 @@ module Admin::FormHelper
 
   def typus_boolean_field(attribute, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
-#{check_box :item, attribute} #{I18n.t("Checked if active", :default => "Checked if active")}</li>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+#{check_box :item, attribute} #{_('Checked if active')}</li>
     HTML
   end
 
   def typus_date_field(attribute, options, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
 #{date_select :item, attribute, options, { :disabled => attribute_disabled?(attribute, klass)} }</li>
     HTML
   end
 
   def typus_datetime_field(attribute, options, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
 #{datetime_select :item, attribute, options, {:disabled => attribute_disabled?(attribute, klass)}}</li>
     HTML
   end
@@ -96,7 +93,7 @@ module Admin::FormHelper
     attribute_display = attribute.split('_file_name').first
 
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute_display.humanize, :default => attribute_display.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute_display.humanize)}</label>
 #{file_field :item, attribute.split("_file_name").first, :disabled => attribute_disabled?(attribute, klass)}</li>
     HTML
 
@@ -104,7 +101,7 @@ module Admin::FormHelper
 
   def typus_password_field(attribute, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
 #{password_field :item, attribute, :class => 'text', :disabled => attribute_disabled?(attribute, klass)}</li>
     HTML
   end
@@ -123,7 +120,7 @@ module Admin::FormHelper
         end
       end
       html << <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
 <select id="item_#{attribute}" #{attribute_disabled?(attribute) ? 'disabled="disabled"' : ''} name="item[#{attribute}]">
 <option value=""></option>
 #{options.join("\n")}
@@ -134,21 +131,21 @@ module Admin::FormHelper
 
   def typus_text_field(attribute, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
 #{text_area :item, attribute, :class => 'text', :rows => klass.typus_options_for(:form_rows), :disabled => attribute_disabled?(attribute, klass)}</li>
     HTML
   end
 
   def typus_time_field(attribute, options, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
 #{time_select :item, attribute, options, {:disabled => attribute_disabled?(attribute, klass)}}</li>
     HTML
   end
 
   def typus_tree_field(attribute, items = @resource[:class].roots, attribute_virtual = 'parent_id')
     <<-HTML
-<li><label for="item_#{attribute}">#{I18n.t(attribute.humanize, :default => attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
 <select id="item_#{attribute}" #{attribute_disabled?(attribute) ? 'disabled="disabled"' : ''} name="item[#{attribute}]">
   <option value=""></option>
   #{expand_tree_into_select_field(items, attribute_virtual)}
@@ -170,7 +167,7 @@ module Admin::FormHelper
 
     comment = %w( read_only auto_generated ).include?(value) ? "<small>#{value} field</small>".humanize : ''
 
-    attribute_humanized = I18n.t(attribute.humanize, :default => attribute.humanize)
+    attribute_humanized = _(attribute.humanize)
     attribute_humanized += " (#{attribute})" if attribute.include?('_id')
 
     <<-HTML
@@ -214,8 +211,8 @@ module Admin::FormHelper
 <a name="#{field}"></a>
 <div class="box_relationships">
   <h2>
-  #{link_to I18n.t(field.humanize, :default => field.humanize), :controller => "admin/#{field}"}
-  <small>#{link_to I18n.t("Add new", :default => "Add new"), link_options if @current_user.can_perform?(model_to_relate, 'create')}</small>
+  #{link_to _(field.humanize), :controller => "admin/#{field}"}
+  <small>#{link_to _('Add new'), link_options if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
       items = @resource[:class].find(params[:id]).send(field).find(:all, :order => model_to_relate.typus_order_by)
@@ -228,7 +225,7 @@ module Admin::FormHelper
                            options)
       else
         html << <<-HTML
-  <div id="flash" class="notice"><p>#{I18n.t("There are no {{records}}.", :records => I18n.t(field.humanize.downcase, :default => field.humanize.downcase), :default => "There are no {{records}}.")}</p></div>
+  <div id="flash" class="notice"><p>#{_("There are no {{records}}.", :records => _(field.humanize.downcase))}</p></div>
         HTML
       end
       html << <<-HTML
@@ -245,8 +242,8 @@ module Admin::FormHelper
 <a name="#{field}"></a>
 <div class="box_relationships">
   <h2>
-  #{link_to I18n.t(field.humanize, :default => field.humanize), :controller => field}
-  <small>#{link_to I18n.t("Add new", :default => "Add new"), :controller => field, :action => 'new', :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id if @current_user.can_perform?(model_to_relate, 'create')}</small>
+  #{link_to _(field.humanize), :controller => field}
+  <small>#{link_to _('Add new'), :controller => field, :action => 'new', :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
       items_to_relate = (model_to_relate.find(:all) - @item.send(field))
@@ -254,7 +251,7 @@ module Admin::FormHelper
         html << <<-HTML
   #{form_tag :action => 'relate', :id => @item.id}
   #{hidden_field :related, :model, :value => model_to_relate}
-  <p>#{ select :related, :id, items_to_relate.collect { |f| [f.typus_name, f.id] }.sort_by { |e| e.first } } &nbsp; #{submit_tag "Add", :class => 'button'}</p>
+  <p>#{ select :related, :id, items_to_relate.collect { |f| [f.typus_name, f.id] }.sort_by { |e| e.first } } &nbsp; #{submit_tag _('Add'), :class => 'button'}</p>
   </form>
         HTML
       end
@@ -263,7 +260,7 @@ module Admin::FormHelper
         html << build_list(model_to_relate, model_to_relate.typus_fields_for(:relationship), items, model_to_relate_as_resource)
       else
         html << <<-HTML
-  <div id="flash" class="notice"><p>#{I18n.t("There are no {{records}}.", :records => I18n.t(field.humanize, :default => field.humanize), :default => "There are no {{records}}.")}</p></div>
+  <div id="flash" class="notice"><p>#{_("There are no {{records}}.", :records => _(field.humanize))}</p></div>
         HTML
       end
       html << <<-HTML

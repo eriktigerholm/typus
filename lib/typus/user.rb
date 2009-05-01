@@ -18,6 +18,7 @@ module Typus
         validates_presence_of :email
         validates_uniqueness_of :email
 
+        validates_confirmation_of :password, :if => :password_required?
         validates_length_of :password, :within => 8..40, :if => :password_required?
         validates_presence_of :password, :if => :password_required?
 
@@ -45,6 +46,7 @@ module Typus
       def generate(email, password, role = Typus::Configuration.options[:root], status = true)
         new :email => email, 
             :password => password, 
+            :password_confirmation => password, 
             :role => role, 
             :status => status
       end

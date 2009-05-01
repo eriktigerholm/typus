@@ -6,7 +6,7 @@
 <%= typus_block :model => @resource[:self], :partial => :edit %>
 
 <%= display_link_to_previous if params[:back_to] %>
-<h2><%= link_to t("Dashboard", :default => "Dashboard"), admin_dashboard_path %> &rsaquo; <%= link_to t(@resource[:class_name_humanized].pluralize, :default => @resource[:class_name_humanized].pluralize), :action => 'index' %> &rsaquo; <%= t("Edit", :default => "Edit") %></h2>
+<h2><%= link_to _("Dashboard"), admin_dashboard_path %> &rsaquo; <%= link_to _(@resource[:class_name_humanized].pluralize), :action => 'index' %> &rsaquo; <%= _("Edit") %></h2>
 
 <%= typus_block :model => @resource[:self], :partial => :edit_top %>
 
@@ -18,7 +18,7 @@
                        :resource_id => params[:resource_id]},
             :html => { :multipart => true } do |f| %>
   <%= build_form(@fields) %>
-  <p><%= submit_tag t("Update entry", :default => "Update entry"), :class => 'button' %></p>
+  <p><%= submit_tag _("Update entry"), :class => 'button' %></p>
 <% end %>
 
 <%= typus_relationships %>

@@ -30,14 +30,14 @@ module Admin::SidebarHelper
     case params[:action]
     when 'index', 'edit', 'show', 'update'
       if @current_user.can_perform?(@resource[:class], 'create')
-        items << (link_to t("Add entry", :default => "Add entry"), :action => 'new')
+        items << (link_to _('Add entry'), :action => 'new')
       end
     end
 
     case params[:action]
     when 'show'
       if @current_user.can_perform?(@resource[:class], 'update')
-        items << (link_to t("Edit entry", :default => "Edit entry"), :action => 'edit', :id => @item.id)
+        items << (link_to _('Edit entry'), :action => 'edit', :id => @item.id)
       end
     end
 
@@ -45,7 +45,7 @@ module Admin::SidebarHelper
 
     case params[:action]
     when 'new', 'create', 'edit', 'show', 'update'
-      items << (link_to t("Back to list", :default => "Back to list"), :action => 'index')
+      items << (link_to _('Back to list'), :action => 'index')
     end
 
     return items
@@ -74,7 +74,7 @@ module Admin::SidebarHelper
   def build_typus_list(items, header = nil, selector = nil)
     return "" if items.empty?
     returning(String.new) do |html|
-      html << "<h2>#{I18n.t(header.humanize, :default => header.humanize)}</h2>\n" unless header.nil?
+      html << "<h2>#{_(header.humanize)}</h2>\n" unless header.nil?
       next unless selector.nil?
       html << "<ul>\n"
       items.each do |item|
@@ -104,8 +104,8 @@ module Admin::SidebarHelper
   def previous_and_next
     return [] unless %w( edit show update ).include?(params[:action])
     returning(Array.new) do |items|
-      items << (link_to I18n.t("Next", :default => "Next"), params.merge(:id => @next.id)) if @next
-      items << (link_to I18n.t("Previous", :default => "Previous"), params.merge(:id => @previous.id)) if @previous
+      items << (link_to _("Next"), params.merge(:id => @next.id)) if @next
+      items << (link_to _("Previous"), params.merge(:id => @previous.id)) if @previous
     end
   end
 
@@ -114,7 +114,7 @@ module Admin::SidebarHelper
     typus_search = @resource[:class].typus_defaults_for(:search)
     return if typus_search.empty?
 
-    search_by = typus_search.collect { |x| I18n.t(x, :default => x) }.to_sentence
+    search_by = typus_search.collect { |x| _(x) }.to_sentence
 
     search_params = params.dup
     %w( action controller search page ).each { |p| search_params.delete(p) }
@@ -122,12 +122,12 @@ module Admin::SidebarHelper
     hidden_params = search_params.map { |key, value| hidden_field_tag(key, value) }
 
     <<-HTML
-<h2>#{I18n.t("Search", :default => "Search")}</h2>
+<h2>#{_('Search')}</h2>
 <form action="" method="get">
 <p><input id="search" name="search" type="text" value="#{params[:search]}"/></p>
 #{hidden_params.sort.join("\n")}
 </form>
-<p class="tip">#{I18n.t("Search by", :default => "Search by")} #{search_by.humanize.downcase}.</p>
+<p class="tip">#{_('Search by')} #{search_by.humanize.downcase}.</p>
     HTML
 
   end
@@ -191,7 +191,7 @@ function surfto_#{model_pluralized}(form) {
 <!-- /Embedded JS -->
 <p><form class="form" action="#">
   <select name="#{model_pluralized}" onChange="surfto_#{model_pluralized}(this.form)">
-    <option value="#{url_for params_without_filter}">#{t("filter by", :default => "filter by")} #{t(model.name.humanize, :default => model.name.humanize)}</option>
+    <option value="#{url_for params_without_filter}">#{_('filter by')} #{_(model.name.humanize)}</option>
     #{items.join("\n")}
   </select>
 </form></p>
@@ -219,7 +219,7 @@ function surfto_#{model_pluralized}(form) {
     %w( today past_7_days this_month this_year ).each do |timeline|
       switch = request.include?("#{filter}=#{timeline}") ? 'on' : 'off'
       options = { "#{filter}".to_sym => timeline, :page => nil }
-      items << (link_to I18n.t(timeline.humanize, :default => timeline.humanize), params.merge(options), :class => switch)
+      items << (link_to _(timeline.humanize), params.merge(options), :class => switch)
     end
     build_typus_list(items, filter)
   end
@@ -229,7 +229,7 @@ function surfto_#{model_pluralized}(form) {
     @resource[:class].typus_boolean(filter.typus_cleaner).each do |key, value|
       switch = request.include?("#{filter.typus_cleaner}=#{key}") ? 'on' : 'off'
       options = { "#{filter.typus_cleaner}".to_sym => key, :page => nil }
-      items << (link_to I18n.t(value, :default => value), params.merge(options), :class => switch)
+      items << (link_to _(value), params.merge(options), :class => switch)
     end
     build_typus_list(items, filter)
   end

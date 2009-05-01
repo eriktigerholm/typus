@@ -76,7 +76,7 @@ end
 
 <!-- Content -->
 
-<h2><%= link_to t("Dashboard", :default => "Dashboard"), admin_dashboard_path %> &rsaquo; #{resource.humanize}</h2>
+<h2><%= link_to _("Dashboard"), admin_dashboard_path %> &rsaquo; #{resource.humanize}</h2>
 
 <p>And here we do whatever we want to ...</p>
 

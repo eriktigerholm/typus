@@ -16,29 +16,25 @@ module Admin::MasterHelper
 
     message = case
               when _params[:resource] && editing
-                I18n.t("You're updating a {{resource_from}} for {{resource_to}}", 
-                       :default => "You're updating a {{resource_from}} for {{resource_to}}.", 
-                       :resource_from =>  options[:resource_from], 
-                       :resource_to => options[:resource_to])
+                _("You're updating a {{resource_from}} for {{resource_to}}.", 
+                  :resource_from =>  options[:resource_from], 
+                  :resource_to => options[:resource_to])
               when editing
-                I18n.t("You're updating a {{resource_from}}", 
-                       :default => "You're updating a {{resource_from}}.", 
-                       :resource_from => options[:resource_from])
+                _("You're updating a {{resource_from}}.", 
+                  :resource_from => options[:resource_from])
               when _params[:resource]
-                I18n.t("You're adding a new {{resource_from}} to {{resource_to}}", 
-                       :default => "You're adding a new {{resource_from}} to {{resource_to}}.", 
-                       :resource_from => options[:resource_from], 
-                       :resource_to => options[:resource_to])
+                _("You're adding a new {{resource_from}} to {{resource_to}}.", 
+                  :resource_from => options[:resource_from], 
+                  :resource_to => options[:resource_to])
               else
-                I18n.t("You're adding a new {{resource_from}}", 
-                       :default => "You're adding a new {{resource_from}}.", 
-                       :resource_from => options[:resource_from] )
+                _("You're adding a new {{resource_from}}.", 
+                  :resource_from => options[:resource_from] )
               end
 
     returning(String.new) do |html|
       html << <<-HTML
 <div id="flash" class="notice">
-  <p>#{message} #{link_to(I18n.t("Do you want to cancel it?", :default => "Do you want to cancel it?"), _params[:back_to])}</p>
+  <p>#{message} #{link_to _("Do you want to cancel it?"), _params[:back_to]}</p>
 </div>
       HTML
     end
@@ -48,7 +44,7 @@ module Admin::MasterHelper
   def remove_filter_link(filter = request.env['QUERY_STRING'])
     return unless filter && !filter.blank?
     <<-HTML
-<small>#{link_to t("Remove filter", :default => "Remove filter")}</small>
+<small>#{link_to _('Remove filter')}</small>
     HTML
   end
 

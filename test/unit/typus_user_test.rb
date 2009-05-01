@@ -7,6 +7,7 @@ class TypusUserTest < ActiveSupport::TestCase
               :last_name => '', 
               :email => 'test@example.com', 
               :password => '12345678', 
+              :password_confirmation => '12345678', 
               :role => Typus::Configuration.options[:root] }
     @typus_user = TypusUser.new(@data)
   end
@@ -69,24 +70,53 @@ END
 
   def test_should_verify_length_of_password_when_under_within
     @typus_user.password = '1234'
+    @typus_user.password_confirmation = '1234'
     assert @typus_user.invalid?
     assert @typus_user.errors.invalid?(:password)
   end
 
   def test_should_verify_length_of_password_when_its_within_on_lower_limit
     @typus_user.password = '=' * 8
+    @typus_user.password_confirmation = '=' * 8
     assert @typus_user.valid?
   end
 
   def test_should_verify_length_of_password_when_its_within_on_upper_limit
     @typus_user.password = '=' * 40
+    @typus_user.password_confirmation = '=' * 40
     assert @typus_user.valid?
   end
 
   def test_should_verify_length_of_password_when_its_over_within
     @typus_user.password = '=' * 50
+    @typus_user.password_confirmation = '=' * 50
     assert @typus_user.invalid?
     assert @typus_user.errors.invalid?(:password)
+  end
+
+  def test_should_verify_confirmation_of_password
+
+    @typus_user.password = '12345678'
+    @typus_user.password_confirmation = '87654321'
+    assert @typus_user.invalid?
+    assert @typus_user.errors.invalid?(:password)
+
+=begin
+
+    # FIXME
+
+    @typus_user.password = '12345678'
+    @typus_user.password_confirmation = nil
+    assert @typus_user.invalid?
+    assert @typus_user.errors.invalid?(:password)
+
+=end
+
+    @typus_user.password = '12345678'
+    @typus_user.password_confirmation = ''
+    assert @typus_user.invalid?
+    assert @typus_user.errors.invalid?(:password)
+
   end
 
   def test_should_verify_role
@@ -132,7 +162,7 @@ END
     salt = @typus_user.salt
     crypted_password = @typus_user.crypted_password
 
-    @typus_user.update_attributes :password => '11111111'
+    @typus_user.update_attributes :password => '11111111', :password_confirmation => '11111111'
     assert_equal salt, @typus_user.salt
     assert_not_equal crypted_password, @typus_user.crypted_password
 

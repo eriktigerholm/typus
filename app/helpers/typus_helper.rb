@@ -27,9 +27,9 @@ module TypusHelper
           new_admin_item_path = { :controller => "admin/#{model.tableize}", :action => 'new'}
           html << <<-HTML
 <tr class="#{cycle('even', 'odd')}">
-<td>#{link_to I18n.t(model.titleize.capitalize.pluralize, :default => model.titleize.capitalize.pluralize), admin_items_path}<br /><small>#{I18n.t(description, :default => "#{description}")}</small></td>
+<td>#{link_to _(model.titleize.capitalize.pluralize), admin_items_path}<br /><small>#{description}</small></td>
 <td class="right"><small>
-#{link_to I18n.t("Add", :default => "Add"), new_admin_item_path if @current_user.can_perform?(model, 'create')}
+#{link_to _('Add'), new_admin_item_path if @current_user.can_perform?(model, 'create')}
 </small></td>
 </tr>
           HTML
@@ -60,7 +60,7 @@ module TypusHelper
       html << <<-HTML
 <table>
 <tr>
-<th colspan="2">#{I18n.t("Resources", :default => "Resources")}</th>
+<th colspan="2">#{_("Resources")}</th>
 </tr>
       HTML
 
@@ -70,7 +70,7 @@ module TypusHelper
 
         html << <<-HTML
 <tr class="#{cycle('even', 'odd')}">
-<td>#{link_to I18n.t(resource.humanize, :default => resource.humanize), resource_path}</td>
+<td>#{link_to _(resource.humanize), resource_path}</td>
 <td align="right" style="vertical-align: bottom;"></td>
 </tr>
         HTML
@@ -100,7 +100,7 @@ module TypusHelper
   def page_title(action = params[:action])
     crumbs = [ Typus::Configuration.options[:app_name] ]
     crumbs << @resource[:class_name_humanized].pluralize if @resource
-    crumbs << I18n.t(action.humanize, :default => action.humanize) unless %w( index ).include?(action)
+    crumbs << _(action.humanize) unless %w( index ).include?(action)
     return crumbs.compact.map { |x| x }.join(' &rsaquo; ')
   end
 
@@ -108,7 +108,7 @@ module TypusHelper
 
     if ActionController::Routing::Routes.named_routes.routes.keys.include?(:root)
       link_to_site = <<-HTML
-<small>#{link_to I18n.t("View site", :default => "View site"), root_path, :target => 'blank'}</small>
+<small>#{link_to _('View site'), root_path, :target => 'blank'}</small>
       HTML
     end
 
@@ -126,8 +126,8 @@ module TypusHelper
 
     <<-HTML
 <ul>
-  <li>#{I18n.t("Logged as", :default => "Logged as")} #{link_to user.full_name(:display_role => true), admin_edit_typus_user_path}</li>
-  <li>#{link_to I18n.t("Sign out", :default => "Sign out"), admin_sign_out_path }</li>
+  <li>#{_('Logged as')} #{link_to user.full_name(:display_role => true), admin_edit_typus_user_path}</li>
+  <li>#{link_to _('Sign out'), admin_sign_out_path }</li>
 </ul>
     HTML
 
@@ -161,7 +161,7 @@ module TypusHelper
     locale_links = Typus.locales.map { |l| "<a href=\"#{uri}?locale=#{l.last}\">#{l.first.downcase}</a>" }
 
     <<-HTML
-<p>#{I18n.t("Set language to", :default => "Set language to")} #{locale_links.join(', ')}.</p>
+<p>#{_('Set language to')} #{locale_links.join(', ')}.</p>
     HTML
 
   end

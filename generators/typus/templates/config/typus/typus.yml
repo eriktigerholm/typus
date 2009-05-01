@@ -1,7 +1,7 @@
 TypusUser:
   fields:
     list: email, role, status
-    form: first_name, last_name, role, email, password
+    form: first_name, last_name, role, email, password, password_confirmation
     options:
       selectors: role
       booleans:

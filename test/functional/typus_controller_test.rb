@@ -185,7 +185,7 @@ class TypusControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to admin_dashboard_path
     assert flash[:notice]
-    assert_equal "Password set to \"hocus-pocus\".", flash[:notice]
+    assert_equal "Password set to \"columbia\".", flash[:notice]
     assert @request.session[:typus_user_id]
     assert !TypusUser.find(:all).empty?
 

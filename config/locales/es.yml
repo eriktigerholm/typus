@@ -1,6 +1,7 @@
 es:
   "Email": "Correo"
   "Password": "Contraseña"
+  "Password confirmation": "Confirmar contraseña"
   "Sign in": "Entrar"
   "Recover password": "Recuperar contraseña"
   "Sign up": "Crear cuenta"
@@ -15,6 +16,7 @@ es:
   "There are not defined applications in config/typus/*.yml": "There are not defined applications in config/typus/*.yml"
   "Overview": "Visión general"
   "Options": "Opciones"
+  "Password confirm": "Confirmación de contraseña"
   "Change password": "Cambiar contraseña"
   "There are no {{records}}": "No hay {{records}}."
   "There are no {{records}} under this filter": "No hay {{records}} con este filtro."

@@ -135,6 +135,7 @@ module Typus
       end
 
       return (!value.nil?) ? value : Typus::Configuration.options[filter.to_sym]
+
     end
 
     def typus_export_formats

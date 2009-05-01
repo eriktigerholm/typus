@@ -37,8 +37,7 @@ class TypusController < ApplicationController
   # Application Dashboard
   #
   def dashboard
-    flash[:notice] = t("There are not defined applications in config/typus/*.yml.", 
-                       :default => "There are not defined applications in config/typus/*.yml.") if Typus.applications.empty?
+    flash[:notice] = _("There are not defined applications in config/typus/*.yml.") if Typus.applications.empty?
   end
 
   def sign_in
@@ -50,8 +49,7 @@ class TypusController < ApplicationController
         session[:typus_user_id] = user.id
         redirect_to params[:back_to] || admin_dashboard_path
       else
-        flash[:error] = t("The email and/or password you entered is invalid", 
-                          :default => "The email and/or password you entered is invalid.")
+        flash[:error] = _("The email and/or password you entered is invalid.")
         redirect_to admin_sign_in_path
       end
     end
@@ -68,8 +66,7 @@ class TypusController < ApplicationController
       if user = Typus.user_class.find_by_email(params[:user][:email])
         ActionMailer::Base.default_url_options[:host] = request.host_with_port
         TypusMailer.deliver_reset_password_link(user)
-        flash[:success] = t("Password recovery link sent to your email", 
-                            :default => "Password recovery link sent to your email.")
+        flash[:success] = _("Password recovery link sent to your email")
         redirect_to admin_sign_in_path
       else
         redirect_to admin_recover_password_path
@@ -84,12 +81,10 @@ class TypusController < ApplicationController
     @user = Typus.user_class.find_by_token!(params[:token])
     if request.post?
       if @user.update_attributes(params[:user])
-        flash[:success] = t("You can login with your new password", 
-                            :default => "You can login with your new password.")
+        flash[:success] = _("You can login with your new password")
         redirect_to admin_sign_in_path
       else
-        flash[:error] = t("Passwords don't match", 
-                          :default => "Passwords don't match.")
+        flash[:error] = _("Passwords don't match")
         redirect_to admin_reset_password_path, :token => params[:token]
       end
     end
@@ -101,24 +96,20 @@ class TypusController < ApplicationController
 
     if request.post?
 
-      email, password = params[:user][:email], 'hocus-pocus'
+      email, password = params[:user][:email], 'columbia'
       user = Typus.user_class.generate(email, password)
 
       if user.save
         session[:typus_user_id] = user.id
-        flash[:notice] = t("Password set to \"{{password}}\"", 
-                           :default => "Password set to \"{{password}}\".", 
-                           :password => password)
+        flash[:notice] = _("Password set to \"{{password}}\".", :password => password)
         redirect_to admin_dashboard_path
       else
-        flash[:error] = t("That doesn't seem like a valid email address", 
-                          :default => "That doesn't seem like a valid email address.")
+        flash[:error] = _("That doesn't seem like a valid email address.")
       end
 
     else
 
-      flash[:notice] = t("Enter your email below to create the first user", 
-                         :default => "Enter your email below to create the first user.")
+      flash[:notice] = _("Enter your email below to create the first user.")
 
     end
 

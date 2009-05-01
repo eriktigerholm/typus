@@ -46,15 +46,14 @@ module Admin::TableHelper
         when 'index'
           perform = link_to image_tag('admin/trash.gif'), { :action => 'destroy', 
                                                             :id => item.id }, 
-                                                            :confirm => t('Remove entry?', :default => "Remove entry?"), 
+                                                            :confirm => _('Remove entry?'), 
                                                             :method => :delete
         else
           perform = link_to image_tag('admin/trash.gif'), { :action => 'unrelate', 
                                                             :id => params[:id], 
                                                             :resource => item.class.name.tableize, 
                                                             :resource_id => item.id }, 
-                                                            :confirm => t("Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
-                                                                          :default => "Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
+                                                            :confirm => _("Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
                                                                           :unrelate_model => model.name.humanize.singularize, 
                                                                           :unrelate_model_from => @resource[:class_name])
         end
@@ -85,7 +84,7 @@ module Admin::TableHelper
       headers = []
       fields.each do |key, value|
 
-        content = I18n.t(key.humanize, :default => key.humanize)
+        content = _(key.humanize)
         content += " (#{key})" if key.include?('_id')
 
         if (model.model_fields.map(&:first).collect { |i| i.to_s }.include?(key.typus_cleaner) || model.reflect_on_all_associations(:belongs_to).map(&:name).include?(key.to_sym)) && params[:action] == 'index'
@@ -168,7 +167,7 @@ module Admin::TableHelper
                   :go => position.last }
 
       html_position << <<-HTML
-#{link_to t(position.first, :default => position.first), params.merge(options)}
+#{link_to _(position.first), params.merge(options)}
       HTML
 
     end
@@ -213,7 +212,7 @@ module Admin::TableHelper
     options = { :controller => item.class.name.tableize, :action => 'toggle', :field => attribute, :id => item.id }
 
     content = if item.class.typus_options_for(:toggle) && !item.send(attribute).nil?
-                link_to link_text, params.merge(options), :confirm => t("Change {{attribute}}?", :default => "Change {{attribute}}?", :attribute => attribute.humanize.downcase)
+                link_to link_text, params.merge(options), :confirm => _("Change {{attribute}}?", :attribute => attribute.humanize.downcase)
               else
                 link_text
               end

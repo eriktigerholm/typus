@@ -27,7 +27,7 @@ module Typus
                       :minute_step => 5, 
                       :nil => 'nil', 
                       :per_page => 15, 
-                      :sidebar_selector => 10, 
+                      :sidebar_selector => 5, 
                       :start_year => nil, 
                       :toggle => true }
 

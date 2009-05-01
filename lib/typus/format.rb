@@ -25,7 +25,7 @@ module Typus
 
       fields = @resource[:class].typus_fields_for(:csv).collect { |i| i.first }
       csv_string = FasterCSV.generate do |csv|
-        csv << fields.map { |f| I18n.t(f.humanize, :default => f.humanize) }
+        csv << fields.map { |f| _(f.humanize) }
         data.each do |item|
           csv << fields.map { |f| item.send(f) }
         end
