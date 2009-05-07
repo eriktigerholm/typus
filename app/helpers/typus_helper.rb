@@ -27,7 +27,7 @@ module TypusHelper
           new_admin_item_path = { :controller => "admin/#{model.tableize}", :action => 'new'}
           html << <<-HTML
 <tr class="#{cycle('even', 'odd')}">
-<td>#{link_to _(model.titleize.capitalize.pluralize), admin_items_path}<br /><small>#{description}</small></td>
+<td>#{link_to _(model.constantize.human_name.pluralize), admin_items_path}<br /><small>#{description}</small></td>
 <td class="right"><small>
 #{link_to _('Add'), new_admin_item_path if @current_user.can_perform?(model, 'create')}
 </small></td>
@@ -88,7 +88,7 @@ module TypusHelper
   def typus_block(*args)
 
     options = args.extract_options!
-    template = [ 'admin', options[:model], options[:location], "_#{options[:partial]}.html.erb" ].compact.join('/')
+    template = [ 'admin', options[:resource], options[:location], "_#{options[:partial]}.html.erb" ].compact.join('/')
 
     exists = ActionController::Base.view_paths.map { |vp| File.exists?("#{Rails.root}/#{vp}/#{template}") }
 
@@ -99,7 +99,7 @@ module TypusHelper
 
   def page_title(action = params[:action])
     crumbs = [ Typus::Configuration.options[:app_name] ]
-    crumbs << @resource[:class_name_humanized].pluralize if @resource
+    crumbs << @resource[:class].human_name.pluralize if @resource
     crumbs << _(action.humanize) unless %w( index ).include?(action)
     return crumbs.compact.map { |x| x }.join(' &rsaquo; ')
   end

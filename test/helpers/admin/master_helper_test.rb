@@ -9,7 +9,7 @@ class Admin::MasterHelperTest < ActiveSupport::TestCase
 
   def test_display_link_to_previous
 
-    output = display_link_to_previous('Post', { :action => 'edit', :back_to => '/back_to_param' })
+    output = display_link_to_previous(Post, { :action => 'edit', :back_to => '/back_to_param' })
     expected = <<-HTML
 <div id="flash" class="notice">
   <p>You're updating a Post. <a href="/back_to_param">Do you want to cancel it?</a></p>

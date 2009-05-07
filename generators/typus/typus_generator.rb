@@ -48,6 +48,9 @@ class TypusGenerator < Rails::Generator::Base
         # attributes.
         form = model.columns.reject { |c| %w( id created_at updated_at ).include?(c.name) }.map(&:name)
 
+        # By default we want to show all model columns in the show action.
+        show = model.columns.map(&:name)
+
         # Detect relationships using reflection and remove the _id part from 
         # attributes when relationships is defined in ActiveRecord.
         list.each do |i|
@@ -58,7 +61,7 @@ class TypusGenerator < Rails::Generator::Base
         end
 
         # Detect relationships using reflection.
-        relationships = [ :belongs_to, :has_and_belongs_to_many, :has_many ].map do |relationship|
+        relationships = [ :belongs_to, :has_and_belongs_to_many, :has_many, :has_one ].map do |relationship|
                           model.reflect_on_all_associations(relationship).map { |i| i.name.to_s }
                         end.flatten.sort
 
@@ -67,6 +70,7 @@ class TypusGenerator < Rails::Generator::Base
   fields:
     list: #{list.join(', ')}
     form: #{form.join(', ')}
+    show: #{show.join(', ')}
     relationship:
     options:
       auto_generated:

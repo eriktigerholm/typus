@@ -66,7 +66,7 @@ class TypusController < ApplicationController
       if user = Typus.user_class.find_by_email(params[:user][:email])
         ActionMailer::Base.default_url_options[:host] = request.host_with_port
         TypusMailer.deliver_reset_password_link(user)
-        flash[:success] = _("Password recovery link sent to your email")
+        flash[:success] = _("Password recovery link sent to your email.")
         redirect_to admin_sign_in_path
       else
         redirect_to admin_recover_password_path
@@ -81,10 +81,10 @@ class TypusController < ApplicationController
     @user = Typus.user_class.find_by_token!(params[:token])
     if request.post?
       if @user.update_attributes(params[:user])
-        flash[:success] = _("You can login with your new password")
+        flash[:success] = _("You can login with your new password.")
         redirect_to admin_sign_in_path
       else
-        flash[:error] = _("Passwords don't match")
+        flash[:error] = _("Passwords don't match.")
         redirect_to admin_reset_password_path, :token => params[:token]
       end
     end

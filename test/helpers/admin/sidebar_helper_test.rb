@@ -61,43 +61,6 @@ class Admin::SidebarHelperTest < ActiveSupport::TestCase
     assert true
   end
 
-  def test_non_crud_actions
-
-    @resource = { :class => Page }
-    @current_user = typus_users(:admin)
-
-    # Index without params
-
-    params = { :controller => 'admin/pages', :action => 'index' }
-    self.expects(:params).at_least_once.returns(params)
-
-    output = non_crud_actions
-    expected = [ "<a href=\"http://test.host/admin/pages/rebuild_all\">Rebuild all</a>" ]
-    assert output.kind_of?(Array)
-    assert_equal expected, output
-
-    # Index with params
-
-    params = { :controller => 'admin/pages', :action => 'index', :status => true }
-    self.expects(:params).at_least_once.returns(params)
-
-    output = non_crud_actions
-    expected = [ "<a href=\"http://test.host/admin/pages/rebuild_all?status=true\">Rebuild all</a>" ]
-    assert output.kind_of?(Array)
-    assert_equal expected, output
-
-    # Edit
-
-    params = { :controller => 'admin/pages', :action => 'edit', :id => 1 }
-    self.expects(:params).at_least_once.returns(params)
-
-    output = non_crud_actions
-    expected = [ "<a href=\"http://test.host/admin/pages/rebuild/1\">Rebuild</a>" ]
-    assert output.kind_of?(Array)
-    assert_equal expected, output
-
-  end
-
   def test_export
 
     @resource = { :class => CustomUser }
@@ -112,20 +75,22 @@ class Admin::SidebarHelperTest < ActiveSupport::TestCase
 
   end
 
-  def test_build_typus_list
-
-    output = build_typus_list([], header = nil)
+  def test_build_typus_list_with_empty_content_and_empty_header
+    output = build_typus_list([], :header => nil)
     assert output.empty?
+  end
 
-    output = build_typus_list(['item1', 'item2'], "Chunky Bacon")
+  def test_build_typus_list_with_content_and_header
+    output = build_typus_list(['item1', 'item2'], :header => "Chunky Bacon")
     assert !output.empty?
     assert_match /Chunky bacon/, output
+  end
 
+  def test_build_typus_list_with_content_without_header
     output = build_typus_list(['item1', 'item2'])
     assert !output.empty?
     assert_no_match /h2/, output
     assert_no_match /\/h2/, output
-
   end
 
   def test_modules
@@ -297,27 +262,6 @@ class Admin::SidebarHelperTest < ActiveSupport::TestCase
 <ul>
 <li><a href="http://test.host/admin/typus_users?status=true" class="off">Active</a></li>
 <li><a href="http://test.host/admin/typus_users?status=false" class="on">Inactive</a></li>
-</ul>
-    HTML
-    assert_equal expected, output
-
-  end
-
-  def test_boolean_filter_with_question_mark
-
-    @resource = { :class => Page, :self => 'pages' }
-    filter = 'is_published?'
-
-    params = { :controller => 'admin/pages', :action => 'index' }
-    self.expects(:params).at_least_once.returns(params)
-
-    request = 'is_published=false&page=1'
-    output = boolean_filter(request, filter)
-    expected = <<-HTML
-<h2>Is published?</h2>
-<ul>
-<li><a href="http://test.host/admin/pages?is_published=true" class="off">Yes, it is</a></li>
-<li><a href="http://test.host/admin/pages?is_published=false" class="on">No, it isn't</a></li>
 </ul>
     HTML
     assert_equal expected, output

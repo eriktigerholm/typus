@@ -1,0 +1,14 @@
+en:
+  activerecord:
+    models:
+      typus_user: "Typus user"
+
+es:
+  activerecord:
+    models:
+      typus_user: "Typus user"
+
+br:
+  activerecord:
+    models:
+      typus_user: "Typus user"

@@ -8,8 +8,4 @@ class String
     Typus::Configuration.config[self][filter.to_s].split(', ') rescue []
   end
 
-  def typus_cleaner
-    delete('?')
-  end
-
 end

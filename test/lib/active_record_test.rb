@@ -30,7 +30,8 @@ class ActiveRecordTest < ActiveSupport::TestCase
                        [:favorite_comment_id, :integer],
                        [:created_at, :datetime],
                        [:updated_at, :datetime],
-                       [:published_at, :datetime]]
+                       [:published_at, :datetime], 
+                       [:typus_user_id, :integer]]
     assert_equal expected_fields.map { |i| i.first }, Post.model_fields.keys
     assert_equal expected_fields.map { |i| i.last }, Post.model_fields.values
   end
@@ -87,13 +88,6 @@ class ActiveRecordTest < ActiveSupport::TestCase
     klass = Class.new(ActiveRecord::Base)
     assert_equal expected_fields, klass.typus_fields_for(:form)
     assert_equal expected_fields, klass.typus_fields_for(:list)
-  end
-
-  def test_should_return_typus_fields_for_a_model_which_contains_question_marks
-    expected_fields = [['title', :string],
-                       ['is_published?', :boolean]]
-    assert_equal expected_fields.map { |i| i.first }, Page.typus_fields_for(:list).keys
-    assert_equal expected_fields.map { |i| i.last }, Page.typus_fields_for(:list).values
   end
 
   def test_should_return_typus_fields_for_relationship_for_typus_user

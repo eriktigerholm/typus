@@ -1,15 +1,17 @@
 <% content_for :sidebar do %>
-  <%= typus_block :model => @resource[:self], :partial => :new_sidebar %>
+  <%= typus_block :resource => @resource[:self], :partial => :new_sidebar %>
   <%= actions %>
 <% end %>
 
-<%= typus_block :model => @resource[:self], :partial => :new %>
+<%= typus_block :resource => @resource[:self], :partial => :new %>
 
 <%= display_link_to_previous if params[:back_to] %>
 
-<h2><%= link_to _("Dashboard"), admin_dashboard_path %> &rsaquo; <%= link_to _(@resource[:class_name_humanized].pluralize), :action => 'index' %> &rsaquo; <%= _('New') %></h2>
+<h2><%= link_to _('Dashboard'), admin_dashboard_path %> &rsaquo; 
+    <%= link_to _(@resource[:class].human_name.pluralize), :action => 'index' %> &rsaquo; 
+    <%= _('New') %></h2>
 
-<%= typus_block :model => @resource[:self], :partial => :new_top %>
+<%= typus_block :resource => @resource[:self], :partial => :new_top %>
 
 <% form_for @item, 
             :url  => { :action => 'create', 
@@ -22,4 +24,4 @@
   <p><%= submit_tag _('Create entry'), :class => 'button' %></p>
 <% end %>
 
-<%= typus_block :model => @resource[:self], :partial => :new_bottom %>
+<%= typus_block :resource => @resource[:self], :partial => :new_bottom %>

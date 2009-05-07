@@ -1,15 +1,16 @@
 <% content_for :sidebar do %>
-  <%= typus_block :model => @resource[:self], :partial => :index_sidebar %>
+  <%= typus_block :resource => @resource[:self], :partial => :index_sidebar %>
   <%= actions %>
   <%= search %>
   <%= filters %>
 <% end %>
 
-<%= typus_block :model => @resource[:self], :partial => :index %>
+<%= typus_block :resource => @resource[:self], :partial => :index %>
 
-<h2><%= link_to _("Dashboard"), admin_dashboard_path %> &rsaquo; <%= _(@resource[:class_name_humanized].pluralize) %> <%= remove_filter_link %></h2>
+<h2><%= link_to _('Dashboard'), admin_dashboard_path %> &rsaquo; 
+    <%= _(@resource[:class].human_name.pluralize) %> <%= remove_filter_link %></h2>
 
-<%= typus_block :model => @resource[:self], :partial => :index_top %>
+<%= typus_block :resource => @resource[:self], :partial => :index_top %>
 
 <% unless @items.count.zero? -%>
   <%= build_list(@resource[:class], @fields, @items) %>
@@ -17,11 +18,11 @@
 <% else %>
   <div id="flash" class="notice">
     <% if @resource[:class].count.zero? %>
-      <p><%= _("There are no {{records}}.", :records => @resource[:class_name_humanized].pluralize.downcase) %></p>
+      <p><%= _("There are no {{records}}.", :records => @resource[:class].human_name.pluralize.downcase) %></p>
     <% else %>
-      <p><%= _("There are no {{records}} under this filter.", :records => @resource[:class_name_humanized].pluralize.downcase) %></p>
+      <p><%= _("There are no {{records}} under this filter.", :records => @resource[:class].human_name.pluralize.downcase) %></p>
     <% end %>
   </div>
 <% end %>
 
-<%= typus_block :model => @resource[:self], :partial => :index_bottom %>
+<%= typus_block :resource => @resource[:self], :partial => :index_bottom %>

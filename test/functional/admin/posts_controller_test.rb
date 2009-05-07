@@ -138,7 +138,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
     post_ = posts(:published)
     @request.env['HTTP_REFERER'] = "/admin/posts/edit/#{post_.id}#categories"
     assert_difference('category.posts.count', 0) do
-      post :unrelate, { :id => post_.id, :resource => 'categories', :resource_id => category.id }
+      post :unrelate, { :id => post_.id, :resource => 'Category', :resource_id => category.id, :association => 'has_and_belongs_to_many' }
     end
     assert_response :redirect
     assert flash[:success]
@@ -156,7 +156,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
     @request.env['HTTP_REFERER'] = "/admin/posts/edit/#{post_.id}#assets"
 
     assert_difference('post_.assets.count', -1) do
-      get :unrelate, { :id => post_.id, :resource => 'assets', :resource_id => post_.assets.first.id }
+      get :unrelate, { :id => post_.id, :resource => 'Asset', :resource_id => post_.assets.first.id, :association => 'has_many' }
     end
 
     assert_response :redirect
@@ -203,8 +203,9 @@ class Admin::PostsControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to :action => 'index'
     assert !flash[:success]
-    assert flash[:warning]
-    assert_match /Toggle is disabled/, flash[:warning]
+    assert !flash[:error]
+    assert flash[:notice]
+    assert_equal "Toggle is disabled.", flash[:notice]
 
   end
 
@@ -232,5 +233,46 @@ class Admin::PostsControllerTest < ActionController::TestCase
   end
 
 =end
+
+  def test_should_verify_root_can_edit_any_record
+    Post.find(:all).each do |post|
+      get :edit, { :id => post.id }
+      assert_response :success
+      assert_template 'edit'
+    end
+  end
+
+  def test_should_verify_editor_can_view_all_records
+    Post.find(:all).each do |post|
+      get :show, { :id => post.id }
+      assert_response :success
+      assert_template 'show'
+    end
+  end
+
+  def test_should_verify_editor_can_edit_their_records
+
+    typus_user = typus_users(:editor)
+    @request.session[:typus_user_id] = typus_user.id
+
+    post = posts(:owned_by_editor)
+    get :edit, { :id => post.id }
+    assert_response :success
+
+  end
+
+  def test_should_verify_editor_cannot_edit_other_users_records
+
+    typus_user = typus_users(:editor)
+    @request.session[:typus_user_id] = typus_user.id
+
+    post = posts(:owned_by_admin)
+    get :edit, { :id => post.id }
+    assert_response :redirect
+    assert_redirected_to :action => 'show', :id => post.id
+    assert flash[:notice]
+    assert_equal "Record owned by another user.", flash[:notice]
+
+  end
 
 end

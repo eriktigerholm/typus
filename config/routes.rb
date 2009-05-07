@@ -1,7 +1,3 @@
-class << ActionController::Routing::Routes;self;end.class_eval do
-  define_method :clear!, lambda {}
-end
-
 ActionController::Routing::Routes.draw do |map|
 
   map.with_options :controller => 'typus', :path_prefix => 'admin' do |i|

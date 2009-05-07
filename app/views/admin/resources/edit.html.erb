@@ -1,14 +1,17 @@
 <% content_for :sidebar do %>
-  <%= typus_block :model => @resource[:self], :partial => :edit_sidebar %>
+  <%= typus_block :resource => @resource[:self], :partial => :edit_sidebar %>
   <%= actions %>
 <% end %>
 
-<%= typus_block :model => @resource[:self], :partial => :edit %>
+<%= typus_block :resource => @resource[:self], :partial => :edit %>
 
 <%= display_link_to_previous if params[:back_to] %>
-<h2><%= link_to _("Dashboard"), admin_dashboard_path %> &rsaquo; <%= link_to _(@resource[:class_name_humanized].pluralize), :action => 'index' %> &rsaquo; <%= _("Edit") %></h2>
 
-<%= typus_block :model => @resource[:self], :partial => :edit_top %>
+<h2><%= link_to _('Dashboard'), admin_dashboard_path %> &rsaquo; 
+    <%= link_to _(@resource[:class].human_name.pluralize), :action => 'index' %> &rsaquo; 
+    <%= _('Edit') %></h2>
+
+<%= typus_block :resource => @resource[:self], :partial => :edit_top %>
 
 <% form_for @item, 
             :url  => { :action => 'update',
@@ -18,9 +21,9 @@
                        :resource_id => params[:resource_id]},
             :html => { :multipart => true } do |f| %>
   <%= build_form(@fields) %>
-  <p><%= submit_tag _("Update entry"), :class => 'button' %></p>
+  <p><%= submit_tag _('Update entry'), :class => 'button' %></p>
 <% end %>
 
 <%= typus_relationships %>
 
-<%= typus_block :model => @resource[:self], :partial => :edit_bottom %>
+<%= typus_block :resource => @resource[:self], :partial => :edit_bottom %>

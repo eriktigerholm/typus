@@ -38,6 +38,7 @@ ActiveRecord::Schema.define do
     t.integer :favorite_comment_id
     t.timestamps
     t.datetime :published_at
+    t.integer :typus_user_id
   end
 
   create_table :typus_users, :force => true do |t|

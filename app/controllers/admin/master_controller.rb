@@ -21,19 +21,27 @@ class Admin::MasterController < ApplicationController
   before_filter :set_locale
 
   before_filter :set_resource
-  before_filter :find_item, :only => [ :show, :edit, :update, :destroy, :toggle, :position, :relate, :unrelate ]
+  before_filter :find_item, 
+                :only => [ :show, :edit, :update, :destroy, :toggle, :position, :relate, :unrelate ]
 
-  before_filter :check_ownership_of_item, :only => [ :edit, :update, :toggle, :position, :relate, :unrelate, :destroy ]
+  before_filter :check_ownership_of_item, 
+                :only => [ :edit, :update, :destroy, :toggle, :position, :relate, :unrelate ]
 
-  before_filter :check_if_user_can_perform_action_on_user, :only => [ :edit, :update, :toggle, :destroy ]
+  before_filter :check_if_user_can_perform_action_on_user, 
+                :only => [ :edit, :update, :toggle, :destroy ]
   before_filter :check_if_user_can_perform_action_on_resource
 
-  before_filter :set_order_and_list_fields, :only => [ :index ]
-  before_filter :set_form_fields, :only => [ :new, :edit, :create, :update ]
+  before_filter :set_order, 
+                :only => [ :index ]
+  before_filter :set_fields, 
+                :only => [ :index, :new, :edit, :create, :update, :show ]
 
   ##
-  # This is the main index of the model. With the filters, conditions 
-  # and more. You can get HTML, CSV and XML listings.
+  # This is the main index of the model. With filters, conditions 
+  # and more.
+  #
+  # By default application can respond_to html, csv and xml, but you 
+  # can add your formats.
   #
   def index
 
@@ -82,7 +90,7 @@ class Admin::MasterController < ApplicationController
     if @item.valid?
       create_with_back_to and return if params[:back_to]
       @item.save
-      flash[:success] = _("{{model}} successfully created", :model => @resource[:class_name_humanized])
+      flash[:success] = _("{{model}} successfully created.", :model => @resource[:class].human_name)
       if @resource[:class].typus_options_for(:index_after_save)
         redirect_to :action => 'index'
       else
@@ -125,12 +133,13 @@ class Admin::MasterController < ApplicationController
   #
   def update
     if @item.update_attributes(params[:item])
-      flash[:success] = _("{{model}} successfully updated.", :model => @resource[:class_name_humanized])
-      if @resource[:class].typus_options_for(:index_after_save)
-        redirect_to params[:back_to] ? "#{params[:back_to]}##{@resource[:self]}" : { :action => 'index' }
-      else
-        redirect_to :action => @resource[:class].typus_options_for(:default_action_on_item), :id => @item.id
-      end
+      flash[:success] = _("{{model}} successfully updated.", :model => @resource[:class].human_name)
+      path = if @resource[:class].typus_options_for(:index_after_save)
+               params[:back_to] ? "#{params[:back_to]}##{@resource[:self]}" : { :action => 'index' }
+             else
+               { :action => @resource[:class].typus_options_for(:default_action_on_item), :id => @item.id }
+             end
+      redirect_to path
     else
       @previous, @next = @item.previous_and_next
       select_template :edit
@@ -142,7 +151,7 @@ class Admin::MasterController < ApplicationController
   #
   def destroy
     @item.destroy
-    flash[:success] = _("{{model}} successfully removed.", :model => @resource[:class_name_humanized])
+    flash[:success] = _("{{model}} successfully removed.", :model => @resource[:class].human_name)
     redirect_to :back
   rescue Exception => error
     error_handler(error, params.merge(:action => 'index', :id => nil))
@@ -155,10 +164,10 @@ class Admin::MasterController < ApplicationController
     if @resource[:class].typus_options_for(:toggle)
       @item.toggle!(params[:field])
       flash[:success] = _("{{model}} {{attribute}} changed.", 
-                          :model => @resource[:class_name_humanized], 
+                          :model => @resource[:class].human_name, 
                           :attribute => params[:field].humanize.downcase)
     else
-      flash[:warning] = _("Toggle is disabled")
+      flash[:notice] = _("Toggle is disabled.")
     end
     redirect_to :back
   end
@@ -179,20 +188,19 @@ class Admin::MasterController < ApplicationController
   end
 
   ##
-  # Relate a model object to another.
+  # Relate a model object to another, this action is used only by the 
+  # has_and_belongs_to_many relationships.
   #
   def relate
 
     resource_class = params[:related][:model].constantize
     resource_tableized = params[:related][:model].tableize
-    resource_id = params[:related][:id]
-    resource = resource_class.find(resource_id)
 
-    @item.send(params[:related][:model].tableize) << resource
+    @item.send(resource_tableized) << resource_class.find(params[:related][:id])
 
-    flash[:success] = _("{{model_a}} related to {{model_b}}", 
-                        :model_a => resource_class.name.humanize, 
-                        :model_b => @resource[:class_name_humanized])
+    flash[:success] = _("{{model_a}} related to {{model_b}}.", 
+                        :model_a => resource_class.human_name, 
+                        :model_b => @resource[:class].human_name)
 
     redirect_to :action => @resource[:class].typus_options_for(:default_action_on_item), 
                 :id => @item.id, 
@@ -206,46 +214,31 @@ class Admin::MasterController < ApplicationController
   def unrelate
 
     resource_class = params[:resource].classify.constantize
-    resource_tableized = params[:resource]
-    resource_id = params[:resource_id]
-    resource = resource_class.find(resource_id)
+    resource = resource_class.find(params[:resource_id])
 
-    case @resource[:class].reflect_on_association(params[:resource].to_sym).macro
-    when :has_and_belongs_to_many
-      @item.send(params[:resource]).delete(resource)
-      flash[:success] = _("{{model_a}} unrelated from {{model_b}}", 
-                          :model_a => resource_class.name.humanize, 
-                          :model_b => @resource[:class_name_humanized])
-    when :has_many
+    case params[:association]
+    when 'has_and_belongs_to_many'
+      @item.send(resource_class.table_name).delete(resource)
+      message = "{{model_a}} unrelated from {{model_b}}."
+    when 'has_many', 'has_one'
       resource.destroy
-      flash[:success] = _("{{model_a}} removed from {{model_b}}", 
-                          :model_a => resource_class.name.humanize, 
-                          :model_b => @resource[:class_name_humanized])
+      message = "{{model_a}} removed from {{model_b}}."
     end
+
+    flash[:success] = _(message, :model_a => resource_class.human_name, :model_b => @resource[:class].human_name)
 
     redirect_to :controller => @resource[:self], 
                 :action => @resource[:class].typus_options_for(:default_action_on_item), 
                 :id => @item.id, 
-                :anchor => resource_tableized
+                :anchor => resource_class.table_name
 
   end
 
 private
 
-  ##
-  # Set current resource.
-  #
   def set_resource
-
     resource = params[:controller].split('/').last
-
-    @resource = {}
-    @resource[:self] = resource
-    @resource[:class] = resource.classify.constantize
-    @resource[:table_name] = resource.classify.constantize.table_name
-    @resource[:class_name] = resource.classify
-    @resource[:class_name_humanized] = resource.humanize.singularize
-
+    @resource = { :self => resource, :class => resource.classify.constantize }
   rescue Exception => error
     error_handler(error)
   end
@@ -275,85 +268,71 @@ private
 
     # If item is owned by the user ...
     unless @item.send(Typus.user_fk) == session[:typus_user_id]
-      flash[:notice] = _("Record owned by another user")
+      flash[:notice] = _("Record owned by another user.")
       redirect_to :action => 'show', :id => @item.id
     end
 
   end
 
-  ##
-  # Set fields and order when performing an index action.
-  #
-  def set_order_and_list_fields
-    # Set a default sort_order.
+  def set_fields
+    @fields = case params[:action]
+              when 'index'
+                @resource[:class].typus_fields_for(:list)
+              when 'new', 'edit', 'create', 'update'
+                @resource[:class].typus_fields_for(:form)
+              else
+                @resource[:class].typus_fields_for(params[:action])
+              end
+  end
+
+  def set_order
     params[:sort_order] ||= 'desc'
-    # Get @fields & @order.
-    @fields = @resource[:class].typus_fields_for(:list)
-    @order = params[:order_by] ? "#{@resource[:table_name]}.#{params[:order_by]} #{params[:sort_order]}" : @resource[:class].typus_order_by
+    @order = params[:order_by] ? "#{@resource[:class].table_name}.#{params[:order_by]} #{params[:sort_order]}" : @resource[:class].typus_order_by
   end
 
-  ##
-  # Set fields and detect relationships.
-  #
-  def set_form_fields
-    @fields = @resource[:class].typus_fields_for(:form)
-    @item_relationships = @resource[:class].typus_defaults_for(:relationships)
-  end
-
-  ##
-  # Select which template to render.
-  #
   def select_template(template, resource = @resource[:self])
     folder = (File.exists?("app/views/admin/#{resource}/#{template}.html.erb")) ? resource : 'resources'
     render :template => "admin/#{folder}/#{template}"
   end
 
   ##
-  # Used by create when params[:back_to] is defined.
+  # When <tt>params[:back_to]</tt> is defined this action is used.
+  #
+  # - <tt>has_and_belongs_to_many</tt> relationships.
+  # - <tt>has_many</tt> relationships (polymorphic ones).
   #
   def create_with_back_to
 
     if params[:resource] && params[:resource_id]
-
       resource_class = params[:resource].classify.constantize
       resource_id = params[:resource_id]
       resource = resource_class.find(resource_id)
-
-      begin
-
-        case @resource[:class].reflect_on_association(params[:resource].to_sym).macro
-        when :has_and_belongs_to_many
-          @item.save
-          @item.send(params[:resource]) << resource
-        when :has_many
-          resource.send(@item.class.name.tableize).create(params[:item])
-        end
-
-      rescue
-
-        # OPTIMIZE: Polimorphic
-        resource.send(@item.class.name.tableize).create(params[:item])
-
-      end
-
-      flash[:success] = _("{{model_a}} successfully assigned to {{model_b}}.", 
-                          :model_a => @item.class, 
-                          :model_b => resource_class.name)
-      redirect_to "#{params[:back_to]}##{@resource[:self]}"
-
+      association = @resource[:class].reflect_on_association(params[:resource].to_sym).macro rescue :polymorphic
     else
-
-      @item.save
-      flash[:success] = _("{{model}} successfully created", :model => @resource[:class_name_humanized])
-      redirect_to "#{params[:back_to]}?#{params[:selected]}=#{@item.id}"
-
+      association = :has_many
     end
+
+    case association
+    when :belongs_to
+      @item.save
+    when :has_and_belongs_to_many
+      @item.save
+      @item.send(params[:resource]) << resource
+    when :has_many
+      @item.save
+      message = _("{{model}} successfully created.", :model => @resource[:class].human_name)
+      path = "#{params[:back_to]}?#{params[:selected]}=#{@item.id}"
+    when :polymorphic
+      resource.send(@item.class.name.tableize).create(params[:item])
+    end
+
+    flash[:success] = message || _("{{model_a}} successfully assigned to {{model_b}}.", 
+                                 :model_a => @item.class, 
+                                 :model_b => resource_class.name)
+    redirect_to path || "#{params[:back_to]}##{@resource[:self]}"
 
   end
 
-  ##
-  # Error handler
-  #
   def error_handler(error, path = admin_dashboard_path)
     raise error unless Rails.env.production?
     flash[:error] = "#{error.message} (#{@resource[:class]})"

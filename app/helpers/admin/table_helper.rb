@@ -1,6 +1,6 @@
 module Admin::TableHelper
 
-  def build_typus_table(model, fields, items, link_options = {})
+  def build_typus_table(model, fields, items, link_options = {}, association = nil)
 
     returning(String.new) do |html|
 
@@ -18,7 +18,7 @@ module Admin::TableHelper
 
         fields.each do |key, value|
           case value
-          when :boolean:           html << typus_table_boolean_field(key.typus_cleaner, item)
+          when :boolean:           html << typus_table_boolean_field(key, item)
           when :datetime:          html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
           when :date:              html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
           when :time:              html << typus_table_datetime_field(key, item, fields.keys.first, link_options)
@@ -51,11 +51,12 @@ module Admin::TableHelper
         else
           perform = link_to image_tag('admin/trash.gif'), { :action => 'unrelate', 
                                                             :id => params[:id], 
-                                                            :resource => item.class.name.tableize, 
+                                                            :association => association, 
+                                                            :resource => model, 
                                                             :resource_id => item.id }, 
                                                             :confirm => _("Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
-                                                                          :unrelate_model => model.name.humanize.singularize, 
-                                                                          :unrelate_model_from => @resource[:class_name])
+                                                                          :unrelate_model => model.human_name, 
+                                                                          :unrelate_model_from => @resource[:class].human_name)
         end
 
         html << <<-HTML
@@ -84,16 +85,16 @@ module Admin::TableHelper
       headers = []
       fields.each do |key, value|
 
-        content = _(key.humanize)
+        content = model.human_attribute_name(key)
         content += " (#{key})" if key.include?('_id')
 
-        if (model.model_fields.map(&:first).collect { |i| i.to_s }.include?(key.typus_cleaner) || model.reflect_on_all_associations(:belongs_to).map(&:name).include?(key.to_sym)) && params[:action] == 'index'
+        if (model.model_fields.map(&:first).collect { |i| i.to_s }.include?(key) || model.reflect_on_all_associations(:belongs_to).map(&:name).include?(key.to_sym)) && params[:action] == 'index'
           sort_order = case params[:sort_order]
                        when 'asc':  'desc'
                        when 'desc': 'asc'
                        end
-          order_by = model.reflect_on_association(key.to_sym).primary_key_name rescue key.typus_cleaner
-          switch = (params[:order_by] == key.typus_cleaner) ? sort_order : ''
+          order_by = model.reflect_on_association(key.to_sym).primary_key_name rescue key
+          switch = (params[:order_by] == key) ? sort_order : ''
           options = { :order_by => order_by, :sort_order => sort_order }
           content = (link_to "<div class=\"#{switch}\">#{content}</div>", params.merge(options))
         end
@@ -212,7 +213,7 @@ module Admin::TableHelper
     options = { :controller => item.class.name.tableize, :action => 'toggle', :field => attribute, :id => item.id }
 
     content = if item.class.typus_options_for(:toggle) && !item.send(attribute).nil?
-                link_to link_text, params.merge(options), :confirm => _("Change {{attribute}}?", :attribute => attribute.humanize.downcase)
+                link_to link_text, params.merge(options), :confirm => _("Change {{attribute}}?", :attribute => item.class.human_attribute_name(attribute).downcase)
               else
                 link_text
               end

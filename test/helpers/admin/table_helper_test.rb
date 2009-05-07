@@ -208,7 +208,7 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
 
     output = typus_table_datetime_field(:created_at, post)
     expected = <<-HTML
-<td>11/07</td>
+<td>#{post.created_at.strftime('%m/%y')}</td>
     HTML
 
     assert_equal expected, output
@@ -222,7 +222,7 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
 
     output = typus_table_datetime_field(:created_at, post, :created_at)
     expected = <<-HTML
-<td><a href="http://test.host/admin/posts/edit/#{post.id}">11/07</a></td>
+<td><a href="http://test.host/admin/posts/edit/#{post.id}">#{post.created_at.strftime('%m/%y')}</a></td>
     HTML
 
     assert_equal expected, output

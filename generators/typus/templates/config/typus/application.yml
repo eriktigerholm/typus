@@ -6,6 +6,7 @@
 #   fields:
 #     list: id, title, category_id, created_at, is_published?
 #     form: title, body, is_published?, created_at
+#     show: title, category, is_published?
 #     relationship: title, status
 #     options:
 #       auto_generated:

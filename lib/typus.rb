@@ -41,7 +41,7 @@ module Typus
     # Returns a list of the submodules of a module.
     #
     def module(name)
-      Typus::Configuration.config.collect { |i| i.first if i.last['module'] == name }.compact.uniq.sort
+      Typus::Configuration.config.collect { |i| i.first if i.last['module'] == name.name }.compact.uniq.sort
     end
 
     ##
@@ -51,7 +51,7 @@ module Typus
     #  Typus::Configuration.config['Post']['application']
     #
     def parent(model, name)
-      Typus::Configuration.config[model][name] || ''
+      Typus::Configuration.config[model.name][name] || ''
     end
 
     ##
@@ -116,7 +116,6 @@ module Typus
 
       # Rails Extensions
       require 'typus/active_record'
-      require 'typus/routes'
 
       # Mixins
       require 'typus/authentication'

@@ -5,17 +5,17 @@ module Admin::SidebarHelper
     returning(String.new) do |html|
 
       html << <<-HTML
-#{build_typus_list(default_actions, 'actions')}
-#{build_typus_list(previous_and_next, 'go_to')}
+#{build_typus_list(default_actions, :header => 'actions')}
+#{build_typus_list(previous_and_next, :header => 'go_to')}
       HTML
 
       html << <<-HTML
-#{build_typus_list(export, 'export')}
+#{build_typus_list(export, :header => 'export')}
       HTML
 
       %w( parent_module submodules ).each do |block|
         html << <<-HTML
-#{build_typus_list(modules(block), block)}
+#{build_typus_list(modules(block), :header => block)}
         HTML
       end
 
@@ -41,7 +41,11 @@ module Admin::SidebarHelper
       end
     end
 
-    items += non_crud_actions
+    @resource[:class].typus_actions_for(params[:action]).each do |action|
+      if @current_user.can_perform?(@resource[:class], action)
+        items << (link_to action.humanize, params.merge(:action => action))
+      end
+    end
 
     case params[:action]
     when 'new', 'create', 'edit', 'show', 'update'
@@ -50,16 +54,6 @@ module Admin::SidebarHelper
 
     return items
 
-  end
-
-  def non_crud_actions
-    returning(Array.new) do |actions|
-      @resource[:class].typus_actions_for(params[:action]).each do |action|
-        if @current_user.can_perform?(@resource[:class], action)
-          actions << (link_to action.humanize, params.merge(:action => action))
-        end
-      end
-    end
   end
 
   def export
@@ -71,24 +65,34 @@ module Admin::SidebarHelper
     end
   end
 
-  def build_typus_list(items, header = nil, selector = nil)
-    return "" if items.empty?
+  def build_typus_list(items, *args)
+
+    options = args.extract_options!
+
+    header = if options[:header]
+               _(options[:header].humanize)
+             elsif options[:attribute]
+               @resource[:class].human_attribute_name(options[:attribute])
+             end
+
+    return String.new if items.empty?
     returning(String.new) do |html|
-      html << "<h2>#{_(header.humanize)}</h2>\n" unless header.nil?
-      next unless selector.nil?
+      html << "<h2>#{header}</h2>\n" unless header.nil?
+      next unless options[:selector].nil?
       html << "<ul>\n"
       items.each do |item|
         html << "<li>#{item}</li>\n"
       end
       html << "</ul>\n"
     end
+
   end
 
   def modules(name)
 
     models = case name
-             when 'parent_module': Typus.parent(@resource[:class_name], 'module')
-             when 'submodules':    Typus.module(@resource[:class_name])
+             when 'parent_module': Typus.parent(@resource[:class], 'module')
+             when 'submodules':    Typus.module(@resource[:class])
              end
 
     return [] if models.empty?
@@ -104,8 +108,8 @@ module Admin::SidebarHelper
   def previous_and_next
     return [] unless %w( edit show update ).include?(params[:action])
     returning(Array.new) do |items|
-      items << (link_to _("Next"), params.merge(:id => @next.id)) if @next
-      items << (link_to _("Previous"), params.merge(:id => @previous.id)) if @previous
+      items << (link_to _('Next'), params.merge(:id => @next.id)) if @next
+      items << (link_to _('Previous'), params.merge(:id => @previous.id)) if @previous
     end
   end
 
@@ -114,7 +118,7 @@ module Admin::SidebarHelper
     typus_search = @resource[:class].typus_defaults_for(:search)
     return if typus_search.empty?
 
-    search_by = typus_search.collect { |x| _(x) }.to_sentence
+    search_by = typus_search.collect { |x| @resource[:class].human_attribute_name(x) }.to_sentence
 
     search_params = params.dup
     %w( action controller search page ).each { |p| search_params.delete(p) }
@@ -127,7 +131,7 @@ module Admin::SidebarHelper
 <p><input id="search" name="search" type="text" value="#{params[:search]}"/></p>
 #{hidden_params.sort.join("\n")}
 </form>
-<p class="tip">#{_('Search by')} #{search_by.humanize.downcase}.</p>
+<p class="tip">#{_('Search by')} #{search_by.downcase}.</p>
     HTML
 
   end
@@ -141,7 +145,6 @@ module Admin::SidebarHelper
 
     returning(String.new) do |html|
       typus_filters.each do |key, value|
-        value = :boolean if key.include?('?')
         case value
         when :boolean:      html << boolean_filter(current_request, key)
         when :string:       html << string_filter(current_request, key)
@@ -150,7 +153,7 @@ module Admin::SidebarHelper
         when :has_and_belongs_to_many:
           html << relationship_filter(current_request, key, true)
         else
-          html << "<p>Unknown</p>"
+          html << "<p>#{_('Unknown')}</p>"
         end
       end
     end
@@ -191,7 +194,7 @@ function surfto_#{model_pluralized}(form) {
 <!-- /Embedded JS -->
 <p><form class="form" action="#">
   <select name="#{model_pluralized}" onChange="surfto_#{model_pluralized}(this.form)">
-    <option value="#{url_for params_without_filter}">#{_('filter by')} #{_(model.name.humanize)}</option>
+    <option value="#{url_for params_without_filter}">#{_('filter by')} #{_(model.human_name)}</option>
     #{items.join("\n")}
   </select>
 </form></p>
@@ -204,34 +207,41 @@ function surfto_#{model_pluralized}(form) {
       end
 
       if form
-        html << build_typus_list(items, filter, true)
+        html << build_typus_list(items, :attribute => filter, :selector => true)
         html << form
       else
-        html << build_typus_list(items, filter)
+        html << build_typus_list(items, :attribute => filter)
       end
 
     end
 
   end
 
+  ##
+  # Thinking in update datetime_filters to ...
+  #
+  #     %w( today last_few_days last_7_days last_30_days )
+  #
+  # ... which are the ones used by 'exception_logger'.
+  #
   def datetime_filter(request, filter)
     items = []
     %w( today past_7_days this_month this_year ).each do |timeline|
       switch = request.include?("#{filter}=#{timeline}") ? 'on' : 'off'
-      options = { "#{filter}".to_sym => timeline, :page => nil }
+      options = { filter.to_sym => timeline, :page => nil }
       items << (link_to _(timeline.humanize), params.merge(options), :class => switch)
     end
-    build_typus_list(items, filter)
+    build_typus_list(items, :attribute => filter)
   end
 
   def boolean_filter(request, filter)
     items = []
-    @resource[:class].typus_boolean(filter.typus_cleaner).each do |key, value|
-      switch = request.include?("#{filter.typus_cleaner}=#{key}") ? 'on' : 'off'
-      options = { "#{filter.typus_cleaner}".to_sym => key, :page => nil }
+    @resource[:class].typus_boolean(filter).each do |key, value|
+      switch = request.include?("#{filter}=#{key}") ? 'on' : 'off'
+      options = { filter.to_sym => key, :page => nil }
       items << (link_to _(value), params.merge(options), :class => switch)
     end
-    build_typus_list(items, filter)
+    build_typus_list(items, :attribute => filter)
   end
 
   def string_filter(request, filter)
@@ -240,10 +250,10 @@ function surfto_#{model_pluralized}(form) {
     values.each do |item|
       link_name, link_filter = (values.first.kind_of?(Array)) ? [ item.first, item.last ] : [ item, item ]
       switch = request.include?("#{filter}=#{link_filter}") ? 'on' : 'off'
-      options = { "#{filter}".to_sym => link_filter, :page => nil }
+      options = { filter.to_sym => link_filter, :page => nil }
       items << (link_to link_name.capitalize, params.merge(options), :class => switch)
     end
-    build_typus_list(items, filter)
+    build_typus_list(items, :attribute => filter)
   end
 
 end

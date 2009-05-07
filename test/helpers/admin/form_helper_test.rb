@@ -28,6 +28,8 @@ class Admin::FormHelperTest < ActiveSupport::TestCase
     <small></small>
     </label>
 <select id="item_post_id" name="item[post_id]"><option value=""></option>
+<option value="3">Post#3</option>
+<option value="4">Post#4</option>
 <option value="1">Post#1</option>
 <option value="2">Post#2</option></select></li>
     HTML
@@ -48,7 +50,7 @@ class Admin::FormHelperTest < ActiveSupport::TestCase
 
     expected = <<-HTML
 <li><label for="item_favorite_comment">Favorite comment
-    <small><a href="http://test.host/admin/comments/new?back_to=%2Fadmin%2Fpost%2Fedit%2F1&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost.\\n\\nClick OK to continue, or click Cancel to stay on this page.');">Add new</a></small>
+    <small><a href="http://test.host/admin/comments/new?back_to=%2Fadmin%2Fpost%2Fedit%2F1&selected=favorite_comment_id" onclick="return confirm('Are you sure you want to leave this page?\\n\\nIf you have made any changes to the fields without clicking the Save/Update entry button, your changes will be lost.\\n\\nClick OK to continue, or click Cancel to stay on this page.');">Add</a></small>
     </label>
 <select id="item_favorite_comment_id" name="item[favorite_comment_id]"><option value=""></option>
 <option value="1">John</option>
@@ -67,19 +69,6 @@ class Admin::FormHelperTest < ActiveSupport::TestCase
     expected = <<-HTML
 <li><label for="item_test">Test</label>
 <input name="item[test]" type="hidden" value="0" /><input id="item_test" name="item[test]" type="checkbox" value="1" /> Checked if active</li>
-               HTML
-
-    assert_equal expected, output
-
-  end
-
-  def test_typus_boolean_field_with_question_mark
-
-    output = typus_boolean_field('is_published?', Post)
-
-    expected = <<-HTML
-<li><label for="item_is_published?">Is published?</label>
-<input name="item[is_published]" type="hidden" value="0" /><input id="item_is_published" name="item[is_published]" type="checkbox" value="1" /> Checked if active</li>
                HTML
 
     assert_equal expected, output
@@ -233,7 +222,7 @@ class Admin::FormHelperTest < ActiveSupport::TestCase
 <div class="box_relationships">
   <h2>
   <a href="http://test.host/admin/comments">Comments</a>
-  <small><a href="http://test.host/admin/comments/new?resource=posts">Add new</a></small>
+  <small><a href="http://test.host/admin/comments/new?resource=post&resource_id=1">Add new</a></small>
   </h2>
 <!-- a_nice_list --></div>
     HTML
@@ -258,7 +247,7 @@ class Admin::FormHelperTest < ActiveSupport::TestCase
 <div class="box_relationships">
   <h2>
   <a href="http://test.host/admin/comments">Comments</a>
-  <small><a href="http://test.host/admin/comments/new?resource=posts">Add new</a></small>
+  <small><a href="http://test.host/admin/comments/new?resource=post&resource_id=1">Add new</a></small>
   </h2>
   <div id="flash" class="notice"><p>There are no comments.</p></div>
 </div>

@@ -15,8 +15,8 @@ class TypusHelperTest < ActiveSupport::TestCase
     assert true
   end
 
-  def test_typus_block
-    output = typus_block(:model => 'posts', :location => 'sidebar', :partial => 'pum')
+  def test_typus_block_when_partial_does_not_exist
+    output = typus_block(:resource => 'posts', :location => 'sidebar', :partial => 'pum')
     assert output.nil?
   end
 

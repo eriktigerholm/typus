@@ -29,7 +29,7 @@ class TypusTest < ActiveSupport::TestCase
 
   def test_should_return_modules_of_a_module
     assert Typus.respond_to?(:module)
-    assert_equal %w( Category ), Typus.module('Post')
+    assert_equal %w( Category ), Typus.module(Post)
   end
 
   def test_should_verify_parent_exists
@@ -48,13 +48,13 @@ class TypusTest < ActiveSupport::TestCase
 =end
 
   def test_should_verify_parent_for_application
-    assert Typus.parent(TypusUser.name, 'application').kind_of?(String)
-    assert_equal 'Typus', Typus.parent(TypusUser.name, 'application')
+    assert Typus.parent(TypusUser, 'application').kind_of?(String)
+    assert_equal 'Typus', Typus.parent(TypusUser, 'application')
   end
 
   def test_should_verify_parent_for_nothing
-    assert Typus.parent(TypusUser.name, 'nothing').kind_of?(String)
-    assert_equal '', Typus.parent(TypusUser.name, 'nothing')
+    assert Typus.parent(TypusUser, 'nothing').kind_of?(String)
+    assert_equal '', Typus.parent(TypusUser, 'nothing')
   end
 
   def test_should_return_models_and_should_be_sorted

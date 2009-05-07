@@ -69,21 +69,21 @@ module Admin::FormHelper
 
   def typus_boolean_field(attribute, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 #{check_box :item, attribute} #{_('Checked if active')}</li>
     HTML
   end
 
   def typus_date_field(attribute, options, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 #{date_select :item, attribute, options, { :disabled => attribute_disabled?(attribute, klass)} }</li>
     HTML
   end
 
   def typus_datetime_field(attribute, options, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 #{datetime_select :item, attribute, options, {:disabled => attribute_disabled?(attribute, klass)}}</li>
     HTML
   end
@@ -101,12 +101,12 @@ module Admin::FormHelper
 
   def typus_password_field(attribute, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 #{password_field :item, attribute, :class => 'text', :disabled => attribute_disabled?(attribute, klass)}</li>
     HTML
   end
 
-  def typus_selector_field(attribute)
+  def typus_selector_field(attribute, klass = @resource[:class])
     returning(String.new) do |html|
       options = []
       @resource[:class].send(attribute).each do |option|
@@ -120,7 +120,7 @@ module Admin::FormHelper
         end
       end
       html << <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 <select id="item_#{attribute}" #{attribute_disabled?(attribute) ? 'disabled="disabled"' : ''} name="item[#{attribute}]">
 <option value=""></option>
 #{options.join("\n")}
@@ -131,21 +131,21 @@ module Admin::FormHelper
 
   def typus_text_field(attribute, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 #{text_area :item, attribute, :class => 'text', :rows => klass.typus_options_for(:form_rows), :disabled => attribute_disabled?(attribute, klass)}</li>
     HTML
   end
 
   def typus_time_field(attribute, options, klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 #{time_select :item, attribute, options, {:disabled => attribute_disabled?(attribute, klass)}}</li>
     HTML
   end
 
-  def typus_tree_field(attribute, items = @resource[:class].roots, attribute_virtual = 'parent_id')
+  def typus_tree_field(attribute, items = @resource[:class].roots, attribute_virtual = 'parent_id', klass = @resource[:class])
     <<-HTML
-<li><label for="item_#{attribute}">#{_(attribute.humanize)}</label>
+<li><label for="item_#{attribute}">#{klass.human_attribute_name(attribute)}</label>
 <select id="item_#{attribute}" #{attribute_disabled?(attribute) ? 'disabled="disabled"' : ''} name="item[#{attribute}]">
   <option value=""></option>
   #{expand_tree_into_select_field(items, attribute_virtual)}
@@ -167,7 +167,7 @@ module Admin::FormHelper
 
     comment = %w( read_only auto_generated ).include?(value) ? "<small>#{value} field</small>".humanize : ''
 
-    attribute_humanized = _(attribute.humanize)
+    attribute_humanized = klass.human_attribute_name(attribute)
     attribute_humanized += " (#{attribute})" if attribute.include?('_id')
 
     <<-HTML
@@ -182,12 +182,14 @@ module Admin::FormHelper
     @back_to = '/' + [ params[:controller], params[:action], params[:id] ].compact.join('/')
 
     returning(String.new) do |html|
-      @item_relationships.each do |relationship|
+      @resource[:class].typus_defaults_for(:relationships).each do |relationship|
         case @resource[:class].reflect_on_association(relationship.to_sym).macro
-        when :has_many
-          html << typus_form_has_many(relationship)
         when :has_and_belongs_to_many
           html << typus_form_has_and_belongs_to_many(relationship)
+        when :has_many
+          html << typus_form_has_many(relationship)
+        when :has_one
+          html << typus_form_has_one(relationship)
         end
       end
     end
@@ -196,22 +198,26 @@ module Admin::FormHelper
 
   def typus_form_has_many(field)
     returning(String.new) do |html|
+
       model_to_relate = @resource[:class].reflect_on_association(field.to_sym).class_name.constantize
       model_to_relate_as_resource = model_to_relate.name.tableize
 
-      foreign_key = @resource[:class].reflections[field.to_sym].primary_key_name
+      reflection = @resource[:class].reflect_on_association(field.to_sym)
+      association = reflection.macro
+      foreign_key = reflection.primary_key_name
 
       link_options = { :controller => "admin/#{field}", 
                        :action => 'new', 
                        :back_to => @back_to, 
-                       :resource => @resource[:self], 
+                       :resource => @resource[:self].singularize, 
+                       :resource_id => @item.id, 
                        foreign_key => @item.id }
 
       html << <<-HTML
 <a name="#{field}"></a>
 <div class="box_relationships">
   <h2>
-  #{link_to _(field.humanize), :controller => "admin/#{field}"}
+  #{link_to model_to_relate.human_name.pluralize, :controller => "admin/#{model_to_relate_as_resource}"}
   <small>#{link_to _('Add new'), link_options if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
@@ -222,10 +228,11 @@ module Admin::FormHelper
                            model_to_relate.typus_fields_for(:relationship), 
                            items, 
                            model_to_relate_as_resource, 
-                           options)
+                           options, 
+                           association)
       else
         html << <<-HTML
-  <div id="flash" class="notice"><p>#{_("There are no {{records}}.", :records => _(field.humanize.downcase))}</p></div>
+  <div id="flash" class="notice"><p>#{_("There are no {{records}}.", :records => model_to_relate.human_name.pluralize.downcase)}</p></div>
         HTML
       end
       html << <<-HTML
@@ -236,13 +243,18 @@ module Admin::FormHelper
 
   def typus_form_has_and_belongs_to_many(field)
     returning(String.new) do |html|
+
       model_to_relate = @resource[:class].reflect_on_association(field.to_sym).class_name.constantize
       model_to_relate_as_resource = model_to_relate.name.tableize
+
+      reflection = @resource[:class].reflect_on_association(field.to_sym)
+      association = reflection.macro
+
       html << <<-HTML
 <a name="#{field}"></a>
 <div class="box_relationships">
   <h2>
-  #{link_to _(field.humanize), :controller => field}
+  #{link_to model_to_relate.human_name.pluralize, :controller => "admin/#{model_to_relate_as_resource}"}
   <small>#{link_to _('Add new'), :controller => field, :action => 'new', :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id if @current_user.can_perform?(model_to_relate, 'create')}</small>
   </h2>
       HTML
@@ -257,10 +269,52 @@ module Admin::FormHelper
       end
       items = @resource[:class].find(params[:id]).send(field)
       unless items.empty?
-        html << build_list(model_to_relate, model_to_relate.typus_fields_for(:relationship), items, model_to_relate_as_resource)
+        html << build_list(model_to_relate, 
+                           model_to_relate.typus_fields_for(:relationship), 
+                           items, 
+                           model_to_relate_as_resource, 
+                           {}, 
+                           association)
       else
         html << <<-HTML
-  <div id="flash" class="notice"><p>#{_("There are no {{records}}.", :records => _(field.humanize))}</p></div>
+  <div id="flash" class="notice"><p>#{_("There are no {{records}}.", :records => model_to_relate.human_name.pluralize.downcase)}</p></div>
+        HTML
+      end
+      html << <<-HTML
+</div>
+      HTML
+    end
+  end
+
+  def typus_form_has_one(field)
+    returning(String.new) do |html|
+
+      model_to_relate = @resource[:class].reflect_on_association(field.to_sym).class_name.constantize
+      model_to_relate_as_resource = model_to_relate.name.tableize
+
+      reflection = @resource[:class].reflect_on_association(field.to_sym)
+      association = reflection.macro
+
+      html << <<-HTML
+<a name="#{field}"></a>
+<div class="box_relationships">
+  <h2>
+  #{link_to model_to_relate.human_name, :controller => "admin/#{model_to_relate_as_resource}"}
+  </h2>
+      HTML
+      items = Array.new
+      items << @resource[:class].find(params[:id]).send(field) unless @resource[:class].find(params[:id]).send(field).nil?
+      unless items.empty?
+        options = { :back_to => @back_to, :resource => @resource[:self], :resource_id => @item.id }
+        html << build_list(model_to_relate, 
+                           model_to_relate.typus_fields_for(:relationship), 
+                           items, 
+                           model_to_relate_as_resource, 
+                           options, 
+                           association)
+      else
+        html << <<-HTML
+  <div id="flash" class="notice"><p>#{_("There is no {{records}}.", :records => model_to_relate.human_name.downcase)}</p></div>
         HTML
       end
       html << <<-HTML
