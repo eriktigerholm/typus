@@ -87,7 +87,7 @@ class TypusController < ApplicationController
         redirect_to admin_sign_in_path
       else
         flash[:error] = _("Passwords don't match.")
-        redirect_to admin_reset_password_path, :token => params[:token]
+        redirect_to admin_reset_password_path(:token => params[:token])
       end
     end
   end
