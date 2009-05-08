@@ -117,6 +117,13 @@ class TypusControllerTest < ActionController::TestCase
 
   end
 
+  def test_should_only_be_allowed_to_reset_password
+    typus_user = typus_users(:admin)
+    post :reset_password, { :token => typus_user.token, :user => { :password => 'drowssap', :password_confirmation => 'drowssap', :role => 'superadmin' } }
+    typus_user.reload
+    assert_not_equal typus_user.role, 'superadmin'
+  end
+
   def test_should_return_404_when_reseting_passsowrd_if_token_is_invalid
     assert_raise(ActiveRecord::RecordNotFound) { get :reset_password, { :token => 'INVALID' } }
   end

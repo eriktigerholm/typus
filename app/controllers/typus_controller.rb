@@ -80,7 +80,9 @@ class TypusController < ApplicationController
   def reset_password
     @user = Typus.user_class.find_by_token!(params[:token])
     if request.post?
-      if @user.update_attributes(params[:user])
+      @user.password = params[:user][:password]
+      @user.password_confirmation = params[:user][:password_confirmation]
+      if @user.save
         flash[:success] = _("You can login with your new password.")
         redirect_to admin_sign_in_path
       else
